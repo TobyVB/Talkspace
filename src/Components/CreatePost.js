@@ -52,27 +52,32 @@ export default function CreatePost(props){
 
     return (
         <>
-            <h1>Create Post</h1>
-            {auth.currentUser && 
-            <form className="chat-message-form" onSubmit={createPost}>
-                <input 
-                    type="text" 
-                    placeholder="title" 
-                    value={formValueTitle} 
-                    onChange={(event) => setFormValueTitle(event.target.value)} 
-                />
-                <textarea 
-                    className="sendChatMessageInput" 
-                    cols={120} 
-                    value={formValueBody} 
-                    onChange={(event) => setFormValueBody(event.target.value)} 
-                    placeholder="create post" 
-                />
-                <button className="sendChatMessage-btn" type="submit" disabled={!formValueTitle}>📧</button>
-            </form>
-            }
-            <p>{formValueTitle}</p>
-            <p>{formValueBody}</p>
+            <div className="create-post page-body">
+                <h1>Create Post</h1>
+                {auth.currentUser && 
+                <form className="create-post-form" onSubmit={createPost}>
+                    <input 
+                        className="create-post-title"
+                        type="text" 
+                        placeholder="Add post title..." 
+                        value={formValueTitle} 
+                        onChange={(event) => setFormValueTitle(event.target.value)} 
+                    />
+                    <hr></hr>
+                    <textarea 
+                        className="create-post-body" 
+                        cols={120} 
+                        value={formValueBody} 
+                        onChange={(event) => setFormValueBody(event.target.value)} 
+                        placeholder="Add post body..." 
+                    />
+                    <button className="sendChatMessage-btn" type="submit" disabled={!formValueTitle}>create post</button>
+                </form>
+                }
+                <p>Title: {formValueTitle}</p>
+                <p>Body:{formValueBody}</p>
+            </div>
+            
         </>
     )
 }

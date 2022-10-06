@@ -69,6 +69,8 @@ export default function SendMessage(props){
         {auth.currentUser && 
             <form className="chat-message-form" onSubmit={sendMessage}>
                 <textarea className="sendChatMessageInput" 
+                    autoFocus
+                    rows={2}
                     cols={120} 
                     value={formValue} 
                     onChange={(event) => setFormValue(event.target.value)} 
@@ -77,7 +79,7 @@ export default function SendMessage(props){
                     className="sendChatMessage-btn" 
                     type="submit" 
                     disabled={!formValue}
-                >📧</button>
+                >send</button>
             </form>
         }
         </>

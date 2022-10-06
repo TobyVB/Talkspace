@@ -36,11 +36,11 @@ export default function ViewProfile(props){
     useEffect(() => {
         const q = query(usersRef, orderBy('createdAt'))
         onSnapshot(q, async (snapshot) => {
-            snapshot.docs.forEach((doc => {
+            snapshot.docs.forEach(doc => {
                 if(doc.data().uid === auth.currentUser.uid){
                     setCurrentUser({ ...doc.data(), id: doc.id})
                 }
-            }))
+            })
         })
     },[])
 
@@ -100,7 +100,6 @@ export default function ViewProfile(props){
             defPicLoc: `${url === null? props.defPicLoc: defPicLoc}`,
             aboutMe: `${aboutMeValue === ""? props.aboutMe: aboutMeValue}`
         })
-        console.log(`shit is updating!`)
         setShowSettings(false)
     }
     // ########## S A V E   C H A N G E S ##########
@@ -158,7 +157,6 @@ export default function ViewProfile(props){
         }).catch((error) => {
             console.log(error.message)
         })
-        console.log(`ran submitImage function`)
     };
 // #############################################################################
 // #############################################################################
@@ -183,8 +181,8 @@ export default function ViewProfile(props){
                         {`${props.aboutMe !== undefined? currentUser.aboutMe: ""}`}
                     </p>
                 </div>
+                <h3>POSTS</h3>
                 <div className="foundUser-posts">
-                    <h3>POSTS</h3>
                     <hr></hr>
                     {posts && posts.map(post => post.uid === currentUser.uid && <Post id={post.id} key={post.id} title={post.title}/>)}
                 </div>

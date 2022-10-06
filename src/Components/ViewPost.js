@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useState, useRef} from "react";
 import { useCollectionData } from 'react-firebase-hooks/firestore';
 import { nanoid } from 'nanoid';
 
@@ -10,7 +10,6 @@ import CreateComment from "./CreateComment.js";
 import Comment from "./Comment.js";
 
 export default function ViewPost(props){
-    console.log("viewPost.js")
     const db = getFirestore();
     const commentsRef = collection(db, 'comments');
     const q = query(commentsRef, orderBy('createdAt'));
@@ -53,26 +52,51 @@ export default function ViewPost(props){
         })
     },[foundPost])
 
-    
+
+
+    const scrollTarget = useRef();
+    const scrollingTop = (event) => {
+        const elmnt = scrollTarget;
+        elmnt.current.scrollIntoView({
+          behavior: "smooth",
+          block: "center",
+          inline: "start"
+        });
+    };
+    setTimeout(()=> {
+        if(props.capturedUnique !== ""){scrollingTop();}
+    }, 200)
+        
+    function resetUnique(){props.setCapturedUnique("");}
+    function doNothing(){}
+
+
     return (
         <div className="page-body post">
-            <div className="post-header-text">
-                <h2>{foundPost.title}</h2>
-                <p 
-                    className="post-author"
-                    onClick={() => props.sendUID(foundUser.uid)}>author: {foundUser.username}
-                </p>
+            <div>
+                <div className="post-header-text">
+                    <h2>{foundPost.title}</h2>
+                    <p 
+                        className="post-author"
+                        onClick={() => props.sendUID(foundUser.uid)}>author: {foundUser.username}
+                    </p>
+                </div>
+                <div className="post-body">
+                    <p>{foundPost.body}</p>
+                </div>
             </div>
             
-            <p>{foundPost.body}</p>
 
             {/* write new comment */}
             <CreateComment 
                 capturedPostId={props.capturedPostId}
+                id={foundUser.id}
+                uid={foundUser.uid}
             />
             {/* comments here */}
+            
             <div className="chatMessages">
-                {comments && comments.map(comment => comment.replyTo === props.capturedPostId && <Comment 
+                {comments && comments.map((comment) => comment.replyTo === props.capturedPostId && <div key={nanoid()}><Comment 
                     comment={comment.body}
                     createdAt={comment.createdAt}
                     approval={comment.approval} 
@@ -85,10 +109,15 @@ export default function ViewPost(props){
                     defaultPic={comment.defaultPic}
                     key={nanoid()}
                     comments={comments}
-                    page={props.page}
-                />)}
+                    unique={comment.unique}
+                    capturedUnique={props.capturedUnique}
+                    resetUnique={comment.unique===props.capturedUnique?resetUnique:doNothing}
+                    capturedPostId={props.capturedPostId}
+                />  
+                {props.capturedUnique===comment.unique&&<div ref={scrollTarget}></div>}
+                </div>)}
             </div>
-
         </div>
     )
+    
 }

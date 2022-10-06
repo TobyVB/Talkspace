@@ -9,7 +9,6 @@ import ChatMessage from "./ChatMessage.js";
 import SendMessage from "./SendMessage.js";
 
 
-
 export default function Chatroom(props) {
     const db = getFirestore()
     // const auth = getAuth();
@@ -58,6 +57,7 @@ export default function Chatroom(props) {
     return (
     <>
       <div className="chatroom page-body">
+        <h1>Chatroom!</h1>
         <div className="chatbox">
           <main>
             <p className="endOfChat">beginning of chat...</p>

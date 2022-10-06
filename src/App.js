@@ -1,14 +1,16 @@
 import './App.css';
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
 import {initializeApp} from 'firebase/app';
 import {getAuth} from 'firebase/auth';
 import {getFirestore, onSnapshot,
    collection, query, orderBy
 } from 'firebase/firestore';
+import {useCollectionData} from "react-firebase-hooks/firestore";
 import { useAuthState } from 'react-firebase-hooks/auth';
 
 import {getStorage} from "firebase/storage";
 
+import Notifications from './Components/Notifications';
 import Homepage from "./Components/Homepage.js";
 import ViewProfile from './Components/ViewProfile.js';
 import Login from './Components/Login.js';
@@ -58,7 +60,6 @@ function App() {
         let users = []
         snapshot.docs.forEach((doc) => {
         users.push({ ...doc.data()})
-        // console.log(users)
         })
         users.forEach(user => {
           if(user.uid === auth.currentUser.uid){
@@ -69,6 +70,28 @@ function App() {
       setAllowLogin(false)
     }
   }
+
+  // user alerts/notifications
+  // show bell icon at navbar, when clicked show alerts/notifications
+  // if any alerts/notification, there will be a number of the amount of
+  // missed alerts there are. There will also be a chime each time a new one
+  // is recieved.
+
+  // New doc under notication collection will be created.
+  //  there will be a "to" field, which will store the users doc id, rather than uid
+  //  there will be a "from" field, which will store the notification initiator if there
+  //  is one. For example; a commentor, replier, follower, poster (if you're following)...
+  //  there will be a "type" field, this can be 'reply', 'comment', 'followed', etc
+  
+  // I can look through all notifications, and grab all the onces that are "to" the currentUser
+  // Would do this on every state change in app.js...
+
+
+  const [notifyWindow, setNotifyWindow] = useState(false)
+  function toggleNotifyWindow(){
+    setNotifyWindow(prevNotifyWindow => !prevNotifyWindow);
+  }
+
   
   updateAccess();
   const viewHome = 0;
@@ -80,6 +103,9 @@ function App() {
   const viewCreatePost = 6;
   const viewPost = 7;
   const [page, setPage] = useState(0);
+  function startViewHome(){
+    setPage(0);
+  }
   function startViewChatroom(){
     // put update access here, because this is the first 
     // location user moves to after logging in or Registering.
@@ -104,6 +130,17 @@ function App() {
   function startViewPost(){
     setPage(7);
   }
+  const [startUp, setStartUp] = useState(false)
+  function restartPage(){
+    setPage(99);
+    setStartUp(true)
+  }
+  useEffect(() => {
+    if(startUp === true){
+      startViewPost();
+      setStartUp(false);
+    }
+  }, [startUp])
 
   const [useNavClassNone, setUseNavClassNone] = useState(true) 
   const navClassNone = useNavClassNone? "none": ""
@@ -115,27 +152,47 @@ function App() {
     setUseNavClassNone(true);
   }
   
-  console.log(page);
 
-  const [capturedUID, setCapturedUID] = useState("")
+
+  const [capturedUID, setCapturedUID] = useState("");
   const sendUID = (e) => {
-    // console.log(e)
     setCapturedUID(e);
     startViewOtherProfile();
   }
-
-  const [capturedPostId, setCapturedPostId] = useState("")
+// ############################################################
+  const [capturedPostId, setCapturedPostId] = useState("");
   const sendPostId = (e) => {
     setCapturedPostId(e);
+    console.log("this is the postId I'm grabbing! "+e)
+    startViewPost()
+  }
+// ############################################################
+  const [capturedUnique, setCapturedUnique] = useState("");
+  const sendUnique = (e) => {
+    setCapturedUnique(e)
   }
 
   if(page !== 7){sessionStorage.clear();}
-  
+
+  const notificationsRef = collection(db, 'notifications');
+  const notifyQ = query(notificationsRef, orderBy('createdAt'));
+  const [notifications] = useCollectionData(notifyQ, {
+        createdAt: 'createdAt',
+        unique: 'unique',
+        to: 'to',
+        from: 'from',
+        type: 'type',
+        message: 'message',
+        postId: 'postId'
+  })
+
+
   return (
     <div className="App">
       <header>
         <div className="header">
-          <h1>TalkSpace</h1>
+          <h1 onClick={startViewHome}>TalkSpace</h1>
+          <button className="bell" onClick={toggleNotifyWindow}>🛎<span className="notification-num">{notifications && notifications.length > 0 && notifications.length}</span></button>
           <button className="showNav" onClick={showMenu}>menu</button>
         </div>
         <div className={`login-header-buttons  ${navClassNone}`}
@@ -181,10 +238,21 @@ function App() {
       </header>
     
       <section>
+        {/* NOTIFICATIONS */}
+      {notifyWindow 
+      && <Notifications 
+        toggleNotifyWindow={toggleNotifyWindow} 
+        uid={auth.currentUser.uid} 
+        sendPostId={sendPostId}
+        toPost={startViewPost}
+        restartPage={restartPage}
+        sendUnique={sendUnique}
+      />}
+
         {/* PROFILE */}
       {auth.currentUser && page === viewProfile 
       && <ViewProfile username={userData.username} 
-        defaultPic={userData.defaultPic}
+        defaultPic={userData.defaultPic}   
         defPicLoc={userData.defPicLoc}
         aboutMe={userData.aboutMe}
         updatePage={startViewPost}
@@ -200,7 +268,7 @@ function App() {
         sendUID={sendUID}/>}
 
         {/* HOMEPAGE */}
-      {!auth.currentUser && page === viewHome 
+      {page === viewHome 
       && <Homepage />}
 
         {/* HOME */}
@@ -234,8 +302,12 @@ function App() {
         username={userData.username} 
         defaultPic={userData.defaultPic}
         sendUID={sendUID}
-        page={page}
+        capturedUnique={capturedUnique}
+        setCapturedUnique={setCapturedUnique}
       />}
+      <div className="footer">
+        <h3>tobcvb@gmail.com 2022</h3>
+      </div>
     </div>
   );
 }

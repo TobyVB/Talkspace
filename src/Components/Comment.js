@@ -4,7 +4,7 @@ import {arrayRemove, arrayUnion, doc,
    query, orderBy, onSnapshot,
    serverTimestamp, addDoc
 } from 'firebase/firestore'
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import Clock from "./Utils/Clock.js";
 
 import { nanoid } from 'nanoid';
@@ -14,10 +14,9 @@ export default function Comment(props){
     const db = getFirestore()
     const { body, uid, username } = props.comment;
 
-    
-
-
     const commentsRef = collection(db, 'comments');
+    const notifyRef = collection(db, 'notifications');
+
     const [formValue, setFormValue] = useState('');
 
 
@@ -26,7 +25,7 @@ export default function Comment(props){
 
     function updateApprove(e){
         e.stopPropagation();
-        const docRef = doc(db, 'comments', props.id)
+        const docRef = props.type === "reply" ? doc(db, 'comments', props.commentId) : doc(db, 'comments', props.id)
         updateDoc(docRef, {
             approval: arrayUnion(auth.currentUser.uid),
             disapproval: arrayRemove(auth.currentUser.uid)
@@ -39,7 +38,7 @@ export default function Comment(props){
     }
     function updateDisapprove(e){
         e.stopPropagation();
-        const docRef = doc(db, 'comments', props.id)
+        const docRef = props.type === "reply" ? doc(db, 'comments', props.commentId) : doc(db, 'comments', props.id)
         updateDoc(docRef, {
             approval: arrayRemove(auth.currentUser.uid),
             disapproval: arrayUnion(auth.currentUser.uid)
@@ -90,6 +89,7 @@ export default function Comment(props){
         })
     },[])
 
+    const [unique, setUnique] = useState(nanoid())
 
     function createComment(e){
         e.preventDefault()
@@ -102,7 +102,8 @@ export default function Comment(props){
             replyTo: props.id,
             username: currentUser.username,
             defaultPic: currentUser.defaultPic,
-            type: props.type
+            type: props.type,
+            unique: `${props.type?props.unique:unique}`,
         })
         .then(() => {
             setFormValue('');
@@ -122,10 +123,35 @@ export default function Comment(props){
                 })
             })
         })
-        e.preventDefault()
+        // create notification for the replyTo
+        .then(() => {
+            addDoc(notifyRef, {
+                to: props.uid,
+                from: currentUser.id,
+                type: "reply",
+                message: `${currentUser.username} replied to your comment.`,
+                postId: props.capturedPostId,
+                unique: `${props.type?props.unique:unique}`,         
+                createdAt: serverTimestamp()
+            })
+            .then(() => {
+                const q = query(notifyRef, orderBy('createdAt'))
+                onSnapshot(q, (snapshot) => {
+                    let notifications = []
+                    snapshot.docs.forEach((doc) => {
+                        notifications.push({...doc.data(), id: doc.id})
+                    })
+                    notifications.forEach((notification) => {
+                        const docRef = doc(db, 'notifications', notification.id)
+                        updateDoc(docRef, {
+                            id: notification.id
+                        })
+                    })
+                })
+            })
+        })
+        setUnique(nanoid())
     }
-
-
 
     
 
@@ -134,23 +160,55 @@ export default function Comment(props){
 
     function toggleReplies(){   
         // REMOVE COMMENT/REPLY TO OPEN REPLIES FOR
-        if(sessionStorage.getItem(props.id) === props.id){
-            sessionStorage.removeItem(props.id)
+        if(sessionStorage.getItem(props.unique) === props.unique){
+            sessionStorage.removeItem(props.unique)
         } else {
-            sessionStorage.setItem(props.id, props.id)
+            sessionStorage.setItem(props.unique, props.unique)
         }   
         setUpdate(prevUpdate => !prevUpdate);
     }
 
-
-
+    const [replyPressed, setReplyPressed] = useState(false)
     const [showForm, setShowForm] = useState(false);
     function toggleShowForm(){
         setShowForm(prevShowForm => !prevShowForm)
+        if(showForm){
+            setTextareaCols(0);
+            setFormValue("");
+        } else {
+            setFormValue(`@${props.username} `)
+        }
+        setReplyPressed(prevReplyPressed => !prevReplyPressed)
     }
+
+    const [replyList, setReplyList] = useState(0)
+    useEffect(() => {
+        props.comments && props.comments.map((comment) => {
+            if(comment.replyTo === props.id){
+                setReplyList(prevReplyList => {
+                    return prevReplyList+=1
+                })
+                console.log(`replyList length `+replyList.length)
+            }
+        })
+    }, [])
+
+    const [textareaCols, setTextareaCols] = useState(1);
+    function handleKeyPress(e){
+        if(e.key === 'Enter'){
+            setTextareaCols(prevTextareaCols => prevTextareaCols += 1)
+        }
+    }
+
+    
+    
+    
     return (
-        <div className="comment">
-            <div className="container-main flex">    
+        <div 
+            className={`comment ${props.unique===props.capturedUnique&& `targetedComment`}`}
+            onClick={props.resetUnique}
+        >
+            <div className="comment-container-main flex">    
                 <img 
                     className="comment-profile-pic" 
                     alt="user" 
@@ -161,14 +219,13 @@ export default function Comment(props){
                     <div className={`comment-full-header`}>
                     
                         <div className={`container-chat-header`}>
-                            <p className="name">{props.username}</p>
+                            <p className="comment-name">{props.username}</p>
                         </div>
                         
                         <Clock createdAt={props.createdAt}/>
                     </div>
                     <div className={`container-full-comment`}>
                         <div className={`comment-chat-text`}>
-                            {/* {props.type==="reply" && <p>@{props.username}</p>} */}
                             <p className="comment-text">{props.comment}</p>
                         </div>
                         <div className="flex comment-impact">
@@ -187,53 +244,70 @@ export default function Comment(props){
                                 <p className="impact-metrics hidden-impact" 
                                 onClick={removeImpact}>🚫</p> */}
                             </div>
-                            {!showForm && <button className="reply-btn" onClick={toggleShowForm}>REPLY</button>}
+                            {!showForm && !replyPressed && <button className="reply-btn" onClick={toggleShowForm}>REPLY</button>}
                         </div>
-                        
 
                         {showForm && 
                             <form className="create-comment-form" onSubmit={createComment}>
                                 <textarea className="reply-input" 
+                                    ref={ref => ref && ref.focus()}
+                                    onFocus={(e) => e.currentTarget.setSelectionRange(e.currentTarget.value.length, e.currentTarget.value.length)}
+                                    autoFocus
+                                    onKeyPress={handleKeyPress}
                                     cols={40} 
+                                    rows={textareaCols}
                                     value={formValue} 
                                     onChange={(event) => setFormValue(event.target.value)} 
-                                    placeholder="From Comment.js map function in ViewPost.js" />
-                                <div>
+                                    placeholder="Add a reply..." />
+                                <div className="reply-btns">
+                                    {showForm && <button className="cancel-reply" onClick={toggleShowForm}>CANCEL</button>}
                                     <button 
                                         className="sendComment-btn" 
                                         type="submit" 
                                         disabled={!formValue}
                                     >REPLY</button>
-                                    {showForm && <button onClick={toggleShowForm}>cancel</button>}
                                 </div>
                             </form>
                         } 
                         
-                        
-
-                        {sessionStorage.getItem(props.id) === props.id && props.comments && 
-                        props.comments.map(comment => comment.replyTo === props.id && 
-                            <div className="reply"> 
-                                <Comment 
-                                    comment={comment.body}
-                                    createdAt={comment.createdAt}
-                                    approval={comment.approval} 
-                                    disapproval={comment.disapproval}
-                                    username={comment.username}
-                                    uid={comment.uid}
-                                    id={props.type===comment? comment.id: props.id}
-                                    type={"reply"}
-                                    sendUID={props.sendUID}
-                                    defaultPic={comment.defaultPic}
-                                    key={nanoid()}
-                                />
-                            </div>
-                        )}
-                        {/* ############################################################ */}
-                        {props.type === "comment" && sessionStorage.getItem(props.id) === null
-                        && <button className="show-replies" onClick={toggleReplies}>REPLIES</button>}
-                        {props.type === "comment" && sessionStorage.getItem(props.id) === props.id
-                        && <button className="show-replies" onClick={toggleReplies}>hide replies</button>}
+                        <div className="comment-chain">
+                            {props.type === "comment" 
+                            && sessionStorage.getItem(props.unique) === props.unique
+                            && <button 
+                                className="show-replies" 
+                                onClick={toggleReplies}>hide replies
+                            </button>}
+                            {sessionStorage.getItem(props.unique) === props.unique && props.comments && 
+                            props.comments.map(comment => comment.replyTo === props.id && 
+                                <div className="reply" key={nanoid()}> 
+                                    <Comment 
+                                        comment={comment.body}
+                                        createdAt={comment.createdAt}
+                                        approval={comment.approval} 
+                                        disapproval={comment.disapproval}
+                                        username={comment.username}
+                                        uid={comment.uid}
+                                        id={props.type===comment? comment.id: props.id}
+                                        commentId={comment.id}
+                                        type={"reply"}
+                                        sendUID={props.sendUID}
+                                        defaultPic={comment.defaultPic}
+                                        key={nanoid()}
+                                        resetUnique={props.resetUnique}
+                                        unique={props.unique}
+                                        capturedPostId={props.capturedPostId}
+                                    />
+                                </div>
+                            )}
+                            {/* ############################################################ */}
+                            {props.type === "comment" 
+                            && sessionStorage.getItem(props.unique) === null
+                            && replyList > 0 
+                            && <button 
+                                className="show-replies" 
+                                onClick={toggleReplies}>{`${replyList}`} {`${replyList>1?"REPLIES":"REPLY"}`}
+                            </button>}
+                        </div>
                     </div>
                 </div>
             </div>
