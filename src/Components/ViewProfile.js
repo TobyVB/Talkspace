@@ -30,7 +30,11 @@ export default function ViewProfile(props){
     const [defPicLoc, setDefPicLoc] = useState(props.defPicLoc);
 
     const [objURL, setObjURL] = useState("")
-    
+
+    useEffect(() => {
+        window.scrollTo(0, 0)
+    }, [])
+    console.log("profile")
 
     // ########## A C C E S S   C U R R E N T   U S E R'S   D O C ##########
     useEffect(() => {
@@ -46,20 +50,8 @@ export default function ViewProfile(props){
 
     // ########## F I N D   U S E R'S   P O S T  D O C S ##########
     const postsRef = collection(db, 'posts');
-    const [foundPosts, setFoundPosts] = useState("")
-    useEffect(() => {
-        const q = query(postsRef, orderBy('createdAt'))
-        onSnapshot(q, async (snapshot) => {
-            snapshot.docs.forEach((doc => {
-                if(doc.data().uid === currentUser.uid){
-                    setFoundPosts({ ...doc.data(), id: doc.id})
-                }
-            }))
-        })
-    },[currentUser])
-
-    const q = query(postsRef, orderBy('createdAt'));
-    const [posts] = useCollectionData(q, { 
+    const qPosts = query(postsRef, orderBy('createdAt'));
+    const [posts] = useCollectionData(qPosts, { 
       createdAt: 'createdAt', 
       idField: 'id', 
       title: 'title',
@@ -84,6 +76,7 @@ export default function ViewProfile(props){
     // ########## S H O W   E D I T   P R O F I L E ##########
     function showSettingsBool(){
         setShowSettings(prevChange => !prevChange)
+        window.scrollTo(0, 0)
     }
     function cancelShowSettings(){
         setShowSettings(prevChange => !prevChange)
@@ -91,6 +84,8 @@ export default function ViewProfile(props){
 
         setHideEditAboutMe(true)
         setHideEditImage(true);
+
+        window.scrollTo(0, 0)
     }
     // ########## U P D A T E   U S E R ##########
     async function updateUser(){
@@ -102,6 +97,8 @@ export default function ViewProfile(props){
         })
         setShowSettings(false)
     }
+
+
     // ########## S A V E   C H A N G E S ##########
     function save(){
         {image !== null &&
@@ -164,7 +161,7 @@ export default function ViewProfile(props){
 // #############################################################################
 // #############################################################################
     return (
-        <div>
+        <>{currentUser && <div>
             {/* ############### P R O F I L E ################ */}
             <div className="profile page-body">
                 <button className="edit-user-btn" onClick={showSettingsBool}>edit profile</button>
@@ -178,7 +175,7 @@ export default function ViewProfile(props){
                         src={image!==null?objURL:currentUser.defaultPic}
                     /> 
                     <p>
-                        {`${props.aboutMe !== undefined? currentUser.aboutMe: ""}`}
+                        {`${currentUser.aboutMe !== undefined? currentUser.aboutMe: ""}`}
                     </p>
                 </div>
                 <h3>POSTS</h3>
@@ -234,7 +231,7 @@ export default function ViewProfile(props){
                     <button onClick={cancelShowSettings}>cancel</button>
                 </div>
             </div>
-        </div>
+        </div>}</>
     )
 }
 

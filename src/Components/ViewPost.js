@@ -22,6 +22,10 @@ export default function ViewPost(props){
         body: 'body'
     })
 
+    useEffect(() => {
+        window.scrollTo(0, 0)
+    }, [])
+
     
     // FIND THE POST DOC
     const postsRef = collection(db, 'posts');
@@ -67,8 +71,10 @@ export default function ViewPost(props){
         if(props.capturedUnique !== ""){scrollingTop();}
     }, 200)
         
-    function resetUnique(){props.setCapturedUnique("");}
+    function resetUnique(){props.setCapturedUnique("");props.setCurrentCommentId("")}
     function doNothing(){}
+
+
 
 
     return (
@@ -113,6 +119,7 @@ export default function ViewPost(props){
                     capturedUnique={props.capturedUnique}
                     resetUnique={comment.unique===props.capturedUnique?resetUnique:doNothing}
                     capturedPostId={props.capturedPostId}
+                    currentCommentId={props.currentCommentId}
                 />  
                 {props.capturedUnique===comment.unique&&<div ref={scrollTarget}></div>}
                 </div>)}

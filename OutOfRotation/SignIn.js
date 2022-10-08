@@ -6,6 +6,8 @@ import React from "react";
 export default function Anonymous(){
     const auth = getAuth();
 
+    window.scrollTo(0, 0)
+
     // const signInWithGoogle = () => {
     //     const provider = new firebase.auth.GoogleAuthProvider();
     //     auth.signInWithPopup(provider)

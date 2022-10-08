@@ -15,7 +15,6 @@ import Homepage from "./Components/Homepage.js";
 import ViewProfile from './Components/ViewProfile.js';
 import Login from './Components/Login.js';
 import Register from './Components/Register.js';
-import Chatroom from "./Components/Chatroom.js";
 import ViewOtherProfile from './Components/ViewOtherProfile';
 import CreatePost from './Components/CreatePost.js';
 import ViewPost from './Components/ViewPost.js';
@@ -42,6 +41,7 @@ function App() {
       setPage(0);
       auth.signOut();
       setAllowLogin(true)
+      // setuserData('');
   }
   function SignOut(){
     return auth.currentUser && (
@@ -67,49 +67,26 @@ function App() {
           }
         })
       })
+      console.log("user has been updated from app.js")
       setAllowLogin(false)
     }
   }
-
-  // user alerts/notifications
-  // show bell icon at navbar, when clicked show alerts/notifications
-  // if any alerts/notification, there will be a number of the amount of
-  // missed alerts there are. There will also be a chime each time a new one
-  // is recieved.
-
-  // New doc under notication collection will be created.
-  //  there will be a "to" field, which will store the users doc id, rather than uid
-  //  there will be a "from" field, which will store the notification initiator if there
-  //  is one. For example; a commentor, replier, follower, poster (if you're following)...
-  //  there will be a "type" field, this can be 'reply', 'comment', 'followed', etc
-  
-  // I can look through all notifications, and grab all the onces that are "to" the currentUser
-  // Would do this on every state change in app.js...
 
 
   const [notifyWindow, setNotifyWindow] = useState(false)
   function toggleNotifyWindow(){
     setNotifyWindow(prevNotifyWindow => !prevNotifyWindow);
   }
-
   
-  updateAccess();
-  const viewHome = 0;
-  const viewChatroom = 1;
+  const viewHome = 1;
   const viewRegister = 2;
   const viewLogin = 3;
   const viewProfile = 4;
   const viewOtherProfile = 5;
   const viewCreatePost = 6;
   const viewPost = 7;
-  const [page, setPage] = useState(0);
+  const [page, setPage] = useState(1);
   function startViewHome(){
-    setPage(0);
-  }
-  function startViewChatroom(){
-    // put update access here, because this is the first 
-    // location user moves to after logging in or Registering.
-    updateAccess();
     setPage(1);
   }
   function startViewRegister(){
@@ -121,6 +98,18 @@ function App() {
   function startViewProfile(){
     setPage(4);
   }
+  const [updateReadyGo, setUpdateReadyGo] = useState(false)
+  function updateReady(){
+    setUpdateReadyGo(true)
+    updateAccess();
+  }
+  useEffect(() => {
+    if( updateReadyGo === true ){
+      console.log('userData.aboutMe: '+userData.aboutMe);
+      startViewHome();
+      setUpdateReadyGo(false)
+    }
+  }, [updateReadyGo])
   function startViewOtherProfile(){
     setPage(5);
   }
@@ -144,12 +133,14 @@ function App() {
 
   const [useNavClassNone, setUseNavClassNone] = useState(true) 
   const navClassNone = useNavClassNone? "none": ""
-
+  const [navToggle, setNavToggle] = useState(false)
   function showMenu(){
-    setUseNavClassNone(false);
+    setUseNavClassNone(prev => !prev);
+    setNavToggle(prev => !prev)
   }
   function hideMenu(){
     setUseNavClassNone(true);
+    setNavToggle(false)
   }
   
 
@@ -163,7 +154,7 @@ function App() {
   const [capturedPostId, setCapturedPostId] = useState("");
   const sendPostId = (e) => {
     setCapturedPostId(e);
-    console.log("this is the postId I'm grabbing! "+e)
+    // console.log("this is the postId I'm grabbing! "+e)
     startViewPost()
   }
 // ############################################################
@@ -171,6 +162,13 @@ function App() {
   const sendUnique = (e) => {
     setCapturedUnique(e)
   }
+
+  const [currentCommentId, setCurrentCommentId] = useState("");
+  const sendCurrentCommentId = (e) => {
+    setCurrentCommentId(e)
+    console.log("what do we have here from App.js: "+e)
+  }
+
 
   if(page !== 7){sessionStorage.clear();}
 
@@ -189,14 +187,14 @@ function App() {
 
   return (
     <div className="App">
-      <header>
-        <div className="header">
-          <h1 onClick={startViewHome}>TalkSpace</h1>
+      <header onMouseLeave={hideMenu}>
+        <div className={`header ${navToggle && `header-toggle`}`}>
+          <div className="nav-title"><p>The</p><h1 onClick={startViewHome}>TalkSpace</h1></div>
           <button className="bell" onClick={toggleNotifyWindow}>🛎<span className="notification-num">{notifications && notifications.length > 0 && notifications.length}</span></button>
           <button className="showNav" onClick={showMenu}>menu</button>
         </div>
         <div className={`login-header-buttons  ${navClassNone}`}
-          onMouseLeave={hideMenu}>
+          >
           {!auth.currentUser &&
           <>
             <button 
@@ -218,11 +216,6 @@ function App() {
               disabled={page === viewProfile ? "+true" : ""} 
               onClick={startViewProfile}
             >Profile</button>
-            <button 
-              className="nav-btn" 
-              disabled={page === viewChatroom ? "+true" : ""} 
-              onClick={startViewChatroom}
-            >Chatroom</button>
             <button className="nav-btn">
               Settings
             </button>
@@ -247,6 +240,8 @@ function App() {
         toPost={startViewPost}
         restartPage={restartPage}
         sendUnique={sendUnique}
+        sendCurrentCommentId={sendCurrentCommentId}
+        notifications={notifications}
       />}
 
         {/* PROFILE */}
@@ -257,23 +252,23 @@ function App() {
         aboutMe={userData.aboutMe}
         updatePage={startViewPost}
         sendPostId={sendPostId}
-
+        userData={userData}
         id={userData.id} 
         signout={exit}/>}
 
-        {/* CHATROOM */}
-      {auth.currentUser && page === viewChatroom 
-      && <Chatroom username={userData.username} 
-        defaultPic={userData.defaultPic}
-        sendUID={sendUID}/>}
-
         {/* HOMEPAGE */}
       {page === viewHome 
-      && <Homepage />}
+      && <Homepage 
+        updatePage={startViewPost}
+        sendPostId={sendPostId}
+        goToProfile={startViewProfile}
+        sendUserId={sendUID}
+      />}
 
-        {/* HOME */}
+        {/* LOGIN */}
       {!auth.currentUser && page === viewLogin 
       && <Login 
+        updateReady={updateReady}
         updatePage={startViewProfile} />}
 
         {/* REGISTER */}
@@ -304,6 +299,8 @@ function App() {
         sendUID={sendUID}
         capturedUnique={capturedUnique}
         setCapturedUnique={setCapturedUnique}
+        currentCommentId={currentCommentId}
+        setCurrentCommentId={setCurrentCommentId}
       />}
       <div className="footer">
         <h3>tobcvb@gmail.com 2022</h3>

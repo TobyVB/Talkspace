@@ -2,12 +2,12 @@
 // ############################# I M P O R T S #################################
 // #############################################################################
 import {getAuth, signInWithEmailAndPassword} from "firebase/auth";
-import React, {useRef, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 
 // #############################################################################
 // ########################### L O G I N   F U N C. ############################
 // #############################################################################
-export default function Register(props){
+export default function Login(props){
     const auth = getAuth();
     function login(email, password) {
         return signInWithEmailAndPassword(auth, email, password);
@@ -16,8 +16,8 @@ export default function Register(props){
     const emailRef = useRef();
     const passwordRef = useRef();
 
+    // loading is just used for disabling button
     const [loading, setLoading] = useState(false);
-
     async function handleLogin() {
         setLoading(true);
         try {
@@ -26,7 +26,8 @@ export default function Register(props){
             console.log("error with handleSignup function in Register.js");
         }
         setLoading(false);
-        props.updatePage();
+        // props.updateAccess();
+        props.updateReady();
     }
 // #############################################################################
 // #############################  R E T U R N  #################################

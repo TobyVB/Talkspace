@@ -3,7 +3,7 @@ import {arrayRemove, arrayUnion, doc,
    getFirestore, updateDoc
 } from 'firebase/firestore'
 import React from 'react';
-import Clock from "./Utils/Clock.js";
+import Clock from "../src/Components/Utils/Clock.js";
 
 
 

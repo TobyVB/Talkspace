@@ -7,18 +7,17 @@ import Notification from "./Notification.js";
 
 export default function Notifications(props){
     const db = getFirestore();
-    const notificationsRef = collection(db, 'notifications');
-    const q = query(notificationsRef, orderBy('createdAt'));
-    const [notifications] = useCollectionData(q, {
-        createdAt: 'createdAt',
-        unique: 'unique',
-        to: 'to',
-        from: 'from',
-        type: 'type',
-        message: 'message',
-        postId: 'postId'
-    })
-    
+    // const notificationsRef = collection(db, 'notifications');
+    // const qNotify = query(notificationsRef, orderBy('createdAt'));
+    // const [notifications] = useCollectionData(qNotify, {
+    //     createdAt: 'createdAt',
+    //     unique: 'unique',
+    //     to: 'to',
+    //     from: 'from',
+    //     type: 'type',
+    //     message: 'message',
+    //     postId: 'postId'
+    // })
 
     return (
 
@@ -29,10 +28,10 @@ export default function Notifications(props){
                 >CANCEL
             </button>
 
-            {notifications && notifications.length < 1 && <p>No new notifications.</p>}
+            {props.notifications && props.notifications.length < 1 && <p>No new notifications.</p>}
 
             <div>
-            {notifications && notifications.map((notification, index) => notification.to === props.uid && 
+            {props.notifications && props.notifications.map((notification, index) => notification.to === props.uid && 
                 <Notification 
                     key={index} 
                     message={notification.message}
@@ -45,6 +44,7 @@ export default function Notifications(props){
                     unique={notification.unique}
                     id={notification.id}
                     sendUnique={props.sendUnique}
+                    sendCurrentCommentId={props.sendCurrentCommentId}
                 /> )}
             </div>
         </div>  

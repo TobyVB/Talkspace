@@ -42,52 +42,54 @@ export default function CreateComment(props){
             replyTo: props.capturedPostId,
             username: currentUser.username,
             defaultPic: currentUser.defaultPic,
-            unique: unique
+            unique: unique,
         })
         .then(() => {
             setFormValue('');
         })
+        // UPDATE HAS BEEN UPDATED...
         .then(() => {
             const q = query(commentsRef, orderBy('createdAt'))
-            onSnapshot(q, (snapshot) => {
-                let comments = []
-                snapshot.docs.forEach((doc) => {
-                    comments.push({ ...doc.data(), id: doc.id })
-                })
-                comments.forEach((comment) => {
-                    const docRef = doc(db, 'comments', comment.id)
-                    updateDoc(docRef, {
-                        id: comment.id
-                    })
+            onSnapshot(q, async (snapshot) => {
+                snapshot.docs.forEach((document) => {
+                    const docRef = doc(db, 'comments', document.id)
+                    if(document.data().unique === unique){
+                        console.log(unique)
+                        updateDoc(docRef, {
+                            id: document.id
+                        })
+                    }
                 })
             })
         })
         // create notification for the replyTo
         .then(() => {
-            addDoc(notifyRef, {
-                to: props.uid,
-                from: currentUser.id,
-                type: "comment",
-                message: `${currentUser.username} commented on your post.`,
-                postId: props.capturedPostId,
-                unique: unique,
-                createdAt: serverTimestamp()
-            })
-            .then(() => {
-                const q = query(notifyRef, orderBy('createdAt'))
-                onSnapshot(q, (snapshot) => {
-                    let notifications = []
-                    snapshot.docs.forEach((doc) => {
-                        notifications.push({ ...doc.data(), id: doc.id})
-                    })
-                    notifications.forEach((notification) => {
-                        const docRef = doc(db, 'notifications', notification.id)
-                        updateDoc(docRef, {
-                            id: notification.id
+            // if(currentUser.uid !== props.uid){
+                addDoc(notifyRef, {
+                    to: props.uid,
+                    from: currentUser.id,
+                    type: "comment",
+                    message: `${currentUser.username} commented on your post.`,
+                    postId: props.capturedPostId,
+                    unique: unique,
+                    createdAt: serverTimestamp()
+                })
+                // UPDATE HAS BEEN UPDATED...
+                .then(() => {
+                    const q = query(notifyRef, orderBy('createdAt'))
+                    onSnapshot(q, async (snapshot) => {
+                        snapshot.docs.forEach((document) => {
+                            const docRef = doc(db, 'notifications', document.id)
+                            if(document.data().unique === unique){
+                                console.log(unique)
+                                updateDoc(docRef, {
+                                    id: document.id
+                                })
+                            }
                         })
                     })
                 })
-            })
+            // }
         })
         setUnique(nanoid())
     }

@@ -22,6 +22,30 @@ export default function Notification(props){
 
 
 
+
+    // grab that comment with the same unique as the currentNotification's unique
+    const commentsRef = collection(db, 'comments');
+    const [currentComment, setCurrentComment] = useState("");
+    useEffect(() => {
+        if(currentNotification !== ""){
+            const q = query(commentsRef, orderBy('createdAt'))
+            onSnapshot(q, async (snapshot)=> {
+                snapshot.docs.forEach(doc => {
+                    if(doc.data().unique === currentNotification.unique){
+                        setCurrentComment({...doc.data(), id: doc.id})
+                    }
+                })
+            })
+        } 
+    }, [currentNotification])
+    
+    useEffect(() => {
+        if(currentComment !== ""){
+            console.log("from notification.js: "+currentComment.id)
+        }
+    },[currentComment])
+
+
     function checkNotification(){
         console.log('the current notification id: '+currentNotification.id)
         if(props.type==="comment" || props.type==="reply"){
@@ -46,6 +70,14 @@ export default function Notification(props){
             if(currentNotification.type="reply"){
                 sessionStorage.setItem(props.unique, props.unique)
             }
+        })
+        .then(() => {
+            // For some reason session storage isn't getting the currentComment.id
+            // so fixing that is the next order of business.
+            // console.log("blahblahblah: "+currentComment.id)
+            // sessionStorage.setItem("commentId", JSON.stringify(currentComment.id))
+            // instead of using sessionStorage, send it to a capture function
+            props.sendCurrentCommentId(currentComment.id)
         })
     }
 

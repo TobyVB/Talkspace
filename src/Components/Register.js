@@ -31,6 +31,9 @@ export default function Register({updatePage}){
     const [loading, setLoading] = useState(false);
     const [username, setUsername] = useState('');
 
+    const [unique, setUnique] = useState(nanoid())
+    window.scrollTo(0, 0)
+
     function handleChange(event){
         const target = event.target;
         const name = target.name;
@@ -53,26 +56,42 @@ export default function Register({updatePage}){
             createdAt: serverTimestamp(),
             defaultPic: url,
             defPicLoc: randomNum,
+            unique: unique,
         })
+        // UPDATE HAS BEEN UPDATED...
         .then(() => {
             const q = query(usersRef, orderBy('createdAt'))
-            onSnapshot(q, (snapshot) => {
-                let users = []
-                snapshot.docs.forEach((doc) => { 
-                    doc.data().uid === auth.currentUser.uid ? 
-                users.push({ ...doc.data(), id: doc.id }) :
-                console.log(users)
-                })
-                // if uid is same
-                users.forEach((user) => {
-                    const docRef = doc(db, 'users', user.id)
-                    updateDoc(docRef, {
-                        id: user.id
-                    })
-                    // console.log("it worked "+docRef)
+            onSnapshot(q, async (snapshot) => {
+                snapshot.docs.forEach((document) => {
+                    const docRef = doc(db, 'users', document.id)
+                    if(document.data().unique === unique){
+                        console.log(unique)
+                        updateDoc(docRef, {
+                            id: document.id
+                        })
+                    }
                 })
             })
         })
+        // .then(() => {
+        //     const q = query(usersRef, orderBy('createdAt'))
+        //     onSnapshot(q, (snapshot) => {
+        //         let users = []
+        //         snapshot.docs.forEach((doc) => { 
+        //             doc.data().uid === auth.currentUser.uid ? 
+        //         users.push({ ...doc.data(), id: doc.id }) :
+        //         console.log(users)
+        //         })
+        //         // if uid is same
+        //         users.forEach((user) => {
+        //             const docRef = doc(db, 'users', user.id)
+        //             updateDoc(docRef, {
+        //                 id: user.id
+        //             })
+        //             // console.log("it worked "+docRef)
+        //         })
+        //     })
+        // })
         setImage(null);
         setLoading(false);
         updatePage(); 

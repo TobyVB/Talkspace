@@ -91,6 +91,8 @@ export default function Comment(props){
 
     const [unique, setUnique] = useState(nanoid())
 
+    // NEED TO UPDATE THE CREATE COMMENT FUNCTION HERE TO
+    // USE THE NEW UPDATE STYLE
     function createComment(e){
         e.preventDefault()
         addDoc(commentsRef, {
@@ -110,19 +112,33 @@ export default function Comment(props){
         })
         .then(() => {
             const q = query(commentsRef, orderBy('createdAt'))
-            onSnapshot(q, (snapshot) => {
-                let comments = []
-                snapshot.docs.forEach((doc) => {
-                    comments.push({ ...doc.data(), id: doc.id })
-                })
-                comments.forEach((comment) => {
-                    const docRef = doc(db, 'comments', comment.id)
-                    updateDoc(docRef, {
-                        id: comment.id
-                    })
+            onSnapshot(q, async (snapshot) => {
+                snapshot.docs.forEach((document) => {
+                    const docRef = doc(db, 'comments', document.id)
+                    if(document.data().unique === unique){
+                        console.log(unique)
+                        updateDoc(docRef, {
+                            id: document.id
+                        })
+                    }
                 })
             })
         })
+        // .then(() => {
+        //     const q = query(commentsRef, orderBy('createdAt'))
+        //     onSnapshot(q, (snapshot) => {
+        //         let comments = []
+        //         snapshot.docs.forEach((doc) => {
+        //             comments.push({ ...doc.data(), id: doc.id })
+        //         })
+        //         comments.forEach((comment) => {
+        //             const docRef = doc(db, 'comments', comment.id)
+        //             updateDoc(docRef, {
+        //                 id: comment.id
+        //             })
+        //         })
+        //     })
+        // })
         // create notification for the replyTo
         .then(() => {
             addDoc(notifyRef, {
@@ -136,19 +152,33 @@ export default function Comment(props){
             })
             .then(() => {
                 const q = query(notifyRef, orderBy('createdAt'))
-                onSnapshot(q, (snapshot) => {
-                    let notifications = []
-                    snapshot.docs.forEach((doc) => {
-                        notifications.push({...doc.data(), id: doc.id})
-                    })
-                    notifications.forEach((notification) => {
-                        const docRef = doc(db, 'notifications', notification.id)
-                        updateDoc(docRef, {
-                            id: notification.id
-                        })
+                onSnapshot(q, async (snapshot) => {
+                    snapshot.docs.forEach((document) => {
+                        const docRef = doc(db, 'notifications', document.id)
+                        if(document.data().unique === unique){
+                            console.log(unique)
+                            updateDoc(docRef, {
+                                id: document.id
+                            })
+                        }
                     })
                 })
             })
+            // .then(() => {
+            //     const q = query(notifyRef, orderBy('createdAt'))
+            //     onSnapshot(q, (snapshot) => {
+            //         let notifications = []
+            //         snapshot.docs.forEach((doc) => {
+            //             notifications.push({...doc.data(), id: doc.id})
+            //         })
+            //         notifications.forEach((notification) => {
+            //             const docRef = doc(db, 'notifications', notification.id)
+            //             updateDoc(docRef, {
+            //                 id: notification.id
+            //             })
+            //         })
+            //     })
+            // })
         })
         setUnique(nanoid())
     }
@@ -181,17 +211,10 @@ export default function Comment(props){
         setReplyPressed(prevReplyPressed => !prevReplyPressed)
     }
 
-    const [replyList, setReplyList] = useState(0)
-    useEffect(() => {
-        props.comments && props.comments.map((comment) => {
-            if(comment.replyTo === props.id){
-                setReplyList(prevReplyList => {
-                    return prevReplyList+=1
-                })
-                console.log(`replyList length `+replyList.length)
-            }
-        })
-    }, [])
+    
+    const replyChain = props.comments && props.comments.filter(comment => 
+        comment.replyTo === props.id
+    )
 
     const [textareaCols, setTextareaCols] = useState(1);
     function handleKeyPress(e){
@@ -201,10 +224,13 @@ export default function Comment(props){
     }
 
     
-    
-    
+    // console.log("test from comment: props.currentCommentId: "+props.currentCommentId)
+    // console.log("test from comment: props.id: "+props.id)
+
+
     return (
         <div 
+            // className={`comment ${props.currentCommentId===props.id && `targetedComment`}`}
             className={`comment ${props.unique===props.capturedUnique&& `targetedComment`}`}
             onClick={props.resetUnique}
         >
@@ -239,14 +265,12 @@ export default function Comment(props){
                                 onClick={updateDisapprove}>👎</p>
                                 {disapproves > 0
                                     &&<span className="numImpact">{disapproves}</span>}
-
                                 {/* <p className="impact-metrics hidden-impact">📊</p>
                                 <p className="impact-metrics hidden-impact" 
                                 onClick={removeImpact}>🚫</p> */}
                             </div>
                             {!showForm && !replyPressed && <button className="reply-btn" onClick={toggleShowForm}>REPLY</button>}
                         </div>
-
                         {showForm && 
                             <form className="create-comment-form" onSubmit={createComment}>
                                 <textarea className="reply-input" 
@@ -269,7 +293,6 @@ export default function Comment(props){
                                 </div>
                             </form>
                         } 
-                        
                         <div className="comment-chain">
                             {props.type === "comment" 
                             && sessionStorage.getItem(props.unique) === props.unique
@@ -300,13 +323,11 @@ export default function Comment(props){
                                 </div>
                             )}
                             {/* ############################################################ */}
-                            {props.type === "comment" 
-                            && sessionStorage.getItem(props.unique) === null
-                            && replyList > 0 
-                            && <button 
-                                className="show-replies" 
-                                onClick={toggleReplies}>{`${replyList}`} {`${replyList>1?"REPLIES":"REPLY"}`}
-                            </button>}
+                            <button className="show-replies" onClick={toggleReplies}>{
+                                props.type === "comment" 
+                                && sessionStorage.getItem(props.unique) === null
+                                && replyChain.length > 0 ? "- show replies -": ""
+                            }</button>
                         </div>
                     </div>
                 </div>

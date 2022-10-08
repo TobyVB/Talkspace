@@ -4,7 +4,8 @@ import {collection, getFirestore, addDoc,
      serverTimestamp, onSnapshot, updateDoc,
       query, orderBy,
       doc
-} from 'firebase/firestore'
+} from 'firebase/firestore';
+import { nanoid } from 'nanoid';
 
 export default function CreatePost(props){
 
@@ -14,6 +15,12 @@ export default function CreatePost(props){
     const [formValueTitle, setFormValueTitle] = useState('');
     const [formValueBody, setFormValueBody] = useState('');
 
+    const [unique, setUnique] = useState(nanoid())
+
+    useEffect(() => {
+        window.scrollTo(0, 0)
+    }, [])
+
     function createPost(e){
         e.preventDefault()
         addDoc(postsRef, {
@@ -22,30 +29,47 @@ export default function CreatePost(props){
             uid: auth.currentUser.uid,
             approval: [],
             disapproval: [],
-            createdAt: serverTimestamp()
+            createdAt: serverTimestamp(),
+            unique: unique
         })
         .then(() => {
             setFormValueTitle('');
             setFormValueBody('')
         })
-        // creating id field and adding doc's id to it
+        // UPDATE HAS BEEN UPDATED...
         .then(() => {
             const q = query(postsRef, orderBy('createdAt'))
-            onSnapshot(q, (snapshot) => {
-                let posts = []
-                snapshot.docs.forEach((doc) => {
-                    posts.push({ ...doc.data(), id: doc.id})
-                })
-                posts.forEach((post) => {
-                    const docRef = doc(db, 'posts', post.id)
-                    updateDoc(docRef, {
-                        id: post.id
-                    })
-                    props.updatePage();
-                    props.sendPostId(post.id)
+            onSnapshot(q, async (snapshot) => {
+                snapshot.docs.forEach((document) => {
+                    const docRef = doc(db, 'posts', document.id)
+                    if(document.data().unique === unique){
+                        console.log(unique)
+                        updateDoc(docRef, {
+                            id: document.id
+                        })
+                        props.updatePage();
+                        props.sendPostId(document.id)
+                    }
                 })
             })
         })
+        // .then(() => {
+        //     const q = query(postsRef, orderBy('createdAt'))
+        //     onSnapshot(q, (snapshot) => {
+        //         let posts = []
+        //         snapshot.docs.forEach((doc) => {
+        //             posts.push({ ...doc.data(), id: doc.id})
+        //         })
+        //         posts.forEach((post) => {
+        //             const docRef = doc(db, 'posts', post.id)
+        //             updateDoc(docRef, {
+        //                 id: post.id
+        //             })
+        //             props.updatePage();
+        //             props.sendPostId(post.id)
+        //         })
+        //     })
+        // })
     }
 
     
