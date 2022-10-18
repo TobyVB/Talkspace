@@ -27,6 +27,7 @@ export default function CreatePost(props){
             title: formValueTitle,
             body: formValueBody,
             uid: auth.currentUser.uid,
+            follows: [],
             approval: [],
             disapproval: [],
             createdAt: serverTimestamp(),
@@ -53,53 +54,35 @@ export default function CreatePost(props){
                 })
             })
         })
-        // .then(() => {
-        //     const q = query(postsRef, orderBy('createdAt'))
-        //     onSnapshot(q, (snapshot) => {
-        //         let posts = []
-        //         snapshot.docs.forEach((doc) => {
-        //             posts.push({ ...doc.data(), id: doc.id})
-        //         })
-        //         posts.forEach((post) => {
-        //             const docRef = doc(db, 'posts', post.id)
-        //             updateDoc(docRef, {
-        //                 id: post.id
-        //             })
-        //             props.updatePage();
-        //             props.sendPostId(post.id)
-        //         })
-        //     })
-        // })
     }
-
-    
 
     return (
         <>
             <div className="create-post page-body">
-                <h1>Create Post</h1>
+                <h1 className="create-post-h1">Create Post</h1>
                 {auth.currentUser && 
                 <form className="create-post-form" onSubmit={createPost}>
-                    <input 
-                        className="create-post-title"
+                    <textarea 
+                        className="create-post-title-input"
+                        cols={1} 
                         type="text" 
                         placeholder="Add post title..." 
                         value={formValueTitle} 
                         onChange={(event) => setFormValueTitle(event.target.value)} 
                     />
-                    <hr></hr>
                     <textarea 
-                        className="create-post-body" 
+                        className="create-post-body-input" 
                         cols={120} 
+                        rows={5}
                         value={formValueBody} 
                         onChange={(event) => setFormValueBody(event.target.value)} 
                         placeholder="Add post body..." 
                     />
-                    <button className="sendChatMessage-btn" type="submit" disabled={!formValueTitle}>create post</button>
+                    <button className="create-post-btn" type="submit" disabled={!formValueTitle}>create post</button>
                 </form>
                 }
-                <p>Title: {formValueTitle}</p>
-                <p>Body:{formValueBody}</p>
+                {/* <h3 className="create-post-title">{formValueTitle}</h3>
+                <p className="create-post-body">{formValueBody}</p> */}
             </div>
             
         </>

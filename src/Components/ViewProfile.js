@@ -61,17 +61,6 @@ export default function ViewProfile(props){
         props.updatePage()
         props.sendPostId(e)
     }
-    function Post(props){
-        return (
-            <>
-                <p 
-                    className="post-link"
-                    onClick={() => viewPost(props.id)}
-                >{props.title}</p>
-                <hr></hr>
-            </>
-        )
-    }
 
     // ########## S H O W   E D I T   P R O F I L E ##########
     function showSettingsBool(){
@@ -155,18 +144,38 @@ export default function ViewProfile(props){
             console.log(error.message)
         })
     };
+
+    // ##################################################################
+    function Post(props){
+        return (
+            <>
+                <p 
+                    className="post-link"
+                    onClick={() => viewPost(props.id)}
+                 >{props.title}</p>
+            </>
+        )
+    }
 // #############################################################################
 // #############################################################################
 // #############################  R E T U R N  #################################
 // #############################################################################
 // #############################################################################
+
+
+// User can like/follow a post. When they do, their name is updated to the the array field of the post
+// And the post is added to the users following posts array field
+// Here in the foundUser's profile. We'll look for all posts that have the foundUser's uid in the array field
+
+
+
     return (
         <>{currentUser && <div>
             {/* ############### P R O F I L E ################ */}
             <div className="profile page-body">
                 <button className="edit-user-btn" onClick={showSettingsBool}>edit profile</button>
                 <h2 
-                className="profile-header-text">{`${currentUser.username}'s page`}
+                className="profile-header-text">{`${currentUser.username}`}
                 </h2>
                 <div className="profile-jumbotron">
                     <img 
@@ -178,10 +187,21 @@ export default function ViewProfile(props){
                         {`${currentUser.aboutMe !== undefined? currentUser.aboutMe: ""}`}
                     </p>
                 </div>
-                <h3>POSTS</h3>
-                <div className="foundUser-posts">
-                    <hr></hr>
-                    {posts && posts.map(post => post.uid === currentUser.uid && <Post id={post.id} key={post.id} title={post.title}/>)}
+                <div className="profile-post-sections">
+                    <div>
+                        <h3>{`${currentUser.username}'s posts`}</h3>
+                        <div className="foundUser-posts">
+                            {posts && posts.filter(post => post.uid === currentUser.uid).length < 1 && "... No posts to show"}
+                            {posts && posts.map(post => post.uid === currentUser.uid && <Post id={post.id} key={post.id} title={post.title}/>)}
+                        </div>
+                    </div>
+                    <div>
+                        <h3>Liked Posts</h3>
+                        <div className="foundUser-posts">
+                            {/* {posts && posts.map(post => post.uid === currentUser.uid && <Post id={post.id} key={post.id} title={post.title}/>)} */}
+                            {posts && posts.map(post => post.follows.includes(currentUser.id)  && <Post id={post.id} key={post.id} title={post.title}/>)}
+                        </div>
+                    </div>
                 </div>
             </div>
             {/* ############### S E T T I N G S ################ */}
@@ -207,7 +227,6 @@ export default function ViewProfile(props){
                         <button onClick={cancelEditImage}>cancel</button>
                     </>
                 } 
-                <hr className="settings-hr"></hr>
                 {/* ############### E D I T   A B O U T   M E ################ */}
                 {hideEditAboutMe && <div className="edit-profile-section"><button onClick={showEditAboutMe}>edit About Me</button></div>}
                 {!hideEditAboutMe &&
@@ -224,10 +243,10 @@ export default function ViewProfile(props){
                         <button onClick={cancelEditAboutMe}>cancel</button>
                     </div>
                 }
-                <hr className="settings-hr"></hr>
+
                 {/* ############### S A V E   S E T T I N G S ################ */}
-                <div>
-                    <button onClick={save}>save()</button>
+                <div className="save-cancel-edit-profile">
+                    <button onClick={save}>save</button>
                     <button onClick={cancelShowSettings}>cancel</button>
                 </div>
             </div>

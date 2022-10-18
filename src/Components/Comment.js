@@ -19,61 +19,77 @@ export default function Comment(props){
 
     const [formValue, setFormValue] = useState('');
 
+    const [approveImpactSelected, setApproveImpactSelected] = useState(false);
+    const [disapproveImpactSelected, setDisapproveImpactSelected] = useState(false);
 
-    const [approveImpactSelected, setApproveImpactSelected] = React.useState(false);
-    const [disapproveImpactSelected, setDisapproveImpactSelected] = React.useState(false);
+    // const [foundComment, setFoundComment] = useState("")
+    // useEffect(() => {
+    //     const q = query(commentsRef, orderBy('createdAt'))
+    //     onSnapshot(q, async, (snapshot) => {
+    //         snapshot.docs.forEach((doc) => {
+    //             if(doc.data().id === props.id){
+    //                 setFoundComment({...doc.data(), id: doc.id})
+    //             }
+    //         })
+    //     })
+    // })
 
     function updateApprove(e){
         e.stopPropagation();
-        const docRef = props.type === "reply" ? doc(db, 'comments', props.commentId) : doc(db, 'comments', props.id)
-        updateDoc(docRef, {
-            approval: arrayUnion(auth.currentUser.uid),
-            disapproval: arrayRemove(auth.currentUser.uid)
-        })
-        .then(() => {
-            setApproveImpactSelected(true)
-            setDisapproveImpactSelected(false)
-            console.log("approved")
-        })
+        const docRef = doc(db, "comments", props.id)
+        if(!props.approval.includes(auth.currentUser.uid)){
+            updateDoc(docRef, {
+                approval: arrayUnion(auth.currentUser.uid),
+                disapproval: arrayRemove(auth.currentUser.uid)
+            })
+            .then(() => {
+                setApproveImpactSelected(true)
+                setDisapproveImpactSelected(false)
+                console.log("approved")
+            })
+        } else {
+            updateDoc(docRef, {
+                approval: arrayRemove(auth.currentUser.uid)
+            })
+            .then(() => {
+                setApproveImpactSelected(false)
+            })
+        }
     }
     function updateDisapprove(e){
         e.stopPropagation();
-        const docRef = props.type === "reply" ? doc(db, 'comments', props.commentId) : doc(db, 'comments', props.id)
-        updateDoc(docRef, {
-            approval: arrayRemove(auth.currentUser.uid),
-            disapproval: arrayUnion(auth.currentUser.uid)
-        })
-        .then(() => {
-            setDisapproveImpactSelected(true)
-            setApproveImpactSelected(false)
-            console.log("disapproved")
-        })
+        const docRef = doc(db, "comments", props.id)
+        if(!props.disapproval.includes(auth.currentUser.uid)){
+            updateDoc(docRef, {
+                approval: arrayRemove(auth.currentUser.uid),
+                disapproval: arrayUnion(auth.currentUser.uid)
+            })
+            .then(() => {
+                setDisapproveImpactSelected(true)
+                setApproveImpactSelected(false)
+                console.log("disapproved")
+            })
+        } else {
+            updateDoc(docRef, {
+                disapproval: arrayRemove(auth.currentUser.uid)
+            })
+            .then(() => {
+                setDisapproveImpactSelected(false)
+            })
+        }
+        
     }
-    function removeImpact(){
-        const docRef = doc(db, 'comments', props.id)
-        updateDoc(docRef, {
-            approval: arrayRemove(auth.currentUser.uid),
-            disapproval: arrayRemove(auth.currentUser.uid)
-        })
-        .then(() => {
-            setDisapproveImpactSelected(false)
-            setApproveImpactSelected(false)
-            console.log("impact removed")
-        })
-    }
-
 
     // if uid in approval then add class 'voteCasted'
     const approveImpactClass = approveImpactSelected? 'approve-impact-selected': ''
     // if uid in disapproval then add class 'votedCasted'
     const disapproveImpactClass = disapproveImpactSelected? 'disapprove-impact-selected': ''
 
-
     const approves = props.approval.length;
     const disapproves = props.disapproval.length;
     const headCount = approves + disapproves;
 
-
+    const [unique, setUnique] = useState(nanoid())
 
     const usersRef = collection(db, 'users');
     const [currentUser, setCurrentUser] = useState("")
@@ -89,7 +105,7 @@ export default function Comment(props){
         })
     },[])
 
-    const [unique, setUnique] = useState(nanoid())
+    
 
     // NEED TO UPDATE THE CREATE COMMENT FUNCTION HERE TO
     // USE THE NEW UPDATE STYLE
@@ -104,7 +120,7 @@ export default function Comment(props){
             replyTo: props.id,
             username: currentUser.username,
             defaultPic: currentUser.defaultPic,
-            type: props.type,
+            type: "reply",
             unique: `${props.type?props.unique:unique}`,
         })
         .then(() => {
@@ -115,31 +131,15 @@ export default function Comment(props){
             onSnapshot(q, async (snapshot) => {
                 snapshot.docs.forEach((document) => {
                     const docRef = doc(db, 'comments', document.id)
-                    if(document.data().unique === unique){
+                    // if(document.data().unique === unique){
                         console.log(unique)
                         updateDoc(docRef, {
                             id: document.id
                         })
-                    }
+                    // }
                 })
             })
         })
-        // .then(() => {
-        //     const q = query(commentsRef, orderBy('createdAt'))
-        //     onSnapshot(q, (snapshot) => {
-        //         let comments = []
-        //         snapshot.docs.forEach((doc) => {
-        //             comments.push({ ...doc.data(), id: doc.id })
-        //         })
-        //         comments.forEach((comment) => {
-        //             const docRef = doc(db, 'comments', comment.id)
-        //             updateDoc(docRef, {
-        //                 id: comment.id
-        //             })
-        //         })
-        //     })
-        // })
-        // create notification for the replyTo
         .then(() => {
             addDoc(notifyRef, {
                 to: props.uid,
@@ -164,30 +164,12 @@ export default function Comment(props){
                     })
                 })
             })
-            // .then(() => {
-            //     const q = query(notifyRef, orderBy('createdAt'))
-            //     onSnapshot(q, (snapshot) => {
-            //         let notifications = []
-            //         snapshot.docs.forEach((doc) => {
-            //             notifications.push({...doc.data(), id: doc.id})
-            //         })
-            //         notifications.forEach((notification) => {
-            //             const docRef = doc(db, 'notifications', notification.id)
-            //             updateDoc(docRef, {
-            //                 id: notification.id
-            //             })
-            //         })
-            //     })
-            // })
         })
         setUnique(nanoid())
     }
 
-    
-
     // ACCESS REPLIES
     const [update, setUpdate] = useState(false)
-
     function toggleReplies(){   
         // REMOVE COMMENT/REPLY TO OPEN REPLIES FOR
         if(sessionStorage.getItem(props.unique) === props.unique){
@@ -211,44 +193,32 @@ export default function Comment(props){
         setReplyPressed(prevReplyPressed => !prevReplyPressed)
     }
 
-    
-    const replyChain = props.comments && props.comments.filter(comment => 
-        comment.replyTo === props.id
-    )
+
+
+    const replyChain = props.comments && props.comments.filter(comment => comment.replyTo === props.id)
 
     const [textareaCols, setTextareaCols] = useState(1);
-    function handleKeyPress(e){
-        if(e.key === 'Enter'){
-            setTextareaCols(prevTextareaCols => prevTextareaCols += 1)
-        }
-    }
-
-    
-    // console.log("test from comment: props.currentCommentId: "+props.currentCommentId)
-    // console.log("test from comment: props.id: "+props.id)
-
+    function handleKeyPress(e){if(e.key === 'Enter'){setTextareaCols(prevTextareaCols => prevTextareaCols += 1)}}
 
     return (
         <div 
-            // className={`comment ${props.currentCommentId===props.id && `targetedComment`}`}
-            className={`comment ${props.unique===props.capturedUnique&& `targetedComment`}`}
+            className={`comment ${props.unique===props.capturedUnique&& `targetedComment`}${props.type === 'reply'?' comment-type-reply':' comment-type-comment'}`}
             onClick={props.resetUnique}
         >
             <div className="comment-container-main flex">    
-                <img 
-                    className="comment-profile-pic" 
-                    alt="user" 
-                    src={props.defaultPic}
-                    onClick={() => props.sendUID(props.uid)} 
-                />
+                
                 <div>
                     <div className={`comment-full-header`}>
-                    
+                        <img 
+                            className="comment-profile-pic" 
+                            alt="user" 
+                            src={props.defaultPic}
+                            onClick={() => props.sendUID(props.uid)} 
+                        />
                         <div className={`container-chat-header`}>
                             <p className="comment-name">{props.username}</p>
                         </div>
-                        
-                        <Clock createdAt={props.createdAt}/>
+                        <Clock createdAt={props.createdAt} type={props.type}/>
                     </div>
                     <div className={`container-full-comment`}>
                         <div className={`comment-chat-text`}>
@@ -256,23 +226,19 @@ export default function Comment(props){
                         </div>
                         <div className="flex comment-impact">
                             <div className="rate-chatMessage">
-                                <p className={`hidden-impact ${approves > 0 && `hidden-impact-bright`} ${approveImpactClass}`} 
+                                <p className={`hidden-impact ${props.approval.includes(auth.currentUser.uid) && `hidden-impact-bright`} ${approveImpactClass}`} 
                                 onClick={updateApprove}>👍</p>
                                 {approves > 0 
                                     &&<span className="numImpact">{approves}</span>}
 
-                                <p className={`hidden-impact ${disapproves > 0 && `hidden-impact-bright`} ${disapproveImpactClass}`} 
+                                <p className={`hidden-impact ${props.disapproval.includes(auth.currentUser.uid) && `hidden-impact-bright`} ${disapproveImpactClass}`} 
                                 onClick={updateDisapprove}>👎</p>
-                                {disapproves > 0
-                                    &&<span className="numImpact">{disapproves}</span>}
-                                {/* <p className="impact-metrics hidden-impact">📊</p>
-                                <p className="impact-metrics hidden-impact" 
-                                onClick={removeImpact}>🚫</p> */}
+                                {disapproves > 0 &&<span className="numImpact">{disapproves}</span>}
                             </div>
                             {!showForm && !replyPressed && <button className="reply-btn" onClick={toggleShowForm}>REPLY</button>}
                         </div>
                         {showForm && 
-                            <form className="create-comment-form" onSubmit={createComment}>
+                            <form className="create-reply-form" onSubmit={createComment}>
                                 <textarea className="reply-input" 
                                     ref={ref => ref && ref.focus()}
                                     onFocus={(e) => e.currentTarget.setSelectionRange(e.currentTarget.value.length, e.currentTarget.value.length)}
@@ -296,12 +262,14 @@ export default function Comment(props){
                         <div className="comment-chain">
                             {props.type === "comment" 
                             && sessionStorage.getItem(props.unique) === props.unique
-                            && <button 
+                            && props.comments.filter(comment => comment.replyTo === props.id).length > 0 &&
+                             <button 
                                 className="show-replies" 
                                 onClick={toggleReplies}>hide replies
                             </button>}
-                            {sessionStorage.getItem(props.unique) === props.unique && props.comments && 
-                            props.comments.map(comment => comment.replyTo === props.id && 
+                            {sessionStorage.getItem(props.unique) === props.unique && 
+                            props.comments && 
+                            props.comments.map(comment => comment.unique === props.unique && comment.type === "reply" &&
                                 <div className="reply" key={nanoid()}> 
                                     <Comment 
                                         comment={comment.body}
@@ -310,8 +278,7 @@ export default function Comment(props){
                                         disapproval={comment.disapproval}
                                         username={comment.username}
                                         uid={comment.uid}
-                                        id={props.type===comment? comment.id: props.id}
-                                        commentId={comment.id}
+                                        id={comment.id}
                                         type={"reply"}
                                         sendUID={props.sendUID}
                                         defaultPic={comment.defaultPic}
@@ -323,11 +290,10 @@ export default function Comment(props){
                                 </div>
                             )}
                             {/* ############################################################ */}
-                            <button className="show-replies" onClick={toggleReplies}>{
-                                props.type === "comment" 
-                                && sessionStorage.getItem(props.unique) === null
-                                && replyChain.length > 0 ? "- show replies -": ""
-                            }</button>
+                            {props.type === "comment" 
+                            && sessionStorage.getItem(props.unique) === null
+                            && replyChain.length > 0 && <button className="show-replies" onClick={toggleReplies}> - show replies -</button>
+                            }
                         </div>
                     </div>
                 </div>

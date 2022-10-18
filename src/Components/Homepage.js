@@ -3,9 +3,10 @@ import { useCollectionData } from 'react-firebase-hooks/firestore';
 import { query, orderBy, onSnapshot, 
     collection, getFirestore 
 } from "firebase/firestore";
+import {getAuth} from 'firebase/auth';
 
 export default function Home(props){
-
+    const auth = getAuth();
     const db = getFirestore();
     
     useEffect(() => {
@@ -63,31 +64,20 @@ export default function Home(props){
 
     function Post(props){
         return (
-            <>
-                <p 
-                    className="post-link"
-                    onClick={() => viewPost(props.id)}
-                >
-                    {props.title}
-                </p>
+            <div className="homepage-post">
                 <div 
                     onClick={() => viewProfile(props.uid)}
                     className="profile-link"
                 >
-                    - {users && users.map(user => user.uid === props.uid && user.username)}
+                    Posted by {users && users.map(user => user.uid === props.uid && user.username)}
                 </div>
-                <hr></hr>
-                
-            </>
-        )
-    }
-    function Author(props){
-        return (
-            <>
-                <p>
-                    {props.author}
+                <p 
+                    className="post-link"
+                    onClick={auth.currentUser ?() => viewPost(props.id): () => alert("You need to login for access")}
+                >
+                    {props.title}
                 </p>
-            </>
+            </div>
         )
     }
 
@@ -100,7 +90,10 @@ export default function Home(props){
                         <h1 className="talkspace-homepage">Talkspace</h1>
                     </div>
                 </div> 
-                {posts && posts.map(post =>  <Post id={post.id} key={post.id} title={post.title} uid={post.uid}/>)}
+                <div className="homepage-posts">
+                    {posts && posts.map(post =>  <Post id={post.id} key={post.id} title={post.title} uid={post.uid}/>)}
+                </div>
+                
         </div>
     )
 }

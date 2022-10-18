@@ -38,11 +38,12 @@ export default function CreateComment(props){
             uid: auth.currentUser.uid,
             approval: [],
             disapproval: [],
-            createdAt: serverTimestamp(),
+            type: "comment",
             replyTo: props.capturedPostId,
             username: currentUser.username,
             defaultPic: currentUser.defaultPic,
             unique: unique,
+            createdAt: serverTimestamp(),
         })
         .then(() => {
             setFormValue('');
@@ -64,7 +65,7 @@ export default function CreateComment(props){
         })
         // create notification for the replyTo
         .then(() => {
-            // if(currentUser.uid !== props.uid){
+            if(currentUser.uid !== props.uid){
                 addDoc(notifyRef, {
                     to: props.uid,
                     from: currentUser.id,
@@ -89,7 +90,7 @@ export default function CreateComment(props){
                         })
                     })
                 })
-            // }
+            }
         })
         setUnique(nanoid())
     }

@@ -63,7 +63,6 @@ export default function ViewOtherProfile(props){
                     className="post-link"
                     onClick={() => viewPost(props.id)}
                 >{props.title}</p>
-                <hr></hr>
             </>
         )
     }
@@ -84,12 +83,10 @@ export default function ViewOtherProfile(props){
                     {foundUser.aboutMe}
                 </p>
             </div>
+            <h3>POSTS</h3>
             <div className="foundUser-posts">
-                <h3>POSTS</h3>
-                <hr></hr>
                 {posts && posts.map(post => post.uid === foundUser.uid && <Post id={post.id} key={post.id} title={post.title}/>)}
             </div>
-
         </div>
     )
 }

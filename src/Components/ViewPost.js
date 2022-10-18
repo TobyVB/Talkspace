@@ -3,14 +3,17 @@ import { useCollectionData } from 'react-firebase-hooks/firestore';
 import { nanoid } from 'nanoid';
 
 import { query, orderBy, onSnapshot, 
-    collection, getFirestore, doc
+    collection, getFirestore, doc, 
+    updateDoc, arrayUnion, arrayRemove
 } from "firebase/firestore";
+import { getAuth } from "firebase/auth";
 
 import CreateComment from "./CreateComment.js";
 import Comment from "./Comment.js";
 
 export default function ViewPost(props){
     const db = getFirestore();
+    const auth = getAuth();
     const commentsRef = collection(db, 'comments');
     const q = query(commentsRef, orderBy('createdAt'));
     const [comments] = useCollectionData(q, {
@@ -75,21 +78,52 @@ export default function ViewPost(props){
     function doNothing(){}
 
 
-
+    // #####################################   F O L L O W   A N D   U N F O L L O W   P O S T   #############################################
+    function followPost(){
+        if(!foundPost.follows.includes(props.userDataId)){
+            const postRef = doc(db, 'posts', foundPost.id)
+            updateDoc(postRef, {
+                follows: arrayUnion(props.userDataId)
+            })
+            .then(() => {
+                const userRef = doc(db, 'users', props.userDataId)
+                updateDoc(userRef, {
+                    following: arrayUnion(foundPost.id)
+                })
+            })
+        } else {
+            const postRef = doc(db, 'posts', foundPost.id)
+            updateDoc(postRef, {
+                follows: arrayRemove(props.userDataId)
+            })
+            .then(() => {
+                const userRef = doc(db, 'users', props.userDataId)
+                updateDoc(userRef, {
+                    following: arrayRemove(foundPost.id)
+                })
+            })
+        }
+    }
+    function editPost(){
+        props.editPost();
+    }
 
     return (
         <div className="page-body post">
-            <div>
-                <div className="post-header-text">
-                    <h2>{foundPost.title}</h2>
-                    <p 
-                        className="post-author"
-                        onClick={() => props.sendUID(foundUser.uid)}>author: {foundUser.username}
-                    </p>
-                </div>
+            { auth.currentUser.uid === foundPost.uid && <button className="edit-post-btn" onClick={editPost}>edit post</button>}
+            <div className="view-post-container">
+            <p 
+                    className="post-author"
+                    onClick={() => props.sendUID(foundUser.uid)}>Authored by: {foundUser.username}
+                </p>
+                {/* <div className="post-header-text"> */}
+                    <h4 className="post-title">{foundPost.title}</h4>
+                {/* </div> */}
+                
                 <div className="post-body">
                     <p>{foundPost.body}</p>
                 </div>
+                <button className="follow-post" onClick={followPost}>{foundPost && foundPost.follows.includes(props.userDataId)?"- UNFOLLOW":"+ FOLLOW"}</button>
             </div>
             
 

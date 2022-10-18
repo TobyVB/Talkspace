@@ -73,25 +73,6 @@ export default function Register({updatePage}){
                 })
             })
         })
-        // .then(() => {
-        //     const q = query(usersRef, orderBy('createdAt'))
-        //     onSnapshot(q, (snapshot) => {
-        //         let users = []
-        //         snapshot.docs.forEach((doc) => { 
-        //             doc.data().uid === auth.currentUser.uid ? 
-        //         users.push({ ...doc.data(), id: doc.id }) :
-        //         console.log(users)
-        //         })
-        //         // if uid is same
-        //         users.forEach((user) => {
-        //             const docRef = doc(db, 'users', user.id)
-        //             updateDoc(docRef, {
-        //                 id: user.id
-        //             })
-        //             // console.log("it worked "+docRef)
-        //         })
-        //     })
-        // })
         setImage(null);
         setLoading(false);
         updatePage(); 

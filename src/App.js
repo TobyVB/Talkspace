@@ -18,6 +18,7 @@ import Register from './Components/Register.js';
 import ViewOtherProfile from './Components/ViewOtherProfile';
 import CreatePost from './Components/CreatePost.js';
 import ViewPost from './Components/ViewPost.js';
+import ViewEditPost from './Components/ViewEditPost.js';
 
 const firebaseConfig = {
   apiKey: "AIzaSyCXgrZdHQUbrEgrjTi71-Mc80WK0Ibj3zk",
@@ -38,9 +39,9 @@ function App() {
   useAuthState(auth);
 
   function exit(){
-      setPage(0);
+      setPage(1);
       auth.signOut();
-      setAllowLogin(true)
+      setAllowLogin(true);
       // setuserData('');
   }
   function SignOut(){
@@ -61,9 +62,10 @@ function App() {
         snapshot.docs.forEach((doc) => {
         users.push({ ...doc.data()})
         })
-        users.forEach(user => {
-          if(user.uid === auth.currentUser.uid){
+        users.forEach(user => { 
+          if(auth.currentUser && user.uid === auth.currentUser.uid){
             setuserData(user)
+            console.log("boinga")
           }
         })
       })
@@ -71,7 +73,10 @@ function App() {
       setAllowLogin(false)
     }
   }
-
+  updateAccess()
+  // useEffect(()=> {
+  //   console.log(userData.username)
+  // }, [userData])
 
   const [notifyWindow, setNotifyWindow] = useState(false)
   function toggleNotifyWindow(){
@@ -85,6 +90,7 @@ function App() {
   const viewOtherProfile = 5;
   const viewCreatePost = 6;
   const viewPost = 7;
+  const viewEditPost = 8;
   const [page, setPage] = useState(1);
   function startViewHome(){
     setPage(1);
@@ -118,6 +124,9 @@ function App() {
   }
   function startViewPost(){
     setPage(7);
+  }
+  function startViewEditPost(){
+    setPage(8);
   }
   const [startUp, setStartUp] = useState(false)
   function restartPage(){
@@ -190,11 +199,15 @@ function App() {
       <header onMouseLeave={hideMenu}>
         <div className={`header ${navToggle && `header-toggle`}`}>
           <div className="nav-title"><p>The</p><h1 onClick={startViewHome}>TalkSpace</h1></div>
-          <button className="bell" onClick={toggleNotifyWindow}>🛎<span className="notification-num">{notifications && notifications.length > 0 && notifications.length}</span></button>
+          <button className="bell" onClick={toggleNotifyWindow}>🛎
+            <span className="notification-num"> {notifications && auth.currentUser &&
+              notifications.filter(notification => auth.currentUser.uid === notification.to).length > 0 && 
+              notifications.filter(notification => auth.currentUser.uid === notification.to).length}
+            </span>
+          </button>
           <button className="showNav" onClick={showMenu}>menu</button>
         </div>
-        <div className={`login-header-buttons  ${navClassNone}`}
-          >
+        <div className={`login-header-buttons  ${navClassNone}`}>
           {!auth.currentUser &&
           <>
             <button 
@@ -269,7 +282,7 @@ function App() {
       {!auth.currentUser && page === viewLogin 
       && <Login 
         updateReady={updateReady}
-        updatePage={startViewProfile} />}
+      />}
 
         {/* REGISTER */}
       {!auth.currentUser && page === viewRegister 
@@ -293,17 +306,27 @@ function App() {
 
         {/* VIEW POST */}
       {auth.currentUser && page === viewPost 
-      && <ViewPost capturedPostId={capturedPostId}
-        username={userData.username} 
-        defaultPic={userData.defaultPic}
+      && <ViewPost 
+        capturedPostId={capturedPostId}
+        // username={userData.username} 
+        // defaultPic={userData.defaultPic}
         sendUID={sendUID}
         capturedUnique={capturedUnique}
         setCapturedUnique={setCapturedUnique}
         currentCommentId={currentCommentId}
         setCurrentCommentId={setCurrentCommentId}
+        userDataId={userData.id}
+        editPost={startViewEditPost}
+      />}
+
+      {/* VIEW EDIT POST */}
+      {auth.currentUser && page === viewEditPost
+      && <ViewEditPost 
+        capturedPostId={capturedPostId}
+        cancel={startViewPost}
       />}
       <div className="footer">
-        <h3>tobcvb@gmail.com 2022</h3>
+        <h3 className='footer-email'>tobcvb@gmail.com 2022</h3>
       </div>
     </div>
   );

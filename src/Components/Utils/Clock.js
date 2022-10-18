@@ -12,7 +12,7 @@ export default function Clock(props){
     
     
     return (
-        <div className={`time ${props.messageClass}`}>
+        <div className={`time ${props.messageClass} ${props.type==='reply'?' time-reply':' time-comment'}`}>
             <p>{day}</p>
             <p>{timeOfDay}</p>
         </div>

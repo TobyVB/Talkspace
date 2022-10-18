@@ -26,8 +26,8 @@ export default function Login(props){
             console.log("error with handleSignup function in Register.js");
         }
         setLoading(false);
-        // props.updateAccess();
         props.updateReady();
+        window.location.reload(false);
     }
 // #############################################################################
 // #############################  R E T U R N  #################################
@@ -44,7 +44,7 @@ export default function Login(props){
                         className="input-login"
                         placeholder="email"
                         name="email"
-                    ></input>
+                    />
                     <label htmlFor="password">Enter password</label>
                     <input
                         ref={passwordRef}
