@@ -1,9 +1,9 @@
-import React, {useEffect, useState} from "react";
+import React, { useEffect, useState } from "react";
 import { useCollectionData } from 'react-firebase-hooks/firestore';
 import { query, orderBy, onSnapshot, 
     collection, getFirestore 
 } from "firebase/firestore";
-import {getAuth} from 'firebase/auth';
+import { getAuth } from 'firebase/auth';
 
 export default function Home(props){
     const auth = getAuth();
@@ -53,15 +53,22 @@ export default function Home(props){
     });
 
     function viewPost(e){
-        props.updatePage()
-        props.sendPostId(e)
+        if(auth.currentUser && auth.currentUser.emailVerified){
+            props.updatePage()
+            props.sendPostId(e)
+        } else {
+            props.verificationReminder();
+        }
     }
 
     function viewProfile(e){
-        props.goToProfile()
-        props.sendUserId(e)
+        if(auth.currentUser && auth.currentUser.emailVerified){
+            props.goToProfile()
+            props.sendUserId(e)
+        } else {
+            props.verificationReminder();
+        }
     }
-
     function Post(props){
         return (
             <div className="homepage-post">
@@ -73,7 +80,7 @@ export default function Home(props){
                 </div>
                 <p 
                     className="post-link"
-                    onClick={auth.currentUser ?() => viewPost(props.id): () => alert("You need to login for access")}
+                    onClick={() => viewPost(props.id)}
                 >
                     {props.title}
                 </p>
@@ -93,7 +100,6 @@ export default function Home(props){
                 <div className="homepage-posts">
                     {posts && posts.map(post =>  <Post id={post.id} key={post.id} title={post.title} uid={post.uid}/>)}
                 </div>
-                
         </div>
     )
 }

@@ -1,10 +1,9 @@
 import React, {useEffect, useState} from "react";
-import { useCollectionData } from 'react-firebase-hooks/firestore';
 import { query, orderBy, onSnapshot, 
     collection, getFirestore, doc, 
     updateDoc
 } from "firebase/firestore";
-import { getAuth, updateCurrentUser } from "firebase/auth";
+import { getAuth} from "firebase/auth";
 
 export default function ViewPost(props){
     const db = getFirestore();
@@ -14,7 +13,6 @@ export default function ViewPost(props){
         window.scrollTo(0, 0)
     }, [])
 
-    
     // FIND THE POST DOC
     const postsRef = collection(db, 'posts');
     const [foundPost, setFoundPost] = useState("")
@@ -43,15 +41,14 @@ export default function ViewPost(props){
         })
     },[foundPost])
 
-
     async function updatePost(){
         const docRef = doc(db, 'posts', foundPost.id)
         await updateDoc(docRef, {
             title: `${titleValue === ""? foundPost.title: titleValue}`,
-            body: `${bodyValue === ""? foundPost.body: bodyValue}`
+            body: `${bodyValue === ""? foundPost.body: bodyValue}`,
+            video: `${linkValue === ""? foundPost.video: linkValue}`
         })
     }
-
 
     function cancel(){
         props.cancel();
@@ -63,14 +60,13 @@ export default function ViewPost(props){
 
     const [titleValue, setTitleValue] = useState("")
     const [bodyValue, setBodyValue] = useState("")
+    const [linkValue, setLinkValue] = useState("")
     useEffect(() => {
         setTitleValue(foundPost.title)
-    }, [foundPost])
-    useEffect(() => {
         setBodyValue(foundPost.body)
-    },[foundPost])
+        foundPost.video && setLinkValue(foundPost.video)
+    }, [foundPost])
     
-
     return (
         <div className="page-body post">
             <div className="view-post-container">
@@ -85,15 +81,22 @@ export default function ViewPost(props){
                         value={titleValue}
                         onChange={(event) => setTitleValue(event.target.value)}
                     />
-                
                 <div className="post-body">
-                    {/* <p>{foundPost.body}</p> was where textarea is now */}
                     <textarea   
                         className="edit-post-textarea edit-post-body"
                         cols={200}
                         rows={4}
                         value={bodyValue}
                         onChange={(event) => setBodyValue(event.target.value)}
+                    />
+                    <textarea 
+                        className="create-post-video-textarea"
+                        cols={200} 
+                        row={1}
+                        type="text" 
+                        placeholder="youtube link..."
+                        value={linkValue}
+                        onChange={(event) => setLinkValue(event.target.value)}
                     />
                 </div>
             </div>

@@ -1,48 +1,29 @@
-// #############################################################################
-// ############################# I M P O R T S #################################
-// #############################################################################
-import {getAuth, createUserWithEmailAndPassword} from "firebase/auth";
+import {getAuth, createUserWithEmailAndPassword, sendEmailVerification} from "firebase/auth";
 import { getFirestore, collection, addDoc,
      serverTimestamp, onSnapshot, doc,
       updateDoc, query, orderBy 
     } from "firebase/firestore";
-import {storage} from '../App.js';
-import {ref, uploadBytes, getDownloadURL} from "firebase/storage";
-
-import * as imageConversion from 'image-conversion';
-
 import { nanoid } from 'nanoid';
+import React, { useRef, useState } from "react";
 
-import React, {useEffect, useRef, useState} from "react";
-
-// #############################################################################
-// ######################## R E G I S T E R   F U N C. #########################
-// #############################################################################
-export default function Register({updatePage}){
+export default function Register(props){
     const db = getFirestore();
     const usersRef = collection(db, 'users');
     const auth = getAuth();
-    function signup(email, password) {
-        return createUserWithEmailAndPassword(auth, email, password);
-    }
     const emailRef = useRef();
     const passwordRef = useRef();
-    const [randomNum, setRandomNum] = useState(nanoid())
+    const usernameRef = useRef();
     const [loading, setLoading] = useState(false);
-    const [username, setUsername] = useState('');
 
     const [unique, setUnique] = useState(nanoid())
     window.scrollTo(0, 0)
 
-    function handleChange(event){
-        const target = event.target;
-        const name = target.name;
-        const value = target.value;
-        setUsername(value)
+    function signup(email, password) {
+        return createUserWithEmailAndPassword(auth, email, password)
     }
 
     async function handleSignup() {
-        localStorage.setItem('username', username)
+        localStorage.setItem('username', usernameRef.current.value)
         setLoading(true);
         try {
             await signup(emailRef.current.value, passwordRef.current.value);
@@ -51,11 +32,9 @@ export default function Register({updatePage}){
         }
         await addDoc(usersRef, {
             email: auth.currentUser.email,
-            username: username,
+            username: usernameRef.current.value,
             uid: auth.currentUser.uid,
             createdAt: serverTimestamp(),
-            defaultPic: url,
-            defPicLoc: randomNum,
             unique: unique,
         })
         // UPDATE HAS BEEN UPDATED...
@@ -73,55 +52,22 @@ export default function Register({updatePage}){
                 })
             })
         })
-        setImage(null);
-        setLoading(false);
-        updatePage(); 
-        URL.revokeObjectURL(image) 
-    }
-    
-// #############################################################################
-// ######################## I M A G E   S T U F F ##############################
-// #############################################################################
-    const [image, setImage] = useState(null);
-    const [url, setUrl] = useState(null);
-    const [objURL, setObjURL] = useState("")
-
-    // This is to make sure createObjectURL only runs once
-    useEffect(()=> {
-        setObjURL(image?URL.createObjectURL(image):null)
-    },[image])
-
-    const handleImageChange = (e) => {
-        if (e.target.files[0]) {
-            const file = e.target.files[0];
-            console.log("file is: "+file);
-            imageConversion.compressAccurately(file, 100).then(res=>{
-                console.log(res);
-                setImage(res)
-            })
-        }
-        setReady(false);
-    }
-    const handleSubmit = () => {
-        const imageRef = ref(storage, randomNum);
-        uploadBytes(imageRef, image).then(() => {
-            getDownloadURL(imageRef).then((url) => {
-                setUrl(url);
-            })
-            .catch((error) => {
-                console.log(error.message, "error getting image address")
+        .then(() => {
+            sendEmailVerification(auth.currentUser)
+            .then(() => {
+                // Email verification sent!
+                // ...
             });
-        }).catch((error) => {
-            console.log(error.message)
         })
-        setReady(true);
-    };
+        .then(() => {
+            props.exit();
+        })
+        .then(() => {
+            setLoading(false);
+            props.updatePage(); 
+        })
+    }
 
-    const [ready, setReady] = useState(false);
-
-// #############################################################################
-// #############################  R E T U R N  #################################
-// #############################################################################
     return (
         <>  
             <div className="register-page page-body">
@@ -131,45 +77,34 @@ export default function Register({updatePage}){
                     <input
                         ref={emailRef}
                         id="email"
-                        className="input-register"
+                        className="input-user-cred"
                         placeholder="email"
                         name="email"
                     />
+                    <p>... not a valid email</p>
                     <label htmlFor="password">Password</label>
                     <input
                         ref={passwordRef}
                         id="password"
-                        className="input-register"
+                        className="input-user-cred"
                         placeholder="password"
                         type="password"
                         name="password"
                     />
+                    <p>... password must be between 6 and 50 characters and include letters and numbers</p>
                     <label htmlFor="username">Username</label>
                     <input
+                        ref={usernameRef}
                         id="username"
-                        className="input-register"
+                        className="input-user-cred"
                         placeholder="username"
                         name="username"
-                        value={username}
-                        onChange={handleChange}
+
                     />
-                    <hr />
-                    <h2>Set Avatar</h2>
-                    <input 
-                        className="fileTypeInput" 
-                        type="file" 
-                        accept=".jpg, .jpeg, .png" 
-                        onChange={handleImageChange} /> 
-                    <img    
-                        className="preview-image"
-                        alt="preview profile"
-                        src={image !== null ?objURL:null}
-                    />
-                    <button className="finalizeImage register-btn" 
-                        disabled={image === null || ready === true} 
-                        onClick={handleSubmit}>finalize image</button>
-                    <button className="register-btn btm-btn" 
-                        disabled={loading || ready === false} 
+                    <p>... username is already taken</p>
+                    <hr/>
+                    <button className="btn-user-cred" 
+                        disabled={loading} 
                         onClick={handleSignup}>register</button>
                 </div>
             </div>
@@ -177,5 +112,16 @@ export default function Register({updatePage}){
     )
 }
 
+// Some snippets for future reference incase I auto delete unverified accounts after 
+// 10 minutes in this case..
+// 60000 is the same as one minute....
 
- 
+// const d1 = new Date();
+// const currentTime = d1.getTime();
+
+// if(document.data().isVerified === false){
+    //     if(currentTime - document.data().createdAt.toDate().getTime() < 600000){
+    //         // delete doc and delete user
+            
+    //     }
+// }

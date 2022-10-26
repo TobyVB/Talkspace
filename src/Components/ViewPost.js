@@ -1,13 +1,11 @@
 import React, {useEffect, useState, useRef} from "react";
 import { useCollectionData } from 'react-firebase-hooks/firestore';
 import { nanoid } from 'nanoid';
-
 import { query, orderBy, onSnapshot, 
     collection, getFirestore, doc, 
     updateDoc, arrayUnion, arrayRemove
 } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
-
 import CreateComment from "./CreateComment.js";
 import Comment from "./Comment.js";
 
@@ -29,7 +27,6 @@ export default function ViewPost(props){
         window.scrollTo(0, 0)
     }, [])
 
-    
     // FIND THE POST DOC
     const postsRef = collection(db, 'posts');
     const [foundPost, setFoundPost] = useState("")
@@ -44,7 +41,6 @@ export default function ViewPost(props){
         })
     },[])
 
-
     // FIND THE USER DOC
     const usersRef = collection(db, 'users');
     const [foundUser, setFoundUser] = useState("")
@@ -58,8 +54,6 @@ export default function ViewPost(props){
             }))
         })
     },[foundPost])
-
-
 
     const scrollTarget = useRef();
     const scrollingTop = (event) => {
@@ -76,7 +70,6 @@ export default function ViewPost(props){
         
     function resetUnique(){props.setCapturedUnique("");props.setCurrentCommentId("")}
     function doNothing(){}
-
 
     // #####################################   F O L L O W   A N D   U N F O L L O W   P O S T   #############################################
     function followPost(){
@@ -108,33 +101,44 @@ export default function ViewPost(props){
         props.editPost();
     }
 
+    const [link, setLink] = useState("")
+    const [startLink, setStartLink] = useState(false)
+
+    useEffect(() => {
+        if(startLink === true){
+            setLink(prevLink => prevLink.slice(17));
+        }
+        setStartLink(false);
+    }, [startLink])
+
+    useEffect(()=> {
+        foundPost.video && setLink(foundPost.video.slice(17))
+    }, [foundPost])
+
+    // if text includes https://youtu.be/ copy the text until the next " " and put it in a variable
+    // also hide or remove text that matches the created variable
+    // where the removed or hidden text was, put in an iframe
+
     return (
         <div className="page-body post">
             { auth.currentUser.uid === foundPost.uid && <button className="edit-post-btn" onClick={editPost}>edit post</button>}
             <div className="view-post-container">
-            <p 
+                <p 
                     className="post-author"
                     onClick={() => props.sendUID(foundUser.uid)}>Authored by: {foundUser.username}
                 </p>
-                {/* <div className="post-header-text"> */}
-                    <h4 className="post-title">{foundPost.title}</h4>
-                {/* </div> */}
-                
+                <h4 className="post-title">{foundPost.title}</h4>
                 <div className="post-body">
                     <p>{foundPost.body}</p>
+                    {foundPost.video && <iframe src={`https://www.youtube.com/embed/${link}`}></iframe>}
                 </div>
                 <button className="follow-post" onClick={followPost}>{foundPost && foundPost.follows.includes(props.userDataId)?"- UNFOLLOW":"+ FOLLOW"}</button>
-            </div>
-            
-
-            {/* write new comment */}
+            </div>   
             <CreateComment 
                 capturedPostId={props.capturedPostId}
                 id={foundUser.id}
                 uid={foundUser.uid}
             />
-            {/* comments here */}
-            
             <div className="chatMessages">
                 {comments && comments.map((comment) => comment.replyTo === props.capturedPostId && <div key={nanoid()}><Comment 
                     comment={comment.body}
@@ -160,5 +164,4 @@ export default function ViewPost(props){
             </div>
         </div>
     )
-    
 }

@@ -10,15 +10,25 @@ import { useAuthState } from 'react-firebase-hooks/auth';
 
 import {getStorage} from "firebase/storage";
 
-import Notifications from './Components/Notifications';
+import Notifications from './Components/Notifications.js';
+import Settings from './Components/Settings.js';
 import Homepage from "./Components/Homepage.js";
 import ViewProfile from './Components/ViewProfile.js';
+import ViewEditProfile from './Components/ViewEditProfile.js';
 import Login from './Components/Login.js';
 import Register from './Components/Register.js';
 import ViewOtherProfile from './Components/ViewOtherProfile';
 import CreatePost from './Components/CreatePost.js';
 import ViewPost from './Components/ViewPost.js';
 import ViewEditPost from './Components/ViewEditPost.js';
+// settings
+import ChangeUsername from './Components/ChangeUsername.js';
+import UpdateEmail from './Components/UpdateEmail.js';
+import RetrievePassword from './Components/RetrievePassword.js';
+import ResetPassword from './Components/ResetPassword.js';
+import DeleteAccount from './Components/DeleteAccount.js';
+// Now just need to make all these files...
+// Also today, could go take a look at React router...
 
 const firebaseConfig = {
   apiKey: "AIzaSyCXgrZdHQUbrEgrjTi71-Mc80WK0Ibj3zk",
@@ -39,20 +49,26 @@ function App() {
   useAuthState(auth);
 
   function exit(){
-      setPage(1);
       auth.signOut();
       setAllowLogin(true);
-      // setuserData('');
+  }
+  function cancelSignIn(){
+    auth.signOut();
+      setAllowLogin(true);
   }
   function SignOut(){
     return auth.currentUser && (
-      <button className="nav-btn" onClick={exit}>Sign Out</button>
+      <button 
+      className="nav-btn"
+      onClick={menuSignOut}
+      >Sign Out
+    </button>
     )
   }
-
   const [userData, setuserData] = useState('');
   const [allowLogin, setAllowLogin] = useState(true)
 
+  const [loginCompleted, setLoginCompleted] = useState(false)
   function updateAccess(){
     if(auth.currentUser && allowLogin === true){
       const usersRef = collection(db, 'users');
@@ -65,24 +81,33 @@ function App() {
         users.forEach(user => { 
           if(auth.currentUser && user.uid === auth.currentUser.uid){
             setuserData(user)
-            console.log("boinga")
           }
         })
       })
       console.log("user has been updated from app.js")
       setAllowLogin(false)
+      setLoginCompleted(true)
     }
   }
   updateAccess()
-  // useEffect(()=> {
-  //   console.log(userData.username)
-  // }, [userData])
+
+  useEffect(() => {
+    if(loginCompleted === true){
+        if(auth.currentUser && !auth.currentUser.emailVerified){
+            verificationReminder()
+            auth.signOut();
+            setAllowLogin(true);
+        }
+        setLoginCompleted(false)
+    }
+  }, [loginCompleted])
 
   const [notifyWindow, setNotifyWindow] = useState(false)
   function toggleNotifyWindow(){
     setNotifyWindow(prevNotifyWindow => !prevNotifyWindow);
   }
   
+  const viewSettings = 0;
   const viewHome = 1;
   const viewRegister = 2;
   const viewLogin = 3;
@@ -91,7 +116,18 @@ function App() {
   const viewCreatePost = 6;
   const viewPost = 7;
   const viewEditPost = 8;
+  const viewEditProfile = 9;
+  // settings pages
+  const viewChangeUsername = 10;
+  const viewUpdateEmail = 11;
+  const viewRetrievePassword = 12;
+  const viewResetPassword = 13;
+  const viewDeleteAccount = 14;
+
   const [page, setPage] = useState(1);
+  function startViewSettings(){
+    setPage(0);
+  }
   function startViewHome(){
     setPage(1);
   }
@@ -104,18 +140,6 @@ function App() {
   function startViewProfile(){
     setPage(4);
   }
-  const [updateReadyGo, setUpdateReadyGo] = useState(false)
-  function updateReady(){
-    setUpdateReadyGo(true)
-    updateAccess();
-  }
-  useEffect(() => {
-    if( updateReadyGo === true ){
-      console.log('userData.aboutMe: '+userData.aboutMe);
-      startViewHome();
-      setUpdateReadyGo(false)
-    }
-  }, [updateReadyGo])
   function startViewOtherProfile(){
     setPage(5);
   }
@@ -128,11 +152,44 @@ function App() {
   function startViewEditPost(){
     setPage(8);
   }
+  function startViewEditProfile(){
+    setPage(9);
+  }
+  // settings start page functions
+  function startViewChangeUsername(){
+    setPage(10)
+  }
+  function startViewUpdateEmail(){
+    setPage(11)
+  }
+  function startViewRetrievePassword(){
+    setPage(12)
+  }
+  function startViewResetPassword(){
+    setPage(13)
+  }
+  function startViewDeleteAccount(){
+    setPage(14)
+  }
   const [startUp, setStartUp] = useState(false)
   function restartPage(){
     setPage(99);
     setStartUp(true)
   }
+
+  const [updateReadyGo, setUpdateReadyGo] = useState(false)
+  function updateReady(){
+    setUpdateReadyGo(true)
+    updateAccess();
+  }
+  useEffect(() => {
+    if( updateReadyGo === true ){
+      console.log('userData.aboutMe: '+userData.aboutMe);
+      startViewHome();
+      setUpdateReadyGo(false)
+    }
+  }, [updateReadyGo])
+
   useEffect(() => {
     if(startUp === true){
       startViewPost();
@@ -143,6 +200,19 @@ function App() {
   const [useNavClassNone, setUseNavClassNone] = useState(true) 
   const navClassNone = useNavClassNone? "none": ""
   const [navToggle, setNavToggle] = useState(false)
+
+  const [warning, setWarning] = useState(false);
+  const [transformWarning, setTransformWarning] = useState(false)
+  function verificationReminder(){
+    setWarning(true)
+    setTimeout(()=> {
+      setWarning(false);
+      setTransformWarning(false)
+    },8000)
+    setTimeout(()=> {
+      setTransformWarning(true)
+    },6000)
+  }
   function showMenu(){
     setUseNavClassNone(prev => !prev);
     setNavToggle(prev => !prev)
@@ -151,9 +221,7 @@ function App() {
     setUseNavClassNone(true);
     setNavToggle(false)
   }
-  
-
-
+// ############################################################
   const [capturedUID, setCapturedUID] = useState("");
   const sendUID = (e) => {
     setCapturedUID(e);
@@ -163,7 +231,6 @@ function App() {
   const [capturedPostId, setCapturedPostId] = useState("");
   const sendPostId = (e) => {
     setCapturedPostId(e);
-    // console.log("this is the postId I'm grabbing! "+e)
     startViewPost()
   }
 // ############################################################
@@ -171,13 +238,12 @@ function App() {
   const sendUnique = (e) => {
     setCapturedUnique(e)
   }
-
+// ############################################################
   const [currentCommentId, setCurrentCommentId] = useState("");
   const sendCurrentCommentId = (e) => {
     setCurrentCommentId(e)
-    console.log("what do we have here from App.js: "+e)
   }
-
+// ############################################################
 
   if(page !== 7){sessionStorage.clear();}
 
@@ -193,18 +259,49 @@ function App() {
         postId: 'postId'
   })
 
+  function menuHome(){
+    startViewHome()
+    hideMenu()
+  }
+  function menuLogin(){
+    startViewLogin()
+    hideMenu()
+  }
+  function menuRegister(){
+    startViewRegister()
+    hideMenu()
+  }
+  function menuProfile(){
+    startViewProfile()
+    hideMenu()
+  }
+  function menuCreatePost(){
+    startViewCreatePost()
+    hideMenu()
+  }
+  function menuSettings(){
+    startViewSettings()
+    hideMenu()
+  }
+  function menuSignOut(){
+    exit()
+    setPage(1);
+    hideMenu()
+  }
 
   return (
     <div className="App">
-      <header onMouseLeave={hideMenu}>
+      {warning && <p className={transformWarning?'warning-text transform-warning':'warning-text'}>user needs to be verified</p>}
+      {/* When clicking off header hideMenu */}
+      <header >
         <div className={`header ${navToggle && `header-toggle`}`}>
-          <div className="nav-title"><p>The</p><h1 onClick={startViewHome}>TalkSpace</h1></div>
-          <button className="bell" onClick={toggleNotifyWindow}>🛎
+          <div className="nav-title"><p>The</p><h1 onClick={menuHome}>TalkSpace</h1></div>
+          {auth.currentUser && auth.currentUser.emailVerified && <button className="bell" onClick={toggleNotifyWindow}>🛎
             <span className="notification-num"> {notifications && auth.currentUser &&
               notifications.filter(notification => auth.currentUser.uid === notification.to).length > 0 && 
               notifications.filter(notification => auth.currentUser.uid === notification.to).length}
             </span>
-          </button>
+          </button>}
           <button className="showNav" onClick={showMenu}>menu</button>
         </div>
         <div className={`login-header-buttons  ${navClassNone}`}>
@@ -213,37 +310,42 @@ function App() {
             <button 
               className="nav-btn" 
               disabled={page === viewLogin ? "+true" : ""} 
-              onClick={startViewLogin}
+              onClick={menuLogin}
             >Login</button>
             <button 
               className="nav-btn" 
               disabled={page === viewRegister ? "+true" : ""} 
-              onClick={startViewRegister}
+              onClick={menuRegister}
             >Register</button>
           </>
           }
-          {auth.currentUser && 
+          { auth.currentUser && 
           <>
             <button 
               className="nav-btn" 
               disabled={page === viewProfile ? "+true" : ""} 
-              onClick={startViewProfile}
-            >Profile</button>
-            <button className="nav-btn">
-              Settings
+              onClick={menuProfile}
+              >Profile
             </button>
             <button 
               className="nav-btn" 
               disabled={page === viewCreatePost ? "+true" : ""} 
-              onClick={startViewCreatePost}
-            >Create Post</button>
+              onClick={menuCreatePost}
+              >Create Post
+            </button>
+            <button 
+              className="nav-btn"
+              disabled={page === viewSettings ? "+true" : ""}
+              onClick={menuSettings}
+              >Settings
+            </button>
           </>
           }
           {auth.currentUser && <SignOut />}
         </div>
       </header>
     
-      <section>
+      <section onClick={hideMenu}>
         {/* NOTIFICATIONS */}
       {notifyWindow 
       && <Notifications 
@@ -257,6 +359,16 @@ function App() {
         notifications={notifications}
       />}
 
+        {/* SETTINGS */}
+      {auth.currentUser && page === viewSettings
+      && <Settings
+        changeUsername={startViewChangeUsername}
+        updateEmail={startViewUpdateEmail}
+        retreivePassword={startViewRetrievePassword}
+        resetPassword={startViewResetPassword}
+        deleteAccount={startViewDeleteAccount}
+      />}
+
         {/* PROFILE */}
       {auth.currentUser && page === viewProfile 
       && <ViewProfile username={userData.username} 
@@ -264,10 +376,21 @@ function App() {
         defPicLoc={userData.defPicLoc}
         aboutMe={userData.aboutMe}
         updatePage={startViewPost}
+        editProfile={startViewEditProfile}
         sendPostId={sendPostId}
         userData={userData}
         id={userData.id} 
-        signout={exit}/>}
+        signout={exit}
+      />}
+
+        {/* EDIT PROFILE */}
+      {auth.currentUser && page === viewEditProfile
+      && <ViewEditProfile  
+        cancel={startViewProfile}
+        defaultPic={userData.defaultPic}
+        defPicLoc={userData.defPicLoc}
+        aboutMe={userData.aboutMe}
+      />}
 
         {/* HOMEPAGE */}
       {page === viewHome 
@@ -276,18 +399,26 @@ function App() {
         sendPostId={sendPostId}
         goToProfile={startViewProfile}
         sendUserId={sendUID}
+        verificationReminder={verificationReminder}
       />}
 
         {/* LOGIN */}
-      {!auth.currentUser && page === viewLogin 
+      { !auth.currentUser && page === viewLogin 
       && <Login 
         updateReady={updateReady}
+        startViewLogin={startViewLogin}
+        setAllowLogin={setAllowLogin}
+        verificationReminder={verificationReminder}
+        cancelSignIn={cancelSignIn}
       />}
 
         {/* REGISTER */}
       {!auth.currentUser && page === viewRegister 
-      && <Register updatePage={startViewProfile}/>}
-      </section>
+      && <Register 
+        updatePage={startViewLogin}
+        exit={exit}
+      />}
+  
 
         {/* OTHERS PROFILE */}
       {auth.currentUser && page === viewOtherProfile
@@ -325,6 +456,43 @@ function App() {
         capturedPostId={capturedPostId}
         cancel={startViewPost}
       />}
+
+      {/* VIEW CHANGE USERNAME */}
+      {auth.currentUser && page === viewChangeUsername
+      && <ChangeUsername 
+        cancel={startViewSettings}              
+      />}
+
+      {/* VIEW UPDATE EMAIL */}
+      {auth.currentUser && page === viewUpdateEmail
+      && <UpdateEmail 
+        cancel={startViewSettings}     
+        userData={userData}       
+      />}
+
+      {/* VIEW RETRIEVE PASSWORD */}
+      {auth.currentUser && page === viewRetrievePassword
+      && <RetrievePassword
+        cancel={startViewSettings}            
+      />}
+
+      {/* VIEW RESET PASSWORD */}
+      {auth.currentUser && page === viewResetPassword
+      && <ResetPassword
+        cancel={startViewSettings}            
+      />}
+
+      {/* VIEW DELETE ACCOUNT */}
+      {auth.currentUser && page === viewDeleteAccount
+      && <DeleteAccount
+        cancel={startViewSettings}  
+        id={userData.id}   
+        username={userData.username}  
+        updatePage={startViewHome}     
+      />}
+
+      </section>
+
       <div className="footer">
         <h3 className='footer-email'>tobcvb@gmail.com 2022</h3>
       </div>
@@ -333,3 +501,4 @@ function App() {
 }
 
 export default App;
+

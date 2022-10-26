@@ -1,40 +1,23 @@
 // #############################################################################
 // ############################# I M P O R T S #################################
 // #############################################################################
-import { doc, deleteDoc, getFirestore,
-    updateDoc, query, orderBy,
+import { getFirestore, query, orderBy, 
     onSnapshot, collection
 } from "firebase/firestore";
 import { useCollectionData } from 'react-firebase-hooks/firestore';
-import { getAuth, deleteUser } from "firebase/auth";
-import {ref, uploadBytes, getDownloadURL} from "firebase/storage";
-
-import {storage} from '../App.js';
+import { getAuth } from "firebase/auth";
 import React, {useEffect, useState} from "react";
-import * as imageConversion from 'image-conversion';
-import { nanoid } from 'nanoid';
-// #############################################################################
-// ######################### P R O F I L E   F U N C. ##########################
-// #############################################################################
 export default function ViewProfile(props){
     const db = getFirestore();
     const auth = getAuth();
     const usersRef = collection(db, 'users');
-
     const [currentUser, setCurrentUser] = useState("")
-    const [showSettings, setShowSettings] = useState(false)
-
-    const [randomNum, setRandomNum] = useState(nanoid())
     const [image, setImage] = useState(null);
-    const [url, setUrl] = useState(null);
-    const [defPicLoc, setDefPicLoc] = useState(props.defPicLoc);
-
     const [objURL, setObjURL] = useState("")
 
     useEffect(() => {
         window.scrollTo(0, 0)
     }, [])
-    console.log("profile")
 
     // ########## A C C E S S   C U R R E N T   U S E R'S   D O C ##########
     useEffect(() => {
@@ -57,227 +40,53 @@ export default function ViewProfile(props){
       title: 'title',
       uid: `uid`
     });
+
     function viewPost(e){
         props.updatePage()
         props.sendPostId(e)
     }
 
-    // ########## S H O W   E D I T   P R O F I L E ##########
-    function showSettingsBool(){
-        setShowSettings(prevChange => !prevChange)
-        window.scrollTo(0, 0)
-    }
-    function cancelShowSettings(){
-        setShowSettings(prevChange => !prevChange)
-        setImage(null)
-
-        setHideEditAboutMe(true)
-        setHideEditImage(true);
-
-        window.scrollTo(0, 0)
-    }
-    // ########## U P D A T E   U S E R ##########
-    async function updateUser(){
-        const docRef = doc(db, 'users', currentUser.id)
-        await updateDoc(docRef, {
-            defaultPic: `${url === null? props.defaultPic: url}`,
-            defPicLoc: `${url === null? props.defPicLoc: defPicLoc}`,
-            aboutMe: `${aboutMeValue === ""? props.aboutMe: aboutMeValue}`
-        })
-        setShowSettings(false)
-    }
-
-
-    // ########## S A V E   C H A N G E S ##########
-    function save(){
-        {image !== null &&
-            submitImage();
-        }
-        updateUser()
-    }
-    const [hideEditImage, setHideEditImage] = useState(true);
-    function showEditImage(){
-        setHideEditImage(false);
-    }
-    function cancelEditImage(){
-        setHideEditImage(true);
-    }
-    const [hideEditAboutMe, setHideEditAboutMe] = useState(true);
-    function showEditAboutMe(){
-        setHideEditAboutMe(false)
-    }
-    function cancelEditAboutMe(){
-        setHideEditAboutMe(true)
-    }
-    // ########## U D A T E   A B O U T   M E ##########
-    const [aboutMeValue, setAboutMeValue] = useState(props.aboutMe);
-// #############################################################################
-// ######################## I M A G E   S T U F F ##############################
-// #############################################################################
-    
-    useEffect(()=> {
-        setObjURL(image?URL.createObjectURL(image):null)
-    },[image])
-    // ########## H A N D L E   I M A G E ##########
-    const handleImageChange = async(e) => {
-        if (e.target.files[0]) {
-            const file = e.target.files[0];
-            imageConversion.compressAccurately(file, 100).then(res=>{
-                setImage(res);
-            })
-        }
-        await submitImage();
-    }
-    // ########## I M A G E   S U B M I T ##########
-    const submitImage = async () => {
-        setDefPicLoc(randomNum)
-        const imageRef = ref(storage, randomNum);
-        uploadBytes(imageRef, image).then(() => {
-            getDownloadURL(imageRef).then((url) => {
-                setUrl(url);
-            })
-            // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-            .catch((error) => {
-                console.log(error.message, "error getting image address")
-            });
-        }).catch((error) => {
-            console.log(error.message)
-        })
-    };
-
-    // ##################################################################
     function Post(props){
         return (
-            <>
-                <p 
-                    className="post-link"
-                    onClick={() => viewPost(props.id)}
-                 >{props.title}</p>
-            </>
+            <p 
+                className="post-link"
+                onClick={() => viewPost(props.id)}
+            >{props.title}
+            </p>
         )
     }
-// #############################################################################
-// #############################################################################
-// #############################  R E T U R N  #################################
-// #############################################################################
-// #############################################################################
-
-
-// User can like/follow a post. When they do, their name is updated to the the array field of the post
-// And the post is added to the users following posts array field
-// Here in the foundUser's profile. We'll look for all posts that have the foundUser's uid in the array field
-
-
 
     return (
-        <>{currentUser && <div>
-            {/* ############### P R O F I L E ################ */}
-            <div className="profile page-body">
-                <button className="edit-user-btn" onClick={showSettingsBool}>edit profile</button>
-                <h2 
-                className="profile-header-text">{`${currentUser.username}`}
-                </h2>
-                <div className="profile-jumbotron">
-                    <img 
-                        alt="profile" 
-                        className="profile-picture" 
-                        src={image!==null?objURL:currentUser.defaultPic}
-                    /> 
-                    <p>
-                        {`${currentUser.aboutMe !== undefined? currentUser.aboutMe: ""}`}
-                    </p>
-                </div>
-                <div className="profile-post-sections">
-                    <div>
-                        <h3>{`${currentUser.username}'s posts`}</h3>
-                        <div className="foundUser-posts">
-                            {posts && posts.filter(post => post.uid === currentUser.uid).length < 1 && "... No posts to show"}
-                            {posts && posts.map(post => post.uid === currentUser.uid && <Post id={post.id} key={post.id} title={post.title}/>)}
-                        </div>
+        <div className="profile page-body">
+            <button className="edit-user-btn" onClick={props.editProfile}>edit profile</button>
+            <h2 
+            className="profile-header-text">{`${currentUser.username}`}
+            </h2>
+            <div className="profile-jumbotron">
+                <img 
+                    alt="profile" 
+                    className="profile-picture" 
+                    src={image!==null?objURL:currentUser.defaultPic}
+                /> 
+                <p>
+                    {`${currentUser.aboutMe !== undefined? currentUser.aboutMe: ""}`}
+                </p>
+            </div>
+            <div className="profile-post-sections">
+                <div>
+                    <h3>{`${currentUser.username}'s posts`}</h3>
+                    <div className="foundUser-posts">
+                        {posts && posts.filter(post => post.uid === currentUser.uid).length < 1 && "... No posts to show"}
+                        {posts && posts.map(post => post.uid === currentUser.uid && <Post id={post.id} key={post.id} title={post.title}/>)}
                     </div>
-                    <div>
-                        <h3>Liked Posts</h3>
-                        <div className="foundUser-posts">
-                            {/* {posts && posts.map(post => post.uid === currentUser.uid && <Post id={post.id} key={post.id} title={post.title}/>)} */}
-                            {posts && posts.map(post => post.follows.includes(currentUser.id)  && <Post id={post.id} key={post.id} title={post.title}/>)}
-                        </div>
+                </div>
+                <div>
+                    <h3>Liked Posts</h3>
+                    <div className="foundUser-posts">
+                        {posts && posts.map(post => post.follows.includes(currentUser.id)  && <Post id={post.id} key={post.id} title={post.title}/>)}
                     </div>
                 </div>
             </div>
-            {/* ############### S E T T I N G S ################ */}
-            <div className={!showSettings 
-                ? `hideProSettings edit-profile profile` 
-                : `edit-profile profile`}>
-
-                {/* ############### E D I T   P R O F I L E   P H O T O ################ */}
-                {hideEditImage && <div className="edit-profile-section"><button  onClick={showEditImage}>edit profile photo</button></div>}
-                {!hideEditImage && 
-                    <>
-                        <img 
-                            alt="profile" 
-                            className="profile-picture" 
-                            src={image!==null?objURL:props.defaultPic}
-                        /> 
-                        <input 
-                            className="fileTypeInput" 
-                            type="file" 
-                            accept=".jpg, .jpeg, .png" 
-                            onChange={handleImageChange} 
-                        />
-                        <button onClick={cancelEditImage}>cancel</button>
-                    </>
-                } 
-                {/* ############### E D I T   A B O U T   M E ################ */}
-                {hideEditAboutMe && <div className="edit-profile-section"><button onClick={showEditAboutMe}>edit About Me</button></div>}
-                {!hideEditAboutMe &&
-                    <div className="edit-profile-section">
-                        <textarea
-                            id="aboutMe"
-                            placeholder="Write about yourself"
-                            name="aboutMe"
-                            cols={30}
-                            rows={4}
-                            value={aboutMeValue}
-                            onChange={(event) => setAboutMeValue(event.target.value)}
-                        />
-                        <button onClick={cancelEditAboutMe}>cancel</button>
-                    </div>
-                }
-
-                {/* ############### S A V E   S E T T I N G S ################ */}
-                <div className="save-cancel-edit-profile">
-                    <button onClick={save}>save</button>
-                    <button onClick={cancelShowSettings}>cancel</button>
-                </div>
-            </div>
-        </div>}</>
+        </div>
     )
 }
-
-
-/* <button className="delete-user-btn" 
-    onClick={()=> deleteAllUserData(auth.currentUser)}
-    >Delete User
-</button>  */
-
-
-
-// ########## D E L E T E   U S E R ##########
-    // const deleteAllUserData = async (uid) =>{
-    //     const docRef = doc(db, 'users', props.id)
-    //     deleteDoc(docRef)
-    //         .then(() => {
-    //             console.log(`${props.username} in users deleted`)
-    //         })
-    //         .then(() => {
-    //             ("deleting from database")
-    //             deleteUser(auth.currentUser).then(() => {
-    //                 console.log(`user auth doc has been deleted`)
-    //             }).catch((error) => {
-    //                 console.log(error)
-    //             })
-    //         })
-    //         .then(() => {
-    //             props.signout();
-    //         })
-    // }

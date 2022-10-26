@@ -21,11 +21,14 @@ export default function CreatePost(props){
         window.scrollTo(0, 0)
     }, [])
 
+    const [link, setLink] = useState("")
+
     function createPost(e){
         e.preventDefault()
         addDoc(postsRef, {
             title: formValueTitle,
             body: formValueBody,
+            video: link,
             uid: auth.currentUser.uid,
             follows: [],
             approval: [],
@@ -77,6 +80,14 @@ export default function CreatePost(props){
                         value={formValueBody} 
                         onChange={(event) => setFormValueBody(event.target.value)} 
                         placeholder="Add post body..." 
+                    />
+                    <textarea
+                        className="create-post-video-textarea"
+                        cols={1} 
+                        type="text" 
+                        placeholder="youtube link..."
+                        value={link}
+                        onChange={(event) => setLink(event.target.value)}
                     />
                     <button className="create-post-btn" type="submit" disabled={!formValueTitle}>create post</button>
                 </form>
