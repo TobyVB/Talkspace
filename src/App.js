@@ -23,9 +23,9 @@ import ViewPost from './Components/ViewPost.js';
 import ViewEditPost from './Components/ViewEditPost.js';
 // settings
 import ChangeUsername from './Components/ChangeUsername.js';
-import UpdateEmail from './Components/UpdateEmail.js';
+// import UpdateEmail from './Components/UpdateEmail.js';
 import RetrievePassword from './Components/RetrievePassword.js';
-import ResetPassword from './Components/ResetPassword.js';
+import ChangePassword from './Components/ChangePassword.js';
 import DeleteAccount from './Components/DeleteAccount.js';
 // Now just need to make all these files...
 // Also today, could go take a look at React router...
@@ -119,9 +119,9 @@ function App() {
   const viewEditProfile = 9;
   // settings pages
   const viewChangeUsername = 10;
-  const viewUpdateEmail = 11;
+  // const viewUpdateEmail = 11;
   const viewRetrievePassword = 12;
-  const viewResetPassword = 13;
+  const viewChangePassword = 13;
   const viewDeleteAccount = 14;
 
   const [page, setPage] = useState(1);
@@ -165,7 +165,7 @@ function App() {
   function startViewRetrievePassword(){
     setPage(12)
   }
-  function startViewResetPassword(){
+  function startViewChangePassword(){
     setPage(13)
   }
   function startViewDeleteAccount(){
@@ -363,9 +363,9 @@ function App() {
       {auth.currentUser && page === viewSettings
       && <Settings
         changeUsername={startViewChangeUsername}
-        updateEmail={startViewUpdateEmail}
+        // updateEmail={startViewUpdateEmail}
         retreivePassword={startViewRetrievePassword}
-        resetPassword={startViewResetPassword}
+        changePassword={startViewChangePassword}
         deleteAccount={startViewDeleteAccount}
       />}
 
@@ -464,11 +464,11 @@ function App() {
       />}
 
       {/* VIEW UPDATE EMAIL */}
-      {auth.currentUser && page === viewUpdateEmail
+      {/* {auth.currentUser && page === viewUpdateEmail
       && <UpdateEmail 
         cancel={startViewSettings}     
         userData={userData}       
-      />}
+      />} */}
 
       {/* VIEW RETRIEVE PASSWORD */}
       {auth.currentUser && page === viewRetrievePassword
@@ -477,8 +477,8 @@ function App() {
       />}
 
       {/* VIEW RESET PASSWORD */}
-      {auth.currentUser && page === viewResetPassword
-      && <ResetPassword
+      {auth.currentUser && page === viewChangePassword
+      && <ChangePassword
         cancel={startViewSettings}            
       />}
 

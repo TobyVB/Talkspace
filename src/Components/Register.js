@@ -3,8 +3,9 @@ import { getFirestore, collection, addDoc,
      serverTimestamp, onSnapshot, doc,
       updateDoc, query, orderBy 
     } from "firebase/firestore";
+import { getStorage, ref } from "firebase/storage";
 import { nanoid } from 'nanoid';
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 export default function Register(props){
     const db = getFirestore();
@@ -12,18 +13,85 @@ export default function Register(props){
     const auth = getAuth();
     const emailRef = useRef();
     const passwordRef = useRef();
-    const usernameRef = useRef();
+    // const usernameRef = useRef();
+    const [username, setUsername] = useState("");
     const [loading, setLoading] = useState(false);
 
     const [unique, setUnique] = useState(nanoid())
     window.scrollTo(0, 0)
+
+
+    const storage = getStorage();
+    const [letterRef, setLetterRef] = useState("")
+
+    useEffect(() => {
+        if(username.charAt(0).toLowerCase()=== "a"){
+            setLetterRef(ref(storage, 'defLetters/letterA.png'))
+        } else if(username.charAt(0).toLowerCase()=== "b"){
+            setLetterRef(ref(storage, 'defLetters/letterB.png'))
+        } else if(username.charAt(0).toLowerCase()=== "c"){
+            setLetterRef(ref(storage, 'defLetters/letterC.png'))
+        } else if(username.charAt(0).toLowerCase()=== "d"){
+            setLetterRef(ref(storage, 'defLetters/letterD.png'))
+        } else if(username.charAt(0).toLowerCase()=== "e"){
+            setLetterRef(ref(storage, 'defLetters/letterE.png'))
+        } else if(username.charAt(0).toLowerCase()=== "f"){
+            setLetterRef(ref(storage, 'defLetters/letterF.png'))
+        } else if(username.charAt(0).toLowerCase()=== "g"){
+            setLetterRef(ref(storage, 'defLetters/letterG.png'))
+        } else if(username.charAt(0).toLowerCase()=== "h"){
+            setLetterRef(ref(storage, 'defLetters/letterH.png'))
+        } else if(username.charAt(0).toLowerCase()=== "i"){
+            setLetterRef(ref(storage, 'defLetters/letterI.png'))
+        } else if(username.charAt(0).toLowerCase()=== "j"){
+            setLetterRef(ref(storage, 'defLetters/letterJ.png'))
+        } else if(username.charAt(0).toLowerCase()=== "k"){
+            setLetterRef(ref(storage, 'defLetters/letterK.png'))
+        } else if(username.charAt(0).toLowerCase()=== "l"){
+            setLetterRef(ref(storage, 'defLetters/letterL.png'))
+        } else if(username.charAt(0).toLowerCase()=== "m"){
+            setLetterRef(ref(storage, 'defLetters/letterM.png'))
+        } else if(username.charAt(0).toLowerCase()=== "n"){
+            setLetterRef(ref(storage, 'defLetters/letterN.png'))
+        } else if(username.charAt(0).toLowerCase()=== "o"){
+            setLetterRef(ref(storage, 'defLetters/letterO.png'))
+        } else if(username.charAt(0).toLowerCase()=== "p"){
+            setLetterRef(ref(storage, 'defLetters/letterP.png'))
+        } else if(username.charAt(0).toLowerCase()=== "q"){
+            setLetterRef(ref(storage, 'defLetters/letterQ.png'))
+        } else if(username.charAt(0).toLowerCase()=== "r"){
+            setLetterRef(ref(storage, 'defLetters/letterR.png'))
+        } else if(username.charAt(0).toLowerCase()=== "s"){
+            setLetterRef(ref(storage, 'defLetters/letterS.png'))
+        } else if(username.charAt(0).toLowerCase()=== "t"){
+            setLetterRef(ref(storage, 'defLetters/letterT.png'))
+        } else if(username.charAt(0).toLowerCase()=== "u"){
+            setLetterRef(ref(storage, 'defLetters/letterU.png'))
+        } else if(username.charAt(0).toLowerCase()=== "v"){
+            setLetterRef(ref(storage, 'defLetters/letterV.png'))
+        } else if(username.charAt(0).toLowerCase()=== "w"){
+            setLetterRef(ref(storage, 'defLetters/letterW.png'))
+        } else if(username.charAt(0).toLowerCase()=== "x"){
+            setLetterRef(ref(storage, 'defLetters/letterX.png'))
+        } else if(username.charAt(0).toLowerCase()=== "y"){
+            setLetterRef(ref(storage, 'defLetters/letterY.png'))
+        } else if(username.charAt(0).toLowerCase()=== "z"){
+            setLetterRef(ref(storage, 'defLetters/letterZ.png'))
+        }
+        console.log(letterRef)
+    }, [username])
+    
+    // function getRandomInt(max) {
+    //     return Math.floor(Math.random() * max);
+    //   }
 
     function signup(email, password) {
         return createUserWithEmailAndPassword(auth, email, password)
     }
 
     async function handleSignup() {
-        localStorage.setItem('username', usernameRef.current.value)
+        
+        localStorage.setItem('username', username)
         setLoading(true);
         try {
             await signup(emailRef.current.value, passwordRef.current.value);
@@ -32,10 +100,13 @@ export default function Register(props){
         }
         await addDoc(usersRef, {
             email: auth.currentUser.email,
-            username: usernameRef.current.value,
+            username: username,
             uid: auth.currentUser.uid,
             createdAt: serverTimestamp(),
             unique: unique,
+            defaultPic: letterRef
+            // first: usernameRef.current.value.charAt(0),
+            // bgColor: `rgb(${getRandomInt(255), getRandomInt(255), getRandomInt(255)})`
         })
         // UPDATE HAS BEEN UPDATED...
         .then(() => {
@@ -94,12 +165,13 @@ export default function Register(props){
                     <p>... password must be between 6 and 50 characters and include letters and numbers</p>
                     <label htmlFor="username">Username</label>
                     <input
-                        ref={usernameRef}
+                        // ref={usernameRef}
                         id="username"
                         className="input-user-cred"
                         placeholder="username"
                         name="username"
-
+                        onChange={(event)=> setUsername(event.target.value)}
+                        value={username}
                     />
                     <p>... username is already taken</p>
                     <hr/>

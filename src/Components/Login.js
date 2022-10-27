@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useCollectionData } from 'react-firebase-hooks/firestore';
-import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import { getAuth, signInWithEmailAndPassword, sendPasswordResetEmail } from "firebase/auth";
 import { query, orderBy, collection, getFirestore
 } from "firebase/firestore";
 
@@ -27,23 +27,35 @@ export default function Login(props){
     // loading is just used for disabling button
     const [loading, setLoading] = useState(false);
     async function handleLogin() {
-        // let userLength = 0;
-        // users.forEach(userDoc => {
-        //     if(userDoc.email === emailRef.current.value){
-        //         userLength ++;
-        //     }
-        // })
-        // if(userLength === 1){
-            setLoading(true);
-            try {
-                await login(emailRef.current.value, passwordRef.current.value);
-            } catch {
-                console.log("error with handleSignup function in Register.js");
-            }
-            setLoading(false);
-            props.updateReady();
-            window.location.reload(false);
-        // }
+        setLoading(true);
+        try {
+            await login(emailRef.current.value, passwordRef.current.value);
+        } catch {
+            console.log("error with handleSignup function in Register.js");
+        }
+        setLoading(false);
+        props.updateReady();
+        window.location.reload(false);
+    }
+
+    function sendResetPasswordLink(){
+        sendPasswordResetEmail(auth, emailRef.current.value)
+        .then(() => {
+            // Password reset email sent!
+            // ..
+        })
+        .catch((error) => {
+            const errorCode = error.code;
+            const errorMessage = error.message;
+            console.log(errorCode);
+            console.log(errorMessage);
+            // ..
+        });
+    }
+
+    const [forgotPassword, setForgotPassword] = useState(false);
+    function forgotPasswordBtn(){
+        setForgotPassword(true)
     }
 
     return (
@@ -69,6 +81,15 @@ export default function Login(props){
                 ></input>
                 <hr></hr>
                 <button className="btn-user-cred" disabled={loading} onClick={handleLogin}>login</button>
+                {!forgotPassword && <button className="btn-user-cred" onClick={forgotPasswordBtn}>forgot password?</button>}
+                {forgotPassword &&
+                    <div>
+                        <p>Click to send reset password link to your email</p>
+                        <input type="email" className="input-user-cred" ref={emailRef}></input>
+                        <button className="btn-user-cred" onClick={sendResetPasswordLink}>send link</button>
+                    </div>
+                }
+                
             </div>
         </div>
     )

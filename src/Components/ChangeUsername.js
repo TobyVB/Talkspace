@@ -33,6 +33,9 @@ export default function ChangeUsername(props){
             username: username
         })
         setUsernameChanged(true)
+        setTimeout(() => {
+            props.cancel()
+        }, 3000)
     }
 
     
@@ -47,6 +50,8 @@ export default function ChangeUsername(props){
                 value={username}
             />
             <button onClick={updateUser}>update</button>
+            {!usernameChanged && <p>Current username:</p>}
+            {!usernameChanged && <p>{currentUser.username}</p>}
             {usernameChanged && <p>Username has been changed to: </p>}
             {usernameChanged && <p>{username}</p>}
         </div>

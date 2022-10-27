@@ -26,9 +26,9 @@ export default function Settings(props){
             <hr></hr>
             <div className="settings-buttons">
                 <button onClick={props.changeUsername} >change username</button>
-                <button onClick={props.updateEmail} >update email</button>
+                {/* <button onClick={props.updateEmail} >update email</button> */}
                 <button onClick={props.retreivePassword} >retrieve password</button>
-                <button onClick={props.resetPassword} >reset password</button>
+                <button onClick={props.changePassword} >change password</button>
                 <button onClick={props.deleteAccount} >delete account</button>
             </div>
         </div>

@@ -55,7 +55,8 @@ export default function ViewEditProfile(props){
         {image !== null &&
             submitImage();
         }
-        updateUser()
+        updateUser();
+        props.cancel();
     }
     const [hideEditImage, setHideEditImage] = useState(true);
     function showEditImage(){
