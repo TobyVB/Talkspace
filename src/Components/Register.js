@@ -3,32 +3,42 @@ import { getFirestore, collection, addDoc,
      serverTimestamp, onSnapshot, doc,
       updateDoc, query, orderBy 
     } from "firebase/firestore";
+import { useCollectionData } from 'react-firebase-hooks/firestore';
 import { getStorage, ref, getDownloadURL } from "firebase/storage";
 import { nanoid } from 'nanoid';
 import React, { useEffect, useRef, useState } from "react";
 
 export default function Register(props){
     const db = getFirestore();
-    const usersRef = collection(db, 'users');
     const auth = getAuth();
     const emailRef = useRef();
     const passwordRef = useRef();
     // const usernameRef = useRef();
+    const [email, setEmail] = useState("");
     const [username, setUsername] = useState("");
     const [loading, setLoading] = useState(false);
 
-    const [unique, setUnique] = useState(nanoid())
-    window.scrollTo(0, 0)
+    const [unique, setUnique] = useState(nanoid());
 
-
+    const usersRef = collection(db, 'users');
+    const qUsers = query(usersRef, orderBy('createdAt'));
+    const [users] =  useCollectionData(qUsers, {
+        username: 'username'
+    });
+    
+    useEffect(() => {
+        window.scrollTo(0, 0)
+    }, [])
 
     const storage = getStorage();
     const [letterRef, setLetterRef] = useState("")
-
-    const capL = username.charAt(0).toUpperCase()
-
     
-
+    const capL = username.charAt(0).toUpperCase()
+    const lowL = username.charAt(0).toLowerCase()
+    const letters = ['a','b','c','d','e','f','g','h',
+    'i','j','k','l','m','n','o','p','q','r',
+    's','t','u','v','w','x','y','z']
+    
 
     useEffect(() => {
         setLetterRef(ref(storage, `defLetters/letter${(capL)}.png`))
@@ -36,11 +46,6 @@ export default function Register(props){
     useEffect(() => {
         console.log(letterRef)
     },[letterRef])
-
-    
-    // function getRandomInt(max) {
-    //     return Math.floor(Math.random() * max);
-    //   }
 
     function signup(email, password) {
         return createUserWithEmailAndPassword(auth, email, password)
@@ -110,13 +115,19 @@ export default function Register(props){
                     <h1>SIGN UP</h1>
                     <label htmlFor="email">Email</label>
                     <input
-                        ref={emailRef}
                         id="email"
                         className="input-user-cred"
                         placeholder="email"
                         name="email"
+                        onChange={(event)=> setEmail(event.target.value)}
+                        value={email}
                     />
-                    <p>... not a valid email</p>
+
+                    {users && users.filter(user => user.email === email).length > 0
+                    ? <p>... email already in use</p>
+                    :<p className="invisible-p">invisible text</p>
+                    }
+                    
                     <label htmlFor="password">Password</label>
                     <input
                         ref={passwordRef}
@@ -126,10 +137,9 @@ export default function Register(props){
                         type="password"
                         name="password"
                     />
-                    <p>... password must be between 6 and 50 characters and include letters and numbers</p>
+                    {/* <p>... password must be between 6 and 50 characters and include letters and numbers</p> */}
                     <label htmlFor="username">Username</label>
                     <input
-                        // ref={usernameRef}
                         id="username"
                         className="input-user-cred"
                         placeholder="username"
@@ -137,16 +147,51 @@ export default function Register(props){
                         onChange={(event)=> setUsername(event.target.value)}
                         value={username}
                     />
-                    <p>... username is already taken</p>
+                    
+                    {users && users.filter(user => user.username === username).length > 0 ?
+                            <p>... username is already taken</p>
+                            :<p className="invisible-p"></p>
+                            // make unclickable and invisible, etc
+                    }
+                    {!letters.includes(lowL) ?
+                        <p>... must start with a letter</p>
+                        :<p className="invisible-p">invisible text</p>
+                    }
                     <hr/>
+                    {users && users.filter(user => user.username === username).length < 1 
+                    && 
+                    letters.includes(lowL)
+                    &&
+                    users && users.filter(user => user.email === email).length === 0
+                    ?
                     <button className="btn-user-cred" 
                         disabled={loading} 
-                        onClick={handleSignup}>register</button>
+                        onClick={handleSignup}>register
+                    </button>
+                    :
+                    <button className="btn-user-cred" 
+                        disabled="+true" 
+                        onClick={handleSignup}>register
+                    </button>
+                    }
                 </div>
             </div>
         </>
     )
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // Some snippets for future reference incase I auto delete unverified accounts after 
 // 10 minutes in this case..

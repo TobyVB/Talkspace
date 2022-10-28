@@ -85,6 +85,7 @@ export default function ViewOtherProfile(props){
             </div>
             <h3>POSTS</h3>
             <div className="foundUser-posts">
+                {posts && posts.filter(post => post.uid === foundUser.uid).length < 1 && "... No posts to show"}
                 {posts && posts.map(post => post.uid === foundUser.uid && <Post id={post.id} key={post.id} title={post.title}/>)}
             </div>
         </div>

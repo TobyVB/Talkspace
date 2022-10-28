@@ -83,6 +83,7 @@ export default function ViewProfile(props){
                 <div>
                     <h3>Liked Posts</h3>
                     <div className="foundUser-posts">
+                        {posts && posts.filter(post => post.follows.includes(currentUser.id)).length < 1 && "... No posts to show"}
                         {posts && posts.map(post => post.follows.includes(currentUser.id)  && <Post id={post.id} key={post.id} title={post.title}/>)}
                     </div>
                 </div>

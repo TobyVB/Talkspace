@@ -8,6 +8,10 @@ export default function Login(props){
     const auth = getAuth();
     const db = getFirestore();
 
+    useEffect(() => {
+        window.scrollTo(0, 0)
+    }, [])
+
     function login(email, password) {
         return signInWithEmailAndPassword(auth, email, password);
     }

@@ -132,7 +132,7 @@ textarea:focus, input:focus {
     font-size: 1rem;
   }
   .none {
-    z-index:-5;
+    display: none;
     background-color: rgba(0, 0, 0, 0);
     transition: .15s;
   }
@@ -237,6 +237,10 @@ hr {
   animation-duration: 2.1s;
   animation-iteration-count: infinite;
   animation-direction: normal;
+}
+
+.invisible-p {
+  z-index: -10;
 }
 /* ------------------------------------------------ */
 .container-chat-header {
@@ -454,8 +458,8 @@ form {
   cursor: pointer;
 }
 .edit-profile {
-  top: 10vh;
-  padding-top: 20vh;
+  top: 0vh;
+  padding-top: 30vh;
   position: absolute;
   background-color: rgb(41, 54, 68);
   min-height: 70vh;
@@ -469,11 +473,12 @@ form {
   display: none;
 }
 .foundUser-posts {
-  box-shadow: 0px 0px 10px black;
+  box-shadow: 0px 0px 5px black;
   background-color: rgba(0, 0, 0, .3);
-  padding: .2em 1em;
-  border-radius: 10px;
+  padding: .1em .5em;
+  border-radius: 5px;
   max-height: 50vh;
+  overflow: scroll;
 }
 .post-link {
   cursor: pointer;
@@ -537,7 +542,6 @@ form {
   color: white;
   margin: 2em 0 2em 0;
   padding: 1em 1em 0em 1em;
-  max-width: 90%;
 }
 .create-post-title {
   background-color: rgba(0, 0, 0, .3);
@@ -556,10 +560,10 @@ form {
   min-height: 90vh;
 }
 .view-post-container {
-  background-color: rgba(0, 0, 0, 0.25);
-  padding: 0 1em 1em 1em;
+  background-color: rgba(255, 255, 255, 0.1);
+  padding: 0 0em .5em 0em;
   border: 1px solid black;
-  border-radius: 10px;
+  border-radius: 5px;
 }
 .post h2 {
   margin: 0;
@@ -587,7 +591,7 @@ form {
   padding: .5em 1em;
   background-color: rgba(255, 255, 255, .1);
   box-shadow: 0px 0px 5px black;
-  border-radius: 10px;
+  border-radius: 5px;
 }
 .post-body p {
   font-size: .9rem;
@@ -603,7 +607,7 @@ form {
   margin-top: .5em;
   background: none;
   color: rgba(255, 255, 255, 0.65);
-  padding: .3em;
+  padding: .3em 1.5em;
   font-size: .65rem;
   letter-spacing: .02em;
 }
@@ -692,13 +696,13 @@ form {
 /* ############## C O M M E N T ############### */
 /* ############################################ */
 .comment {
-  background-color: rgba(0,0,0,.3);
-  border-radius: 10px;
+  /* background-color: rgba(0,0,0,.3); */
+  border-radius: 5px;
   padding: .5em;
 }
 .comment-container-main {
   background: rgba(255, 255, 255, .1);
-  border-radius: 10px;
+  border-radius: 5px;
   box-shadow: 0px 0px 5px black;
 }
 .comment-chain {
@@ -780,12 +784,13 @@ textarea {
   color: rgba(1,1,1,0)
 }
 .comment-type-comment {
-  margin: .5em 0;
+  margin: 0;
+  padding: .5em 0;
 }
 .comment-type-reply {
   max-width: 80%;
   padding: .5em;
-  margin: .25em 0em .25em 1em;
+  margin: 0em 0em 0em 1em;
 }
 .time-comment {
   margin-left: 0em;
