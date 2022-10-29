@@ -123,14 +123,21 @@ export default function ViewPost(props){
         <div className="page-body post">
             { auth.currentUser.uid === foundPost.uid && <button className="edit-post-btn" onClick={editPost}>edit post</button>}
             <div className="view-post-container">
-                <p 
-                    className="post-author"
-                    onClick={() => props.sendUID(foundUser.uid)}>Authored by: {foundUser.username}
-                </p>
+                <div className="post-header">
+                    <p 
+                        className="post-author"
+                        onClick={() => props.sendUID(foundUser.uid)}>Authored by: {foundUser.username}
+                    </p>
+                    <img 
+                        alt={foundUser.username}
+                        src={foundUser.defaultPic}
+                        className="post-defaultPic"
+                    />
+                </div>
                 <h4 className="post-title">{foundPost.title}</h4>
                 <div className="post-body">
                     <p>{foundPost.body}</p>
-                    {foundPost.video && <iframe src={`https://www.youtube.com/embed/${link}`}></iframe>}
+                    {foundPost.video && <iframe src={`https://www.youtube.com/embed/${link}`} frameBorder="0" allowFullScreen></iframe>}
                 </div>
                 <button className="follow-post" onClick={followPost}>{foundPost && foundPost.follows.includes(props.userDataId)?"- UNFOLLOW":"+ FOLLOW"}</button>
             </div>   

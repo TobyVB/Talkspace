@@ -1,6 +1,4 @@
-// #############################################################################
-// ############################# I M P O R T S #################################
-// #############################################################################
+import Clock from './Utils/Clock.js';
 import { getFirestore, query, orderBy, 
     onSnapshot, collection
 } from "firebase/firestore";
@@ -65,12 +63,19 @@ export default function ViewProfile(props){
             <div className="profile-jumbotron">
                 <img 
                     alt="profile" 
-                    className="profile-picture" 
+                    className="edit-profile-picture" 
                     src={image!==null?objURL:currentUser.defaultPic}
                 /> 
-                <p>
-                    {`${currentUser.aboutMe !== undefined? currentUser.aboutMe: ""}`}
-                </p>
+                <div className='profile-info-section'>
+                    <div className='flex'>
+                        <p>user since: </p>
+                        <Clock createdAt={currentUser.createdAt}/>
+                    </div>     
+                    <hr></hr>
+                    <p>
+                        {`${currentUser.aboutMe !== undefined? currentUser.aboutMe: ""}`}
+                    </p>
+                </div>
             </div>
             <div className="profile-post-sections">
                 <div>

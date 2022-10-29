@@ -183,16 +183,6 @@ export default function Register(props){
 
 
 
-
-
-
-
-
-
-
-
-
-
 // Some snippets for future reference incase I auto delete unverified accounts after 
 // 10 minutes in this case..
 // 60000 is the same as one minute....

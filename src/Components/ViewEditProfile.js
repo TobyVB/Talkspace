@@ -107,29 +107,37 @@ export default function ViewEditProfile(props){
 
     return (
         <div className="edit-profile profile">
+            {/* ############### S A V E   S E T T I N G S ################ */}
+            <div className="save-cancel-edit-profile">
+                <button onClick={props.cancel}>cancel</button>
+                <button onClick={save}>save</button>
+            </div>
             {/* ############### E D I T   P R O F I L E   P H O T O ################ */}
-            {hideEditImage && <div className="edit-profile-section"><button  onClick={showEditImage}>edit profile photo</button></div>}
+            {hideEditAboutMe && hideEditImage && <div className="edit-profile-section"><button  onClick={showEditImage}>edit profile photo</button></div>}
             {!hideEditImage && 
-                <>
-                    <img 
-                        alt="profile" 
-                        className="profile-picture" 
-                        src={image!==null?objURL:props.defaultPic}
-                    /> 
-                    <input 
-                        className="fileTypeInput" 
-                        type="file" 
-                        accept=".jpg, .jpeg, .png" 
-                        onChange={handleImageChange} 
-                    />
+                <div className="edit-profile-section">
                     <button onClick={cancelEditImage}>cancel</button>
-                </>
+                    <div className="edit-defaultPic">
+                        <img 
+                            alt="profile" 
+                            className="profile-picture" 
+                            src={image!==null?objURL:props.defaultPic}
+                        /> 
+                        <input 
+                            className="fileTypeInput" 
+                            type="file" 
+                            accept=".jpg, .jpeg, .png" 
+                            onChange={handleImageChange} 
+                        />
+                    </div>
+                </div>
             } 
             {/* ############### E D I T   A B O U T   M E ################ */}
-            {hideEditAboutMe && <div className="edit-profile-section"><button onClick={showEditAboutMe}>edit About Me</button></div>}
-            {!hideEditAboutMe &&
+            {hideEditImage && hideEditAboutMe && <div className="edit-profile-section"><button onClick={showEditAboutMe}>edit About Me</button></div>}
+            {!hideEditAboutMe && 
                 <div className="edit-profile-section">
                     <textarea
+                        className="edit-about-textarea"
                         id="aboutMe"
                         placeholder="Write about yourself"
                         name="aboutMe"
@@ -141,11 +149,6 @@ export default function ViewEditProfile(props){
                     <button onClick={cancelEditAboutMe}>cancel</button>
                 </div>
             }
-            {/* ############### S A V E   S E T T I N G S ################ */}
-            <div className="save-cancel-edit-profile">
-                <button onClick={save}>save</button>
-                <button onClick={props.cancel}>cancel</button>
-            </div>
         </div>
     )
 }

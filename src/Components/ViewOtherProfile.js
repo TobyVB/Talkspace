@@ -1,3 +1,4 @@
+import Clock from './Utils/Clock.js';
 import React, {useEffect, useState} from "react";
 import { useCollectionData } from 'react-firebase-hooks/firestore';
 import { query, orderBy, onSnapshot, 
@@ -79,14 +80,34 @@ export default function ViewOtherProfile(props){
                     className="profile-picture" 
                     src={foundUser.defaultPic}
                 /> 
-                <p>
-                    {foundUser.aboutMe}
-                </p>
+                <div>
+                    <div className='flex'>
+                        <p>user since: </p>
+                        <Clock createdAt={foundUser.createdAt}/>
+                    </div>     
+                    <hr></hr>
+                    <p>
+                        {`${foundUser.aboutMe !== undefined? foundUser.aboutMe: ""}`}
+                    </p>
+                </div>
             </div>
-            <h3>POSTS</h3>
-            <div className="foundUser-posts">
-                {posts && posts.filter(post => post.uid === foundUser.uid).length < 1 && "... No posts to show"}
-                {posts && posts.map(post => post.uid === foundUser.uid && <Post id={post.id} key={post.id} title={post.title}/>)}
+            <div className="profile-post-sections">
+                <div>
+                    <div>
+                        <h3>{`${foundUser.username}'s posts`}</h3>
+                        <div className="foundUser-posts">
+                            {posts && posts.filter(post => post.uid === foundUser.uid).length < 1 && "... No posts to show"}
+                            {posts && posts.map(post => post.uid === foundUser.uid && <Post id={post.id} key={post.id} title={post.title}/>)}
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <h3>Liked Posts</h3>
+                    <div className="foundUser-posts">
+                        {posts && posts.filter(post => post.follows.includes(foundUser.id)).length < 1 && "... No posts to show"}
+                        {posts && posts.map(post => post.follows.includes(foundUser.id)  && <Post id={post.id} key={post.id} title={post.title}/>)}
+                    </div>
+                </div>
             </div>
         </div>
     )

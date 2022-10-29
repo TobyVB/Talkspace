@@ -8,6 +8,10 @@ body {
 .flex {
   display: flex;
 }
+.flex-col {
+  display: flex;
+  flex-direction: column;
+}
 .App {
   margin: 0 auto;
 }
@@ -150,6 +154,18 @@ textarea:focus, input:focus {
     width: 8vw;
     height: 8vw;
   }
+  .profile-jumbotron {
+    flex-direction: column;
+  }
+  .edit-defaultPic {
+    flex-direction: column;
+  }
+  .notifications {
+    height: 50vh;
+    width: 60vw;
+    left:20vw;
+    top: 20vh;
+  }
 }
 @media screen and (min-width: 700px) {
   .showNav {
@@ -164,6 +180,12 @@ textarea:focus, input:focus {
     width: 4.5vw;
     height: 4.5vw;
     border: 5px solid rgba(0,0,0,.3)
+  }
+  .notifications {
+    height: 50vh;
+    width: 40vw;
+    left:30vw;
+    top: 20vh;
   }
 }
 .nav-title {
@@ -409,10 +431,17 @@ form {
   color: rgba(255, 255, 255, .85);
 }
 .profile-jumbotron {
-  display: flex;
-  gap: 2em;
   padding-bottom: 3em;
   align-items: center;
+  justify-content: space-between;
+  margin-top: 2em;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1em;
+  padding: 1em;
+}
+.profile-info-section {
+  margin: 0 1.5em;
 }
 .profile-picture {
   max-height: 30vh;
@@ -423,9 +452,17 @@ form {
   box-shadow: 0px 0px 5px black;
   margin-left: 1em;
 }
+.edit-profile-picture {
+  max-height: 30vh;
+  max-width: 30vh;
+  object-fit: scale-down;
+  border-radius: .5em;
+  box-shadow: 0px 0px 5px black;
+  margin-left: 2em;
+}
 .edit-user-btn {
   float: left;
-  margin-top: 1em;
+  margin-top: 2em;
   margin-right: 2em;
   margin-left: 1em;
   border: none;
@@ -456,12 +493,13 @@ form {
   color: white;
   border: none;
   cursor: pointer;
+  z-index: 2;
 }
 .edit-profile {
   top: 0vh;
   padding-top: 30vh;
   position: absolute;
-  background-color: rgb(41, 54, 68);
+  background-color: rgb(57, 76, 95);
   min-height: 70vh;
 }
 .edit-user {
@@ -487,7 +525,8 @@ form {
   border-radius: 5px;
 }
 .save-cancel-edit-profile {
-  margin-top: 10em;
+  margin-top: -4em;
+  margin-bottom: 4.5em;
   justify-content: center;
 }
 .fileTypeInput {
@@ -511,9 +550,30 @@ form {
   gap: 3em;
   padding: 1em;
 }
+.edit-defaultPic {
+  display: flex;
+  gap: 2em;
+  align-items: center;
+  margin-bottom: 2em;
+  margin-top: -1.5em;
+}
+.edit-about-textarea {
+  min-width: 50vw;
+}
 /* ############################################ */
 /* ################## P O S T ################# */
 /* ############################################ */
+.post-header {
+  display: flex;
+  margin-top: 1em;
+}
+.post-defaultPic {
+  max-height: 45px;
+  margin-left: 1em;
+  border-radius: 5em;
+  object-fit: cover;
+  cursor: pointer;
+}
 .create-post-h1 {
   margin: 3em 0 2em 0;
 }
@@ -542,6 +602,8 @@ form {
   color: white;
   margin: 2em 0 2em 0;
   padding: 1em 1em 0em 1em;
+  max-width: 100%;
+  font-family: sans-serif;
 }
 .create-post-title {
   background-color: rgba(0, 0, 0, .3);
@@ -615,7 +677,7 @@ form {
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
   box-sizing: border-box;
-
+  padding: 1em 1em 0 1em;
   max-width: 100%;
   font-family: sans-serif;
 }
@@ -857,10 +919,6 @@ textarea {
   background-color: rgba(0, 0, 0, .85);
   position: fixed;
   z-index: 10;
-  height: 50vh;
-  width: 40vw;
-  left:25vh;
-  top: 20vh;
   display: flex;
   flex-direction: column;
   justify-content: space-between;

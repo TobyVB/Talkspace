@@ -23,6 +23,21 @@ export default function CreatePost(props){
 
     const [link, setLink] = useState("")
 
+
+    // const videos = 2;
+    // for(let i = 0; videos.length > 0; i++){
+    //     "video"+JSON.stringify(i)
+    // }
+
+
+    // jsArr = []; 
+    // for (var i = 1; i <= 10; i++) { 
+    //     jsArr.push('example ' + 1); 
+    // } 
+
+    
+
+    
     function createPost(e){
         e.preventDefault()
         addDoc(postsRef, {
@@ -34,7 +49,8 @@ export default function CreatePost(props){
             approval: [],
             disapproval: [],
             createdAt: serverTimestamp(),
-            unique: unique
+            unique: unique,
+            
         })
         .then(() => {
             setFormValueTitle('');
@@ -59,6 +75,23 @@ export default function CreatePost(props){
         })
     }
 
+    // const [arr, setArr] = useState([
+    //     {name:"vid1", type:"video"}, 
+    //     {name:"text1", type:"text"}, 
+    //     {name:"vid2", type:"video"}, 
+    //     {name:"text2", type:"text"}
+    // ])
+
+    // function addVideo(e){
+    //     e.preventDefault()
+    //     setArr(prevArr => prevArr.push({name:"vid3", type:"vid3"}))
+    // }
+    // function addText(e){
+    //     e.preventDefault()
+    //    setArr(prevArr => prevArr.push({name:"text3", type:"text"}))
+    // }
+
+    
     return (
         <>
             <div className="create-post page-body">
@@ -66,7 +99,7 @@ export default function CreatePost(props){
                 {auth.currentUser && 
                 <form className="create-post-form" onSubmit={createPost}>
                     <textarea 
-                        className="create-post-title-input"
+                        className="create-post-video-textarea"
                         cols={1} 
                         type="text" 
                         placeholder="Add post title..." 
@@ -74,7 +107,7 @@ export default function CreatePost(props){
                         onChange={(event) => setFormValueTitle(event.target.value)} 
                     />
                     <textarea 
-                        className="create-post-body-input" 
+                        className="create-post-video-textarea" 
                         cols={120} 
                         rows={5}
                         value={formValueBody} 
@@ -89,6 +122,29 @@ export default function CreatePost(props){
                         value={link}
                         onChange={(event) => setLink(event.target.value)}
                     />
+                    {/* {arr && arr.map(item => item.type === "video"
+                        ?
+                        <textarea
+                            className="create-post-video-textarea"
+                            cols={1} 
+                            type="text" 
+                            placeholder="youtube link..."
+                            value={link}
+                            onChange={(event) => setLink(event.target.value)}
+                        />
+                        :
+                        <textarea 
+                            className="create-post-video-textarea" 
+                            cols={120} 
+                            rows={5}
+                            value={formValueBody} 
+                            onChange={(event) => setFormValueBody(event.target.value)} 
+                            placeholder="Add post body..." 
+                        />
+                    )}
+                    <button onClick={addVideo}>add new video</button>
+                    <button onClick={addText}>add text</button> */}
+                    <hr></hr>
                     <button className="create-post-btn" type="submit" disabled={!formValueTitle}>create post</button>
                 </form>
                 }

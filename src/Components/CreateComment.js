@@ -95,16 +95,11 @@ export default function CreateComment(props){
         setUnique(nanoid())
     }
 
-    
-
-
-
-
 
     // ########################################################
 
     const [textareaCols, setTextareaCols] = useState(1);
-    
+
     function handleKeyPress(e){
         if(e.key === 'Enter' && textareaCols < 3){
             setTextareaCols(prevTextareaCols => prevTextareaCols += 1)

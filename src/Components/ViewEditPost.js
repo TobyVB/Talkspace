@@ -69,8 +69,10 @@ export default function ViewPost(props){
     
     return (
         <div className="page-body post">
+            <button className="edit-post-btn" onClick={cancel}>cancel</button>
+            <button className="edit-post-btn" onClick={save}>save</button>
             <div className="view-post-container">
-            <p 
+                <p 
                     className="post-author"
                     onClick={() => props.sendUID(foundUser.uid)}>Authored by: {foundUser.username}
                 </p>
@@ -90,7 +92,7 @@ export default function ViewPost(props){
                         onChange={(event) => setBodyValue(event.target.value)}
                     />
                     <textarea 
-                        className="create-post-video-textarea"
+                        className="create-post-video-textarea edit-post-title"
                         cols={200} 
                         row={1}
                         type="text" 
@@ -100,8 +102,6 @@ export default function ViewPost(props){
                     />
                 </div>
             </div>
-            <button className="edit-post-btn" onClick={cancel}>cancel</button>
-                <button className="edit-post-btn" onClick={save}>save</button>
         </div>
     )
 }
