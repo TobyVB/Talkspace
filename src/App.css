@@ -71,9 +71,9 @@ button {
 }
 .login-header-buttons {
   color: white;
-  top: .5em;
-  z-index: 11;
   position: fixed;
+  margin-top: 1.65em;
+  z-index: 11;
   right: 50px;
 }
 .App section {
@@ -196,7 +196,7 @@ textarea:focus, input:focus {
   background-color: transparent;
   border: none;
   color: rgba(255, 255, 255, .9);
-  padding: 12px 20px;
+  padding: 0 20px;
   text-align: left;
   text-decoration: none;
   display: inline-block;

@@ -13,7 +13,11 @@ export default function CreatePost(props){
     const db = getFirestore();
     const postsRef = collection(db, 'posts');
     const [formValueTitle, setFormValueTitle] = useState('');
+
     const [formValueBody, setFormValueBody] = useState('');
+    // const [formValueBody0, setFormValueBody0] = useState('');
+    // const [formValueBody1, setFormValueBody1] = useState('');
+    // const [formValueBody2, setFormValueBody2] = useState('');
 
     const [unique, setUnique] = useState(nanoid())
 
@@ -22,39 +26,66 @@ export default function CreatePost(props){
     }, [])
 
     const [link, setLink] = useState("")
+    // const [link0, setLink0] = useState("")
+    // const [link1, setLink1] = useState("")
+    // const [link2, setLink2] = useState("")
 
 
-    // const videos = 2;
-    // for(let i = 0; videos.length > 0; i++){
-    //     "video"+JSON.stringify(i)
-    // }
+
+    function deleteField(){
+        // below is an example
+        // delete Employee.firstname;
+    }
+
+    // useEffect(()=> {
+    //     console.log(postObj)
+    // }, postObj)
 
 
-    // jsArr = []; 
-    // for (var i = 1; i <= 10; i++) { 
-    //     jsArr.push('example ' + 1); 
-    // } 
 
-    
+    // addDoc(postsRef, {
+    //     title: formValueTitle,
+    //     body: formValueBody0,
+    //     video0: link0,
+    //     video1: link1,
+    //     video2: link2,
+    //     uid: auth.currentUser.uid,
+    //     follows: [],
+    //     approval: [],
+    //     disapproval: [],
+    //     createdAt: serverTimestamp(),
+    //     unique: unique,
+    // })
 
-    
+        // const [arr, setArr] = useState([
+    //     {name:"text1", type:"text"},
+    //     {name:"vid1", type:"video"}
+    // ])
+
+
+    let postObj = {
+        uid: auth.currentUser.uid,
+        follows: [],
+        approval: [],
+        disapproval: [],
+        createdAt: serverTimestamp(),
+        unique: unique,
+        title:formValueTitle,
+        body: formValueBody,
+        
+        // video: link
+    }
+    function addVideo(e){
+        e.preventDefault()
+        postObj ={...postObj, video: link }
+    }
+
     function createPost(e){
         e.preventDefault()
-        addDoc(postsRef, {
-            title: formValueTitle,
-            body: formValueBody,
-            video: link,
-            uid: auth.currentUser.uid,
-            follows: [],
-            approval: [],
-            disapproval: [],
-            createdAt: serverTimestamp(),
-            unique: unique,
-            
-        })
+        addDoc(postsRef, postObj)
         .then(() => {
             setFormValueTitle('');
-            setFormValueBody('')
+            // setFormValueBody('')
         })
         // UPDATE HAS BEEN UPDATED...
         .then(() => {
@@ -74,23 +105,6 @@ export default function CreatePost(props){
             })
         })
     }
-
-    // const [arr, setArr] = useState([
-    //     {name:"vid1", type:"video"}, 
-    //     {name:"text1", type:"text"}, 
-    //     {name:"vid2", type:"video"}, 
-    //     {name:"text2", type:"text"}
-    // ])
-
-    // function addVideo(e){
-    //     e.preventDefault()
-    //     setArr(prevArr => prevArr.push({name:"vid3", type:"vid3"}))
-    // }
-    // function addText(e){
-    //     e.preventDefault()
-    //    setArr(prevArr => prevArr.push({name:"text3", type:"text"}))
-    // }
-
     
     return (
         <>
@@ -122,29 +136,33 @@ export default function CreatePost(props){
                         value={link}
                         onChange={(event) => setLink(event.target.value)}
                     />
-                    {/* {arr && arr.map(item => item.type === "video"
+                    {/* {Object.keys(postObj).forEach(function(key, index){
+                        
+                    })} */}
+                    {/* {arr && arr.map((item, index) => item.type === "video"
                         ?
                         <textarea
+                            key={index}
                             className="create-post-video-textarea"
                             cols={1} 
                             type="text" 
                             placeholder="youtube link..."
-                            value={link}
-                            onChange={(event) => setLink(event.target.value)}
+                            value={JSON.parse("link"+JSON.stringify(index))}
+                            onChange={(event) => JSON.parse("setLink"+JSON.stringify(index))(event.target.value)}
                         />
                         :
                         <textarea 
+                            key={index}
                             className="create-post-video-textarea" 
                             cols={120} 
                             rows={5}
-                            value={formValueBody} 
-                            onChange={(event) => setFormValueBody(event.target.value)} 
+                            value={JSON.parse("formValueBody"+JSON.stringify(index))} 
+                            onChange={(event) => JSON.parse("setFormValueBody"+JSON.stringify(index))(event.target.value)} 
                             placeholder="Add post body..." 
                         />
-                    )}
-                    <button onClick={addVideo}>add new video</button>
-                    <button onClick={addText}>add text</button> */}
+                    )} */}
                     <hr></hr>
+                    <button onClick={addVideo}>testAdd</button>
                     <button className="create-post-btn" type="submit" disabled={!formValueTitle}>create post</button>
                 </form>
                 }
