@@ -296,52 +296,55 @@ function App() {
       <header >
         <div className={`header ${navToggle && `header-toggle`}`}>
           <div className="nav-title"><p>The</p><h1 onClick={menuHome}>TalkSpace</h1></div>
-          {auth.currentUser && auth.currentUser.emailVerified && <button className="bell" onClick={toggleNotifyWindow}>🛎
-            <span className="notification-num"> {notifications && auth.currentUser &&
-              notifications.filter(notification => auth.currentUser.uid === notification.to).length > 0 && 
-              notifications.filter(notification => auth.currentUser.uid === notification.to).length}
-            </span>
-          </button>}
-          <button className="showNav" onClick={showMenu}>menu</button>
-        </div>
-        <div className={`login-header-buttons  ${navClassNone}`}>
-          {!auth.currentUser &&
-          <>
-            <button 
-              className="nav-btn" 
-              disabled={page === viewLogin ? "+true" : ""} 
-              onClick={menuLogin}
-            >Login</button>
-            <button 
-              className="nav-btn" 
-              disabled={page === viewRegister ? "+true" : ""} 
-              onClick={menuRegister}
-            >Register</button>
-          </>
-          }
-          { auth.currentUser && 
-          <>
-            <button 
-              className="nav-btn" 
-              disabled={page === viewProfile ? "+true" : ""} 
-              onClick={menuProfile}
-              >Profile
-            </button>
-            <button 
-              className="nav-btn" 
-              disabled={page === viewCreatePost ? "+true" : ""} 
-              onClick={menuCreatePost}
-              >Create Post
-            </button>
-            <button 
-              className="nav-btn"
-              disabled={page === viewSettings ? "+true" : ""}
-              onClick={menuSettings}
-              >Settings
-            </button>
-          </>
-          }
-          {auth.currentUser && <SignOut />}
+          <div className='menu-container'>
+            <div className={`login-header-buttons  ${navClassNone}`}>
+              {!auth.currentUser &&
+              <>
+                <button 
+                  className="nav-btn" 
+                  disabled={page === viewLogin ? "+true" : ""} 
+                  onClick={menuLogin}
+                >Login</button>
+                <button 
+                  className="nav-btn" 
+                  disabled={page === viewRegister ? "+true" : ""} 
+                  onClick={menuRegister}
+                >Register</button>
+              </>
+              }
+              { auth.currentUser && 
+              <>
+                <button 
+                  className="nav-btn" 
+                  disabled={page === viewProfile ? "+true" : ""} 
+                  onClick={menuProfile}
+                  >Profile
+                </button>
+                <button 
+                  className="nav-btn" 
+                  disabled={page === viewCreatePost ? "+true" : ""} 
+                  onClick={menuCreatePost}
+                  >Create Post
+                </button>
+                <button 
+                  className="nav-btn"
+                  disabled={page === viewSettings ? "+true" : ""}
+                  onClick={menuSettings}
+                  >Settings
+                </button>
+              </>
+              }
+              {auth.currentUser && <SignOut />}
+            </div>
+            <button className="showNav" onClick={showMenu}>menu</button>
+            {auth.currentUser && auth.currentUser.emailVerified && <button className="bell" onClick={toggleNotifyWindow}>🛎
+              <span className="notification-num"> {notifications && auth.currentUser &&
+                notifications.filter(notification => auth.currentUser.uid === notification.to).length > 0 && 
+                notifications.filter(notification => auth.currentUser.uid === notification.to).length}
+              </span>
+            </button>}
+            
+          </div>  
         </div>
       </header>
     
