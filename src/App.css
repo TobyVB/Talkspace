@@ -596,7 +596,8 @@ form {
   color: white;
   margin: 2em 0 2em 0;
   padding: 1em 1em 0em 1em;
-  max-width: 100%;
+  min-width: 90%;
+  max-width: 90%;
   font-family: sans-serif;
 }
 .create-post-title {

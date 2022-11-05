@@ -119,6 +119,18 @@ export default function ViewPost(props){
     // also hide or remove text that matches the created variable
     // where the removed or hidden text was, put in an iframe
 
+    const [numArr, setNumArr] = useState([]);
+    useEffect(() => {
+        let arr = []
+        for(let i=0; i<foundPost.numInputs; i++){
+            arr.push(arr.length+1)
+        }
+        setNumArr(arr)
+    },[foundPost])
+    useEffect(() => {
+        console.log(numArr)
+    }, [numArr])
+
     return (
         <div className="page-body post">
             { auth.currentUser.uid === foundPost.uid && <button className="edit-post-btn" onClick={editPost}>edit post</button>}
@@ -136,8 +148,20 @@ export default function ViewPost(props){
                 </div>
                 <h4 className="post-title">{foundPost.title}</h4>
                 <div className="post-body">
-                    <p>{foundPost.body}</p>
-                    {foundPost.video && <iframe src={`https://www.youtube.com/embed/${link}`} frameBorder="0" allowFullScreen></iframe>}
+
+                    {numArr.map(num =>
+                    foundPost && foundPost[`${`input`+num}`].type === "text" 
+                    ?
+                     <p>{JSON.stringify(foundPost[`${`input`+num}`].output).substring(1).slice(0, JSON.stringify(foundPost[`${`input`+num}`].output).length-2)}</p>
+                    :
+                    foundPost[`${`input`+num}`].type === "video" 
+                    &&
+                    foundPost[`${`input`+num}`].output && <iframe  src={`https://www.youtube.com/embed/${foundPost[`${`input`+num}`].output.slice(17)}`} frameBorder="0" allowFullScreen></iframe>
+                    )}
+                   
+                    
+               
+               
                 </div>
                 <button className="follow-post" onClick={followPost}>{foundPost && foundPost.follows.includes(props.userDataId)?"- UNFOLLOW":"+ FOLLOW"}</button>
             </div>   
