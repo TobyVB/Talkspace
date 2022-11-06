@@ -11,10 +11,8 @@ import React, { useEffect, useRef, useState } from "react";
 export default function Register(props){
     const db = getFirestore();
     const auth = getAuth();
-    const emailRef = useRef();
-    const passwordRef = useRef();
-    // const usernameRef = useRef();
     const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
     const [username, setUsername] = useState("");
     const [loading, setLoading] = useState(false);
 
@@ -25,6 +23,20 @@ export default function Register(props){
     const [users] =  useCollectionData(qUsers, {
         username: 'username'
     });
+
+    function handleChangeEmail(event){
+        const target = event.target;
+        const name = target.name;
+        const value = target.value;
+        setEmail(value)
+    }
+
+    function handleChangePassword(event){
+        const target = event.target;
+        const name = target.name;
+        const value = target.value;
+        setPassword(value)
+    }
     
     useEffect(() => {
         window.scrollTo(0, 0)
@@ -65,7 +77,7 @@ export default function Register(props){
         localStorage.setItem('username', username)
         setLoading(true);
         try {
-            await signup(emailRef.current.value, passwordRef.current.value);
+            await signup(email, password);
         } catch {
             console.log("error with handleSignup function in Register.js");
         }
@@ -119,7 +131,7 @@ export default function Register(props){
                         className="input-user-cred"
                         placeholder="email"
                         name="email"
-                        onChange={(event)=> setEmail(event.target.value)}
+                        onChange={handleChangeEmail}
                         value={email}
                     />
 
@@ -130,7 +142,8 @@ export default function Register(props){
                     
                     <label htmlFor="password">Password</label>
                     <input
-                        ref={passwordRef}
+                        onChange={handleChangePassword}
+                        value={password}
                         id="password"
                         className="input-user-cred"
                         placeholder="password"

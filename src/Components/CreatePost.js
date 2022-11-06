@@ -21,29 +21,12 @@ export default function CreatePost(props){
         window.scrollTo(0, 0)
     }, [])
 
-    const [link, setLink] = useState("");
-    const [input, setInput] = useState("");
-
-
     // deleteField will actually be used in ViewEditPost.js not here
     function deleteField(){
         // below is an example
         // delete Employee.firstname;
     } 
 
-    // addDoc(postsRef, {
-    //     title: formValueTitle,
-    //     body: formValueBody0,
-    //     video0: link0,
-    //     video1: link1,
-    //     video2: link2,
-    //     uid: auth.currentUser.uid,
-    //     follows: [],
-    //     approval: [],
-    //     disapproval: [],
-    //     createdAt: serverTimestamp(),
-    //     unique: unique,
-    // })
 
     const [numInputs, setNumInputs] = useState(0);
 
@@ -58,36 +41,7 @@ export default function CreatePost(props){
         body: formValueBody,
         numInputs: numInputs
     })
-    function addText(e){
-        e.preventDefault()
-        setPostObj ({...postObj, 
-            ["input"+JSON.stringify(numInputs+1)]: {type: "text", output: ""},
-            numInputs: numInputs+1
-        })
-        setNumInputs(prevNumInputs => prevNumInputs+=1);
-        console.log("add text")
-        console.log(postObj)
-        setNumArr(prev => {
-            prev.push(numArr.length+1)
-            return prev
-        })
-    }
-    function addVideo(e){
-        e.preventDefault()
-        setPostObj ({...postObj, 
-            ["input"+JSON.stringify(numInputs+1)]: {type: "video", output: ""},
-            numInputs: numInputs+1
-        })
-        setNumInputs(prevNumInputs => prevNumInputs+=1);
-        console.log("add video")
-        console.log(postObj)
-        setNumArr(prev => {
-            prev.push(numArr.length+1)
-            return prev
-        })
-    }
-
-
+    
     function createPost(e){
         e.preventDefault()
         addDoc(postsRef, postObj)
@@ -123,24 +77,87 @@ export default function CreatePost(props){
             setPostObj(current => {
                 return({...current, numInputs: numInputs-1})
             })
-            let copy2 = postObj
-            let copy3 = copy2
-            for(let i=postObj.numInputs, count = 0; i >= e; i--, count++){
-                copy3 = {...copy2}
-                delete copy3[`${`input`+JSON.stringify(JSON.parse(e)+count)}`];
-                copy3 = {...copy2, 
-                [`${`input`+JSON.stringify(JSON.parse(e))}`]: postObj[`${`input`+JSON.stringify(JSON.parse(e)+1+count)}`]
+            let copy = postObj
+            let copy2 = copy
+            for(let i=postObj.numInputs, count = 0; i >= JSON.parse(e); i--, count++){
+                delete copy2[`${`input`+JSON.stringify(JSON.parse(e)+count)}`];
+                copy2 = {...copy2, 
+                    [`${`input`+JSON.stringify(JSON.parse(e)+count)}`]: copy[`${`input`+JSON.stringify(JSON.parse(e)+1+count)}`]
                 }
-                console.log(`${`input`+JSON.stringify(JSON.parse(e)+count)}`)
-                console.log(postObj[`${`input`+JSON.stringify(JSON.parse(e)+count+1)}`])
-                // delete copy3[`${`input`+JSON.stringify(JSON.parse(e)+1)}`]
-                // setPostObj(copy3);
             }
-            setPostObj(copy3);
+            delete copy2[`${`input`+JSON.stringify(numInputs)}`]
+            setPostObj({...copy2, numInputs:numInputs-1});
         }
-        
         console.log(postObj)
+        setNumInputs(prev => prev-=1);
     };
+
+    function addText(e){
+        let copy = postObj
+        let copy2 = copy
+        let store = {
+            numStore: 0,
+            place: e
+        }
+        for(let i=postObj.numInputs, count = 0; i >= JSON.parse(e); i--, count++){
+            store = {...store, 
+                numStore: count+1,
+                [`${`input`+JSON.stringify(JSON.parse(e)+count+1)}`]: copy[`${`input`+JSON.stringify(JSON.parse(e)+count)}`]
+            }
+            delete copy2[`${`input`+JSON.stringify(JSON.parse(e)+count)}`];
+        }
+        copy2 = {...copy2, ["input"+JSON.stringify(e)]: {type: "text", output: ""}}
+        for(let i=store.numStore, count = 0; count < i; count++){
+            if(count === 0){
+                copy2 = {...copy2, ["input"+JSON.stringify(e)]: {type: "text", output: ""},
+                [`${`input`+JSON.stringify(JSON.parse(e)+count+1)}`]: store[`${`input`+JSON.stringify(JSON.parse(e)+count+1)}`]  
+                }
+            } else {
+                copy2 = {...copy2, [`${`input`+JSON.stringify(JSON.parse(e)+count+1)}`]: store[`${`input`+JSON.stringify(JSON.parse(e)+count+1)}`]}
+            }
+        }
+        setPostObj({...copy2, numInputs:numInputs+1});
+        setNumInputs(prevNumInputs => prevNumInputs+=1);
+        console.log(postObj)
+        setNumArr(prev => {
+            prev.push(numArr.length+1)
+            return prev
+        })
+    }
+    function addVideo(e){
+        let copy = postObj
+        let copy2 = copy
+        let store = {
+            numStore: 0,
+            place: e
+        }
+        for(let i=postObj.numInputs, count = 0; i >= JSON.parse(e); i--, count++){
+            store = {...store, 
+                numStore: count+1,
+                [`${`input`+JSON.stringify(JSON.parse(e)+count+1)}`]: copy[`${`input`+JSON.stringify(JSON.parse(e)+count)}`]
+            }
+            delete copy2[`${`input`+JSON.stringify(JSON.parse(e)+count)}`];
+        }
+        copy2 = {...copy2, ["input"+JSON.stringify(e)]: {type: "video", output: ""}}
+        for(let i=store.numStore, count = 0; count < i; count++){
+            if(count === 0){
+                copy2 = {...copy2, ["input"+JSON.stringify(e)]: {type: "video", output: ""},
+                [`${`input`+JSON.stringify(JSON.parse(e)+count+1)}`]: store[`${`input`+JSON.stringify(JSON.parse(e)+count+1)}`]  
+                }
+            } else {
+                copy2 = {...copy2, [`${`input`+JSON.stringify(JSON.parse(e)+count+1)}`]: store[`${`input`+JSON.stringify(JSON.parse(e)+count+1)}`]}
+            }
+        }
+        setPostObj({...copy2, numInputs:numInputs+1});
+        setNumInputs(prevNumInputs => prevNumInputs+=1);
+        console.log(postObj)
+        setNumArr(prev => {
+            prev.push(numArr.length+1)
+            return prev
+        })
+    }
+
+
 
     function cursorEnd(e){
         const target = e.target;
@@ -149,15 +166,36 @@ export default function CreatePost(props){
 
     const [numArr, setNumArr] = useState([]);
 
+    const [selectedSwapKey, setSelectedSwapKey] = useState();
+    const [selectedSwapValue, setSelectedSwapValue] = useState();
+    const [swapping, setSwapping] = useState(false);
+    function swapFrom(e){
+        setSelectedSwapKey(`input`+JSON.stringify(e))
+        setSelectedSwapValue(postObj[`${`input`+JSON.stringify(e)}`])
+        setSwapping(true)
+        console.log(postObj[`${`input`+JSON.stringify(e)}`])
+    }
+    function swapTo(e){
+        let copy = postObj;
+        copy = {
+            ...copy,
+            [`${selectedSwapKey}`]: postObj[`${`input`+JSON.stringify(e)}`],
+            [`input`+JSON.stringify(e)] : selectedSwapValue
+        }
+        setPostObj(copy);
+        setSwapping(false)
+    }
+
     const inputs = (nums) => {
-        // console.log(postObj[`${`input`+num}`][0])
         return nums.map(num => 
             postObj.numInputs > 0 && postObj[`${`input`+num}`] && postObj[`${`input`+num}`].type === "text" ?
             <div className="insert-input">
+                <button onClick={()=> addText(num)}>add text</button>
+                <button onClick={()=> addVideo(num)}>add video</button>
                 <textarea  
                     name={postObj[`${`input`+num}`]}
-                    autoFocus
-                    onFocus={e => cursorEnd(e)}
+                    // autoFocus
+                    // onFocus={e => cursorEnd(e)}
 
                     className="create-post-video-textarea" 
                     rows={5}
@@ -165,18 +203,22 @@ export default function CreatePost(props){
                     value={postObj[`${`input`+num}`].output} 
                     onChange={(event) => setPostObj({...postObj, [`${`input`+num}`]: { type:"text", output: event.target.value } })} 
                 />
-                <button onClick={addText}>add text</button>
-                <button onClick={addVideo}>add video</button>
-                <button onClick={()=> deleteInput(num)}>delete</button>
+                <div className="input-options">
+                    <button onClick={()=> deleteInput(num)}>delete</button>
+                    {swapping === false && <button onClick={()=> swapFrom(num)}>swap</button>}
+                    {swapping === true && <button onClick={()=> swapTo(num)}>swapTo</button>}
+                </div>
             </div>
             :
             postObj[`${`input`+num}`] &&
             postObj[`${`input`+num}`].type === "video" &&
             <div className="insert-input">
+                <button onClick={()=> addText(num)}>add text</button>
+                <button onClick={()=> addVideo(num)}>add video</button>
                 <textarea
                     name={postObj[`${`input`+num}`]}
-                    autoFocus
-                    onFocus={e => cursorEnd(e)}
+                    // autoFocus
+                    // onFocus={e => cursorEnd(e)}
 
                     className="create-post-video-textarea"
                     type="text" 
@@ -184,9 +226,11 @@ export default function CreatePost(props){
                     value={postObj[`${`input`+num}`].output} 
                     onChange={(event) => setPostObj({...postObj, [`${`input`+num}`]: { type:"video", output: event.target.value } })} 
                 />
-                <button onClick={addText}>add text</button>
-                <button onClick={addVideo}>add video</button>
-                <button onClick={()=> deleteInput(num)}>delete</button>
+                <div className="input-options">
+                    <button onClick={()=> deleteInput(num)}>delete</button>
+                    {swapping === false && <button onClick={()=> swapFrom(num)}>swap</button>}
+                    {swapping === true && <button onClick={()=> swapTo(num)}>swapTo</button>}
+                </div>
             </div>
         )
     }
@@ -205,13 +249,20 @@ export default function CreatePost(props){
                         value={postObj.title} 
                         onChange={(event) => setPostObj({...postObj, title: event.target.value})} 
                     />
+                    {numArr.length === 0 &&
                     <div className="insert-input">
                         <p>Add input(s)</p>
-                        <button onClick={addText}>add text</button>
-                        <button onClick={addVideo}>add video</button>
+                        <button onClick={()=>addText(1)}>add text</button>
+                        <button onClick={()=>addVideo(1)}>add video</button>
                     </div>
+                    }
                     {inputs(numArr)}
-
+                    {numArr.length > 0 &&
+                    <div className="insert-input">
+                        <button onClick={()=>addText(numArr.length+1)}>add text</button>
+                        <button onClick={()=>addVideo(numArr.length+1)}>add video</button>
+                    </div>
+                    }
                     <hr></hr>
                     <button onClick={createPost} className="create-post-btn" type="submit" disabled={!postObj.title}>create post</button>
                 </div>

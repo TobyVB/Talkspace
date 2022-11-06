@@ -76,13 +76,13 @@ export default function ViewPost(props){
                     className="post-author"
                     onClick={() => props.sendUID(foundUser.uid)}>Authored by: {foundUser.username}
                 </p>
-                    <textarea 
-                        className="edit-post-textarea edit-post-title"
-                        cols={200}
-                        rows={2}
-                        value={titleValue}
-                        onChange={(event) => setTitleValue(event.target.value)}
-                    />
+                <textarea 
+                    className="edit-post-textarea edit-post-title"
+                    cols={200}
+                    rows={2}
+                    value={titleValue}
+                    onChange={(event) => setTitleValue(event.target.value)}
+                />
                 <div className="post-body">
                     <textarea   
                         className="edit-post-textarea edit-post-body"
@@ -100,6 +100,7 @@ export default function ViewPost(props){
                         value={linkValue}
                         onChange={(event) => setLinkValue(event.target.value)}
                     />
+                    
                 </div>
             </div>
         </div>
