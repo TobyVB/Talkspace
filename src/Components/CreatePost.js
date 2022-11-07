@@ -13,7 +13,6 @@ export default function CreatePost(props){
     const db = getFirestore();
     const postsRef = collection(db, 'posts');
     const [formValueTitle, setFormValueTitle] = useState('');
-    const [formValueBody, setFormValueBody] = useState('');
 
     const [unique, setUnique] = useState(nanoid())
 
@@ -29,6 +28,7 @@ export default function CreatePost(props){
 
 
     const [numInputs, setNumInputs] = useState(0);
+    const [numArr, setNumArr] = useState([]);
 
     const [ postObj, setPostObj ] = useState({
         uid: auth.currentUser.uid,
@@ -38,8 +38,8 @@ export default function CreatePost(props){
         createdAt: serverTimestamp(),
         unique: unique,
         title: formValueTitle,
-        body: formValueBody,
-        numInputs: numInputs
+        numInputs: numInputs,
+        numArr: numArr
     })
     
     function createPost(e){
@@ -89,6 +89,10 @@ export default function CreatePost(props){
             setPostObj({...copy2, numInputs:numInputs-1});
         }
         console.log(postObj)
+        setNumArr(prev => {
+            prev.pop(numArr.length)
+            return prev
+        })
         setNumInputs(prev => prev-=1);
     };
 
@@ -110,6 +114,38 @@ export default function CreatePost(props){
         for(let i=store.numStore, count = 0; count < i; count++){
             if(count === 0){
                 copy2 = {...copy2, ["input"+JSON.stringify(e)]: {type: "text", output: ""},
+                [`${`input`+JSON.stringify(JSON.parse(e)+count+1)}`]: store[`${`input`+JSON.stringify(JSON.parse(e)+count+1)}`]  
+                }
+            } else {
+                copy2 = {...copy2, [`${`input`+JSON.stringify(JSON.parse(e)+count+1)}`]: store[`${`input`+JSON.stringify(JSON.parse(e)+count+1)}`]}
+            }
+        }
+        setPostObj({...copy2, numInputs:numInputs+1});
+        setNumInputs(prevNumInputs => prevNumInputs+=1);
+        console.log(postObj)
+        setNumArr(prev => {
+            prev.push(numArr.length+1)
+            return prev
+        })
+    }
+    function addImage(e){
+        let copy = postObj
+        let copy2 = copy
+        let store = {
+            numStore: 0,
+            place: e
+        }
+        for(let i=postObj.numInputs, count = 0; i >= JSON.parse(e); i--, count++){
+            store = {...store, 
+                numStore: count+1,
+                [`${`input`+JSON.stringify(JSON.parse(e)+count+1)}`]: copy[`${`input`+JSON.stringify(JSON.parse(e)+count)}`]
+            }
+            delete copy2[`${`input`+JSON.stringify(JSON.parse(e)+count)}`];
+        }
+        copy2 = {...copy2, ["input"+JSON.stringify(e)]: {type: "image", output: ""}}
+        for(let i=store.numStore, count = 0; count < i; count++){
+            if(count === 0){
+                copy2 = {...copy2, ["input"+JSON.stringify(e)]: {type: "image", output: ""},
                 [`${`input`+JSON.stringify(JSON.parse(e)+count+1)}`]: store[`${`input`+JSON.stringify(JSON.parse(e)+count+1)}`]  
                 }
             } else {
@@ -164,7 +200,6 @@ export default function CreatePost(props){
         target.setSelectionRange(1, 1)
     }
 
-    const [numArr, setNumArr] = useState([]);
 
     const [selectedSwapKey, setSelectedSwapKey] = useState();
     const [selectedSwapValue, setSelectedSwapValue] = useState();
@@ -191,12 +226,10 @@ export default function CreatePost(props){
             postObj.numInputs > 0 && postObj[`${`input`+num}`] && postObj[`${`input`+num}`].type === "text" ?
             <div className="insert-input">
                 <button onClick={()=> addText(num)}>add text</button>
+                <button onClick={()=> addImage(num)}>add image</button>
                 <button onClick={()=> addVideo(num)}>add video</button>
                 <textarea  
                     name={postObj[`${`input`+num}`]}
-                    // autoFocus
-                    // onFocus={e => cursorEnd(e)}
-
                     className="create-post-video-textarea" 
                     rows={5}
                     placeholder="Add post body..." 
@@ -211,20 +244,39 @@ export default function CreatePost(props){
             </div>
             :
             postObj[`${`input`+num}`] &&
-            postObj[`${`input`+num}`].type === "video" &&
+            postObj[`${`input`+num}`].type === "video" ?
             <div className="insert-input">
                 <button onClick={()=> addText(num)}>add text</button>
+                <button onClick={()=> addImage(num)}>add image</button>
                 <button onClick={()=> addVideo(num)}>add video</button>
                 <textarea
                     name={postObj[`${`input`+num}`]}
-                    // autoFocus
-                    // onFocus={e => cursorEnd(e)}
-
                     className="create-post-video-textarea"
                     type="text" 
                     placeholder="youtube link..."
                     value={postObj[`${`input`+num}`].output} 
                     onChange={(event) => setPostObj({...postObj, [`${`input`+num}`]: { type:"video", output: event.target.value } })} 
+                />
+                <div className="input-options">
+                    <button onClick={()=> deleteInput(num)}>delete</button>
+                    {swapping === false && <button onClick={()=> swapFrom(num)}>swap</button>}
+                    {swapping === true && <button onClick={()=> swapTo(num)}>swapTo</button>}
+                </div>
+            </div>
+            :
+            postObj[`${`input`+num}`] &&
+            postObj[`${`input`+num}`].type === "image" &&
+            <div className="insert-input">
+                <button onClick={()=> addText(num)}>add text</button>
+                <button onClick={()=> addImage(num)}>add image</button>
+                <button onClick={()=> addVideo(num)}>add video</button>
+                <textarea
+                    name={postObj[`${`input`+num}`]}
+                    className="create-post-video-textarea"
+                    type="text" 
+                    placeholder="image url goes here..."
+                    value={postObj[`${`input`+num}`].output} 
+                    onChange={(event) => setPostObj({...postObj, [`${`input`+num}`]: { type:"image", output: event.target.value } })} 
                 />
                 <div className="input-options">
                     <button onClick={()=> deleteInput(num)}>delete</button>
@@ -253,6 +305,7 @@ export default function CreatePost(props){
                     <div className="insert-input">
                         <p>Add input(s)</p>
                         <button onClick={()=>addText(1)}>add text</button>
+                        <button onClick={()=>addImage(1)}>add image</button>
                         <button onClick={()=>addVideo(1)}>add video</button>
                     </div>
                     }
@@ -260,6 +313,7 @@ export default function CreatePost(props){
                     {numArr.length > 0 &&
                     <div className="insert-input">
                         <button onClick={()=>addText(numArr.length+1)}>add text</button>
+                        <button onClick={()=>addImage(numArr.length+1)}>add image</button>
                         <button onClick={()=>addVideo(numArr.length+1)}>add video</button>
                     </div>
                     }

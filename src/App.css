@@ -205,7 +205,6 @@ textarea:focus, input:focus {
 .nav-btn:disabled {
   background-color: transparent;
   color:dodgerblue;
-  letter-spacing: .05em;
   cursor: not-allowed;
   transition: .2s;
 }
@@ -563,7 +562,8 @@ form {
   margin-top: 1em;
 }
 .post-defaultPic {
-  max-height: 45px;
+  height: 3em;
+  width: 3em;
   margin-left: 1em;
   border-radius: 5em;
   object-fit: cover;
@@ -700,6 +700,23 @@ form {
 }
 .insert-input {
   border: 1px solid red;
+}
+.input-chain {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2em;
+}
+.post-image {
+  width: 45%;
+  flex-shrink: 0;
+}
+.post-video {
+  height: 45vw;
+  width: 100vw;
+}
+.post-text {
+  width: 45%;
+  flex-shrink: 0;
 }
 /* ############################################ */
 /* ############# H O M E P A G E  ############# */

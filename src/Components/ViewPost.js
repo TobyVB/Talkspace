@@ -131,6 +131,7 @@ export default function ViewPost(props){
         console.log(numArr)
     }, [numArr])
 
+
     return (
         <div className="page-body post">
             { auth.currentUser.uid === foundPost.uid && <button className="edit-post-btn" onClick={editPost}>edit post</button>}
@@ -148,19 +149,21 @@ export default function ViewPost(props){
                 </div>
                 <h4 className="post-title">{foundPost.title}</h4>
                 <div className="post-body">
-
+                    <div className="input-chain">
                     {numArr.map(num =>
                     foundPost && foundPost[`${`input`+num}`].type === "text" 
                     ?
-                     <p>{JSON.stringify(foundPost[`${`input`+num}`].output).substring(1).slice(0, JSON.stringify(foundPost[`${`input`+num}`].output).length-2)}</p>
+                     <p className="post-text">{JSON.stringify(foundPost[`${`input`+num}`].output).substring(1).slice(0, JSON.stringify(foundPost[`${`input`+num}`].output).length-2)}</p>
                     :
                     foundPost[`${`input`+num}`].type === "video" 
+                    ?
+                    foundPost[`${`input`+num}`].output && <iframe className="post-video"  src={`https://www.youtube.com/embed/${foundPost[`${`input`+num}`].output.slice(17)}`} frameBorder="0" allowFullScreen ></iframe>
+                    :
+                    foundPost[`${`input`+num}`].type === "image" 
                     &&
-                    foundPost[`${`input`+num}`].output && <iframe  src={`https://www.youtube.com/embed/${foundPost[`${`input`+num}`].output.slice(17)}`} frameBorder="0" allowFullScreen></iframe>
+                    <img className="post-image" src={foundPost[`${`input`+num}`].output}></img>
                     )}
-                   
-                    
-               
+                    </div>
                
                 </div>
                 <button className="follow-post" onClick={followPost}>{foundPost && foundPost.follows.includes(props.userDataId)?"- UNFOLLOW":"+ FOLLOW"}</button>
