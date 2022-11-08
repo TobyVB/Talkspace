@@ -257,6 +257,7 @@ export default function CreatePost(props){
                     value={postObj[`${`input`+num}`].output} 
                     onChange={(event) => setPostObj({...postObj, [`${`input`+num}`]: { type:"video", output: event.target.value } })} 
                 />
+                <iframe  src={`https://www.youtube.com/embed/${postObj[`${`input`+num}`].output.slice(17)}`} frameBorder="0" allowFullScreen></iframe>
                 <div className="input-options">
                     <button onClick={()=> deleteInput(num)}>delete</button>
                     {swapping === false && <button onClick={()=> swapFrom(num)}>swap</button>}
@@ -278,6 +279,7 @@ export default function CreatePost(props){
                     value={postObj[`${`input`+num}`].output} 
                     onChange={(event) => setPostObj({...postObj, [`${`input`+num}`]: { type:"image", output: event.target.value } })} 
                 />
+                <img className="post-image" src={postObj[`${`input`+num}`].output}></img>
                 <div className="input-options">
                     <button onClick={()=> deleteInput(num)}>delete</button>
                     {swapping === false && <button onClick={()=> swapFrom(num)}>swap</button>}
