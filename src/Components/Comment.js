@@ -169,16 +169,58 @@ export default function Comment(props){
     }
 
     // ACCESS REPLIES
-    const [update, setUpdate] = useState(false)
-    function toggleReplies(){   
-        // REMOVE COMMENT/REPLY TO OPEN REPLIES FOR
-        if(sessionStorage.getItem(props.unique) === props.unique){
-            sessionStorage.removeItem(props.unique)
-        } else {
-            sessionStorage.setItem(props.unique, props.unique)
+    const [openReplies, setOpenReplies] = useState(null);
+    const [update, setUpdate] = useState(false);
+    const [replyDisabled, setReplyDisabled] = useState(false);
+    
+    function toggleReplies(){
+        setReplyDisabled(true);
+        if(openReplies === null){
+            setReplyDisabled(false)
+            setOpenReplies(true)
+            // REMOVE COMMENT/REPLY TO OPEN REPLIES FOR
+            if(sessionStorage.getItem(props.unique) === props.unique){
+                sessionStorage.removeItem(props.unique);
+            } else {
+                sessionStorage.setItem(props.unique, props.unique);
+            }   
+            setUpdate(true);
+        }
+        
+        // setInitReplies(prev => !prev)
+        if(openReplies === false){
+            setOpenReplies(true)
+            setReplyDisabled(false)
+            // REMOVE COMMENT/REPLY TO OPEN REPLIES FOR
+            if(sessionStorage.getItem(props.unique) === props.unique){
+                sessionStorage.removeItem(props.unique);
+            } else {
+                sessionStorage.setItem(props.unique, props.unique);
+            }   
+            setUpdate(true);
         }   
-        setUpdate(prevUpdate => !prevUpdate);
+        if(openReplies === true) {
+            setOpenReplies(false);
+            setTimeout(() => {
+                setReplyDisabled(false)
+                if(sessionStorage.getItem(props.unique) === props.unique){
+                    sessionStorage.setItem(props.unique, props.unique);
+                } else {
+                    sessionStorage.removeItem(props.unique);
+                }   
+                setUpdate(false);
+            },1000) 
+        }
     }
+    // function toggleReplies(){
+    //         // REMOVE COMMENT/REPLY TO OPEN REPLIES FOR
+    //     if(sessionStorage.getItem(props.unique) === props.unique){
+    //         sessionStorage.removeItem(props.unique)
+    //     } else {
+    //         sessionStorage.setItem(props.unique, props.unique)
+    //     }   
+    //     setUpdate(prev => !prev);
+    // }
 
     const [replyPressed, setReplyPressed] = useState(false)
     const [showForm, setShowForm] = useState(false);
@@ -261,38 +303,42 @@ export default function Comment(props){
                         } 
                         <div className="comment-chain">
                             {props.type === "comment" 
-                            && sessionStorage.getItem(props.unique) === props.unique
+                            && update
                             && props.comments.filter(comment => comment.replyTo === props.id).length > 0 &&
                              <button 
+                                disabled={replyDisabled && "+true"}
                                 className="show-replies" 
                                 onClick={toggleReplies}>hide replies
                             </button>}
-                            {sessionStorage.getItem(props.unique) === props.unique && 
-                            props.comments && 
-                            props.comments.map(comment => comment.unique === props.unique && comment.type === "reply" &&
-                                <div className="reply" key={nanoid()}> 
-                                    <Comment 
-                                        comment={comment.body}
-                                        createdAt={comment.createdAt}
-                                        approval={comment.approval} 
-                                        disapproval={comment.disapproval}
-                                        username={comment.username}
-                                        uid={comment.uid}
-                                        id={comment.id}
-                                        type={"reply"}
-                                        sendUID={props.sendUID}
-                                        defaultPic={comment.defaultPic}
-                                        key={nanoid()}
-                                        resetUnique={props.resetUnique}
-                                        unique={props.unique}
-                                        capturedPostId={props.capturedPostId}
-                                    />
-                                </div>
-                            )}
+                            <div className={openReplies === true ?`open-reply-chain` : `close-reply-chain`}>
+                                {update && 
+                                // {sessionStorage.getItem(props.unique) === props.unique && 
+                                props.comments && 
+                                props.comments.map(comment => comment.unique === props.unique && comment.type === "reply" &&
+                                    <div className="reply" key={nanoid()}> 
+                                        <Comment 
+                                            comment={comment.body}
+                                            createdAt={comment.createdAt}
+                                            approval={comment.approval} 
+                                            disapproval={comment.disapproval}
+                                            username={comment.username}
+                                            uid={comment.uid}
+                                            id={comment.id}
+                                            type={"reply"}
+                                            sendUID={props.sendUID}
+                                            defaultPic={comment.defaultPic}
+                                            key={nanoid()}
+                                            resetUnique={props.resetUnique}
+                                            unique={props.unique}
+                                            capturedPostId={props.capturedPostId}
+                                        />
+                                    </div>
+                                )}
+                            </div>
                             {/* ############################################################ */}
                             {props.type === "comment" 
-                            && sessionStorage.getItem(props.unique) === null
-                            && replyChain.length > 0 && <button className="show-replies" onClick={toggleReplies}> - show replies -</button>
+                            && !update
+                            && replyChain.length > 0 && <button disabled={replyDisabled && "+true"} className="show-replies" onClick={toggleReplies}> - show replies -</button>
                             }
                         </div>
                     </div>

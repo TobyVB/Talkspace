@@ -610,20 +610,21 @@ form {
 }
 
 .insert-input-animation {
+  overflow-x: hidden;
   animation-name: inputAnimation;
-  animation-duration: .6s;
+  animation-duration: 2s;
   animation-iteration-count: 1;
 }
 @keyframes inputAnimation {
   from {
     max-height: 0vh;
-    filter: blur(5px);
   }
   to {
     max-height: 100vh;
   }
 }
 .delete-input-animation {
+  overflow-x: hidden;
   animation-name: deleteInputAnimation;
   animation-duration: .6s;
   animation-iteration-count: 1;
@@ -634,10 +635,8 @@ form {
   }
   to {
     transform: rotateX(90deg);
-    filter: blur(3px);
-    opacity: 0%;
-    margin-top: -200px;
-    margin-bottom: -200px;
+    margin-top: -10vh;
+    margin-bottom: -10vh;
   }
 }
 .create-post-video-textarea {
@@ -866,6 +865,7 @@ form {
 .comment-chain {
   margin-bottom: .75em;
 }
+
 .comment-profile-pic {
   margin-left: .5em;
   border-radius: 5em;
@@ -963,6 +963,34 @@ textarea {
 /* ############################################ */
 /* ################ R E P L Y ################# */
 /* ############################################ */
+.open-reply-chain {
+  overflow-x: hidden;
+  animation-name: openReplyAnimation;
+  animation-duration: 1.05s;
+  animation-iteration-count: 1;
+}
+@keyframes openReplyAnimation {
+  from {
+    max-height: 0vh;
+  }
+  to {
+    max-height: 300vh;
+  }
+}
+.close-reply-chain {
+  overflow-x: hidden;
+  animation-name: hideReplyAnimation;
+  animation-duration: 1.05s;
+  animation-iteration-count: 1;
+}
+@keyframes hideReplyAnimation {
+  from {
+    max-height: 100vh;
+  }
+  to {
+    max-height: 0vh;
+  }
+}
 .reply-btn {
   border: none;
   background: none;

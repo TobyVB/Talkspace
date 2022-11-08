@@ -140,13 +140,16 @@ export default function ViewPost(props){
                 copy2 = {...copy2, [`${`input`+JSON.stringify(JSON.parse(e)+count+1)}`]: store[`${`input`+JSON.stringify(JSON.parse(e)+count+1)}`]}
             }
         }
-        setPostObj({...copy2, numInputs:numInputs+1});
         setNumInputs(prevNumInputs => prevNumInputs+=1);
         console.log(postObj)
         setNumArr(prev => {
             prev.push(numArr.length+1)
             return prev
         })
+        setPostObj({...copy2, numInputs:numInputs+1, numArr:numArr, ["input"+JSON.stringify(e)]: {type: "text", output: "", initializing:true}});
+        setTimeout(() => {
+            setPostObj({...copy2, numInputs:numInputs+1, numArr:numArr, ["input"+JSON.stringify(e)]: {type: "text", output: "", initializing:false}});
+        }, 1000)
         setShowButtons(false)
     }
     function addImage(e){
@@ -173,13 +176,13 @@ export default function ViewPost(props){
                 copy2 = {...copy2, [`${`input`+JSON.stringify(JSON.parse(e)+count+1)}`]: store[`${`input`+JSON.stringify(JSON.parse(e)+count+1)}`]}
             }
         }
-        setPostObj({...copy2, numInputs:numInputs+1});
         setNumInputs(prevNumInputs => prevNumInputs+=1);
         console.log(postObj)
         setNumArr(prev => {
             prev.push(numArr.length+1)
             return prev
         })
+        setPostObj({...copy2, numInputs:numInputs+1, numArr:numArr});
         setShowButtons(false)
     }
     function addVideo(e){
@@ -206,13 +209,13 @@ export default function ViewPost(props){
                 copy2 = {...copy2, [`${`input`+JSON.stringify(JSON.parse(e)+count+1)}`]: store[`${`input`+JSON.stringify(JSON.parse(e)+count+1)}`]}
             }
         }
-        setPostObj({...copy2, numInputs:numInputs+1});
         setNumInputs(prevNumInputs => prevNumInputs+=1);
         console.log(postObj)
         setNumArr(prev => {
             prev.push(numArr.length+1)
             return prev
         })
+        setPostObj({...copy2, numInputs:numInputs+1, numArr:numArr});
         setShowButtons(false)
     }
 
@@ -246,7 +249,7 @@ export default function ViewPost(props){
     const inputs = (nums) => {
         return nums.map(num => 
             postObj.numInputs > 0 && postObj[`${`input`+num}`] && postObj[`${`input`+num}`].type === "text" ?
-            <div className={`insert-input ${postObj[`${`input`+num}`].output === "" ? "insert-input-animation": postObj[`${`input`+num}`].deleting === true && "delete-input-animation"}`}>
+            <div className={`insert-input ${postObj[`${`input`+num}`].output === "" ? postObj[`${`input`+num}`].initializing === true && "insert-input-animation": postObj[`${`input`+num}`].deleting === true && "delete-input-animation"}`}>
                 
                 <div className="edit-post-btns">
                     <>
@@ -255,14 +258,14 @@ export default function ViewPost(props){
                     {showButtons &&
                     <>
                         <button className="edit-post-btn post-input cancel-insert" onClick={()=>setShowButtons(false)}>cancel</button>
-                        <button className="edit-post-btn post-input" onClick={()=> addText(num)}>add text</button>
-                        <button className="edit-post-btn post-input" onClick={()=> addImage(num)}>add image</button>
-                        <button className="edit-post-btn post-input" onClick={()=> addVideo(num)}>add video</button>
+                        <button className="edit-post-btn post-input" onClick={()=> addText(num)}>text</button>
+                        <button className="edit-post-btn post-input" onClick={()=> addImage(num)}>image</button>
+                        <button className="edit-post-btn post-input" onClick={()=> addVideo(num)}>video</button>
                     </>}
                 </div>
                 <textarea  
                     name={postObj[`${`input`+num}`]}
-                    className={`create-post-video-textarea`}
+                    className={`create-post-video-textarea insert-input ${postObj[`${`input`+num}`].output === "" ? postObj[`${`input`+num}`].initializing === true && "insert-input-animation": postObj[`${`input`+num}`].deleting === true && "delete-input-animation"}`}
                     rows={5}
                     placeholder="Add post body..." 
                     value={postObj[`${`input`+num}`].output} 
@@ -286,9 +289,9 @@ export default function ViewPost(props){
                     {showButtons &&
                     <>
                         <button className="edit-post-btn post-input cancel-insert" onClick={()=>setShowButtons(false)}>cancel</button>
-                        <button className="edit-post-btn post-input" onClick={()=> addText(num)}>add text</button>
-                        <button className="edit-post-btn post-input" onClick={()=> addImage(num)}>add image</button>
-                        <button className="edit-post-btn post-input" onClick={()=> addVideo(num)}>add video</button>
+                        <button className="edit-post-btn post-input" onClick={()=> addText(num)}>text</button>
+                        <button className="edit-post-btn post-input" onClick={()=> addImage(num)}>image</button>
+                        <button className="edit-post-btn post-input" onClick={()=> addVideo(num)}>video</button>
                     </>}
                 </div>
                 <textarea
@@ -319,9 +322,9 @@ export default function ViewPost(props){
                     {showButtons &&
                     <>
                         <button className="edit-post-btn post-input cancel-insert" onClick={()=>setShowButtons(false)}>cancel</button>
-                        <button className="edit-post-btn post-input" onClick={()=> addText(num)}>add text</button>
-                        <button className="edit-post-btn post-input" onClick={()=> addImage(num)}>add image</button>
-                        <button className="edit-post-btn post-input" onClick={()=> addVideo(num)}>add video</button>
+                        <button className="edit-post-btn post-input" onClick={()=> addText(num)}>text</button>
+                        <button className="edit-post-btn post-input" onClick={()=> addImage(num)}>image</button>
+                        <button className="edit-post-btn post-input" onClick={()=> addVideo(num)}>video</button>
                     </>}
                 </div>
                 <textarea
@@ -342,7 +345,6 @@ export default function ViewPost(props){
             </div>
         )
     }
-    console.log("wsdfeesdfsdfsfee")
     console.log(postObj);
     
     return (
@@ -365,9 +367,9 @@ export default function ViewPost(props){
                     {numArr.length === 0 &&
                     <div className="insert-input">
                         <p>Add input(s)</p>
-                        <button onClick={()=>addText(1)}>add text</button>
-                        <button onClick={()=> addImage(1)}>add image</button>
-                        <button onClick={()=>addVideo(1)}>add video</button>
+                        <button onClick={()=>addText(1)}>text</button>
+                        <button onClick={()=> addImage(1)}>image</button>
+                        <button onClick={()=>addVideo(1)}>video</button>
                     </div>
                     }
                     <div className="input-chain">
@@ -381,9 +383,9 @@ export default function ViewPost(props){
                         {showButtons &&
                         <>
                             <button className="edit-post-btn post-input cancel-insert" onClick={()=>setShowButtons(false)}>cancel</button>
-                            <button className="edit-post-btn post-input" onClick={()=> addText(numArr.length+1)}>add text</button>
-                            <button className="edit-post-btn post-input" onClick={()=> addImage(numArr.length+1)}>add image</button>
-                            <button className="edit-post-btn post-input" onClick={()=> addVideo(numArr.length+1)}>add video</button>
+                            <button className="edit-post-btn post-input" onClick={()=> addText(numArr.length+1)}>text</button>
+                            <button className="edit-post-btn post-input" onClick={()=> addImage(numArr.length+1)}>image</button>
+                            <button className="edit-post-btn post-input" onClick={()=> addVideo(numArr.length+1)}>video</button>
                         </>}
                     </div>
                     }
