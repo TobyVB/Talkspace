@@ -73,7 +73,6 @@ export default function ViewPost(props){
     }, [foundPost])
 
 
-
     function deleteInput(e)  {
         if(postObj[`${`input`+e}`].type === "text"){
             setPostObj({...postObj, [`${`input`+e}`]: {type:"text", output: postObj[`${`input`+e}`].ouput, deleting:true}})
@@ -182,7 +181,10 @@ export default function ViewPost(props){
             prev.push(numArr.length+1)
             return prev
         })
-        setPostObj({...copy2, numInputs:numInputs+1, numArr:numArr});
+        setPostObj({...copy2, numInputs:numInputs+1, numArr:numArr, ["input"+JSON.stringify(e)]: {type: "image", output: "", initializing:true}});
+        setTimeout(() => {
+            setPostObj({...copy2, numInputs:numInputs+1, numArr:numArr, ["input"+JSON.stringify(e)]: {type: "image", output: "", initializing:false}});
+        }, 1000)
         setShowButtons(false)
     }
     function addVideo(e){
@@ -215,12 +217,13 @@ export default function ViewPost(props){
             prev.push(numArr.length+1)
             return prev
         })
-        setPostObj({...copy2, numInputs:numInputs+1, numArr:numArr});
+        setPostObj({...copy2, numInputs:numInputs+1, numArr:numArr, ["input"+JSON.stringify(e)]: {type: "video", output: "", initializing:true}});
+        setTimeout(() => {
+            setPostObj({...copy2, numInputs:numInputs+1, numArr:numArr, ["input"+JSON.stringify(e)]: {type: "video", output: "", initializing:false}});
+        }, 1000)
         setShowButtons(false)
     }
 
-
-    
 
     const [selectedSwapKey, setSelectedSwapKey] = useState();
     const [selectedSwapValue, setSelectedSwapValue] = useState();
@@ -280,7 +283,7 @@ export default function ViewPost(props){
             :
             postObj[`${`input`+num}`] &&
             postObj[`${`input`+num}`].type === "video" ?
-            <div className={`insert-input ${postObj[`${`input`+num}`].output === "" ? "insert-input-animation": postObj[`${`input`+num}`].deleting === true && "delete-input-animation"}`}>
+            <div className={`insert-input ${postObj[`${`input`+num}`].output === "" ? postObj[`${`input`+num}`].initializing === true && "insert-input-animation": postObj[`${`input`+num}`].deleting === true && "delete-input-animation"}`}>
                 
                 <div className="edit-post-btns">
                     <>
@@ -297,7 +300,7 @@ export default function ViewPost(props){
                 <textarea
                     rows={1}
                     name={postObj[`${`input`+num}`]}
-                    className="create-post-video-textarea"
+                    className={`create-post-video-textarea insert-input ${postObj[`${`input`+num}`].output === "" ? postObj[`${`input`+num}`].initializing === true && "insert-input-animation": postObj[`${`input`+num}`].deleting === true && "delete-input-animation"}`}
                     type="text" 
                     placeholder="youtube link..."
                     value={postObj[`${`input`+num}`].output} 
@@ -313,7 +316,7 @@ export default function ViewPost(props){
             :
             postObj[`${`input`+num}`] &&
             postObj[`${`input`+num}`].type === "image" &&
-            <div className={`insert-input ${postObj[`${`input`+num}`].output === "" ? "insert-input-animation": postObj[`${`input`+num}`].deleting === true && "delete-input-animation"}`}>
+            <div className={`insert-input ${postObj[`${`input`+num}`].output === "" ? postObj[`${`input`+num}`].initializing === true && "insert-input-animation": postObj[`${`input`+num}`].deleting === true && "delete-input-animation"}`}>
                 
                 <div className="edit-post-btns">
                     <>
@@ -330,7 +333,7 @@ export default function ViewPost(props){
                 <textarea
                     rows={1}
                     name={postObj[`${`input`+num}`]}
-                    className="create-post-video-textarea"
+                    className={`create-post-video-textarea insert-input ${postObj[`${`input`+num}`].output === "" ? postObj[`${`input`+num}`].initializing === true && "insert-input-animation": postObj[`${`input`+num}`].deleting === true && "delete-input-animation"}`}
                     type="text" 
                     placeholder="image url goes here"
                     value={postObj[`${`input`+num}`].output} 
@@ -345,7 +348,6 @@ export default function ViewPost(props){
             </div>
         )
     }
-    console.log(postObj);
     
     return (
         <div className="page-body post">
