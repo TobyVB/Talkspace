@@ -126,7 +126,7 @@ export default function Comment(props){
             onSnapshot(q, async (snapshot) => {
                 snapshot.docs.forEach((document) => {
                     const docRef = doc(db, 'comments', document.id)
-                    if(document.data().unique === unique){
+                    if(document.data().unique === props.unique){
                         console.log(unique)
                         updateDoc(docRef, {
                             id: document.id
