@@ -27,9 +27,10 @@ export default function Comment(props){
 
     function updateApprove(e){
         e.preventDefault();
-        e.stopPropagation();
+        // e.stopPropagation();
         const docRef = doc(db, "comments", props.id)
         if(!props.approval.includes(auth.currentUser.uid)){
+            e.preventDefault();
             updateDoc(docRef, {
                 approval: arrayUnion(auth.currentUser.uid),
                 disapproval: arrayRemove(auth.currentUser.uid)
@@ -40,6 +41,7 @@ export default function Comment(props){
                 console.log("approved")
             })
         } else {
+            e.preventDefault();
             updateDoc(docRef, {
                 approval: arrayRemove(auth.currentUser.uid)
             })
@@ -50,7 +52,7 @@ export default function Comment(props){
     }
     function updateDisapprove(e){
         e.preventDefault();
-        e.stopPropagation();
+        // e.stopPropagation();
         const docRef = doc(db, "comments", props.id)
         if(!props.disapproval.includes(auth.currentUser.uid)){
             updateDoc(docRef, {
@@ -191,21 +193,29 @@ export default function Comment(props){
     const [showRepliesClass, setShowRepliesClass] = useState(false);
     const [hideRepliesClass, setHideRepliesClass] = useState(false)
     function showReplies(){
+        // make user unable to click until animation finishes
+        setReplyDisabled(true)
         // add class for animation
         setShowRepliesClass(true)
         // setTimeout for remove animation class
         setTimeout(() => {
+            setReplyDisabled(false)
             setShowRepliesClass(false)
         }, 1000)
-        setUpdate(prevUpdate => !prevUpdate);
+        // setUpdate(prevUpdate => !prevUpdate);
+        sessionStorage.setItem(props.unique, "true")
     }
     function hideReplies(){
+        // make user unable to click until animation finishes
+        setReplyDisabled(true)
         // add class for animation
         setHideRepliesClass(true)
         // setTimeout for remove animation class
         setTimeout(() => {
+            setReplyDisabled(false)
             setHideRepliesClass(false)
-            setUpdate(prevUpdate => !prevUpdate);
+            // setUpdate(prevUpdate => !prevUpdate);
+            sessionStorage.setItem(props.unique, "false")
         }, 1000)
     }
 
@@ -328,7 +338,8 @@ export default function Comment(props){
                         } 
                         <div className="comment-chain">
                             {props.type === "comment" 
-                            && update
+                            // && update
+                            && sessionStorage.getItem(props.unique) === "true"
                             && props.comments.filter(comment => comment.replyTo === props.id).length > 0 &&
                              <button 
                                 disabled={replyDisabled && "+true"}
@@ -336,7 +347,8 @@ export default function Comment(props){
                                 onClick={hideReplies}>hide replies
                             </button>}
                             <div className={showRepliesClass === true ?`open-reply-chain` : hideRepliesClass && `close-reply-chain`}>
-                                {update && 
+                                {/* {update &&  */}
+                                { sessionStorage.getItem(props.unique) === "true" &&
                                 props.comments && 
                                 props.comments.map(comment => comment.unique === props.unique && comment.type === "reply" &&
 
@@ -362,7 +374,8 @@ export default function Comment(props){
                             </div>
                             {/* ############################################################ */}
                             {props.type === "comment" 
-                            && !update
+                            // && !update
+                            && sessionStorage.getItem(props.unique) !== "true"
                             && replyChain.length > 0 && <button disabled={replyDisabled && "+true"} className="show-replies" onClick={showReplies}> - show replies -</button>
                             }
                         </div>

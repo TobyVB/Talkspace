@@ -245,7 +245,7 @@ function App() {
   }
 // ############################################################
 
-  if(page !== 7){sessionStorage.clear();}
+  if(page !== 7){sessionStorage.removeItem("showReplies");}
 
   const notificationsRef = collection(db, 'notifications');
   const notifyQ = query(notificationsRef, orderBy('createdAt'));
