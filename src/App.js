@@ -27,8 +27,6 @@ import ChangeUsername from './Components/ChangeUsername.js';
 import RetrievePassword from './Components/RetrievePassword.js';
 import ChangePassword from './Components/ChangePassword.js';
 import DeleteAccount from './Components/DeleteAccount.js';
-// Now just need to make all these files...
-// Also today, could go take a look at React router...
 
 const firebaseConfig = {
   apiKey: "AIzaSyCXgrZdHQUbrEgrjTi71-Mc80WK0Ibj3zk",
@@ -39,7 +37,6 @@ const firebaseConfig = {
   appId: "1:732318855377:web:427b3c2f42cf708aaf15f0",
   measurementId: "G-Z5W900LJ0J"
 };
-// initializeApp(firebaseConfig);
 const app = initializeApp(firebaseConfig);
 export const storage = getStorage(app);
 const auth = getAuth();
@@ -245,7 +242,7 @@ function App() {
   }
 // ############################################################
 
-  if(page !== 7){sessionStorage.removeItem("showReplies");}
+  if(page !== 7){sessionStorage.clear();}
 
   const notificationsRef = collection(db, 'notifications');
   const notifyQ = query(notificationsRef, orderBy('createdAt'));
