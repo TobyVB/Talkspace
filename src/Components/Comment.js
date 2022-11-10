@@ -176,43 +176,74 @@ export default function Comment(props){
     //     setUpdate(prevUpdate => !prevUpdate);
     // }
 
-    console.log("test")
 
-    function toggleReplies(){
-        setReplyDisabled(true);
-        if(openReplies === null){
-            setReplyDisabled(false)
-            setOpenReplies(true)
-            if(sessionStorage.getItem(props.unique) === props.unique){
-                sessionStorage.removeItem(props.unique);
-            } else {
-                sessionStorage.setItem(props.unique, props.unique);
-            }   
-            setUpdate(true);
-        }
-        if(openReplies === false){
-            setOpenReplies(true)
-            setReplyDisabled(false)
-            if(sessionStorage.getItem(props.unique) === props.unique){
-                sessionStorage.removeItem(props.unique);
-            } else {
-                sessionStorage.setItem(props.unique, props.unique);
-            }   
-            setUpdate(true);
-        }   
-        if(openReplies === true) {
-            setOpenReplies(false);
-            setTimeout(() => {
-                setReplyDisabled(false)
-                if(sessionStorage.getItem(props.unique) === props.unique){
-                    sessionStorage.setItem(props.unique, props.unique);
-                } else {
-                    sessionStorage.removeItem(props.unique);
-                }   
-                setUpdate(false);
-            },1000) 
-        }
+// Solve scroll animation issue
+
+// Have separate function for show reply and hide reply.
+// When show function is called it adds class that has animation starting at 0vh and ends with 100vh
+// Then sets timeout for around length of animation, when time runs out it removes the class.
+// This is done by adding a ternary for the class.
+// There will be a setShowReplyClass(false)
+// It will start as false turn on, then go back to false.
+// For setHideReply, it will also start as false, turn true and also go back to false after timeout…
+// className={showReplies ? “show-replies” : hide-replies && “hide-replies”}
+
+    const [showRepliesClass, setShowRepliesClass] = useState(false);
+    const [hideRepliesClass, setHideRepliesClass] = useState(false)
+    function showReplies(){
+        // add class for animation
+        setShowRepliesClass(true)
+        // setTimeout for remove animation class
+        setTimeout(() => {
+            setShowRepliesClass(false)
+        }, 1000)
+        setUpdate(prevUpdate => !prevUpdate);
     }
+    function hideReplies(){
+        // add class for animation
+        setHideRepliesClass(true)
+        // setTimeout for remove animation class
+        setTimeout(() => {
+            setHideRepliesClass(false)
+            setUpdate(prevUpdate => !prevUpdate);
+        }, 1000)
+    }
+
+    // function toggleReplies(){
+    //     setReplyDisabled(true);
+    //     if(openReplies === null){
+    //         setReplyDisabled(false)
+    //         setOpenReplies(true)
+    //         if(sessionStorage.getItem(props.unique) === props.unique){
+    //             sessionStorage.removeItem(props.unique);
+    //         } else {
+    //             sessionStorage.setItem(props.unique, props.unique);
+    //         }   
+    //         setUpdate(true);
+    //     }
+    //     if(openReplies === false){
+    //         setOpenReplies(true)
+    //         setReplyDisabled(false)
+    //         if(sessionStorage.getItem(props.unique) === props.unique){
+    //             sessionStorage.removeItem(props.unique);
+    //         } else {
+    //             sessionStorage.setItem(props.unique, props.unique);
+    //         }   
+    //         setUpdate(true);
+    //     }   
+    //     if(openReplies === true) {
+    //         setOpenReplies(false);
+    //         setTimeout(() => {
+    //             setReplyDisabled(false)
+    //             if(sessionStorage.getItem(props.unique) === props.unique){
+    //                 sessionStorage.setItem(props.unique, props.unique);
+    //             } else {
+    //                 sessionStorage.removeItem(props.unique);
+    //             }   
+    //             setUpdate(false);
+    //         },1000) 
+    //     }
+    // }
     
 
     const [replyPressed, setReplyPressed] = useState(false)
@@ -302,9 +333,9 @@ export default function Comment(props){
                              <button 
                                 disabled={replyDisabled && "+true"}
                                 className="show-replies" 
-                                onClick={toggleReplies}>hide replies
+                                onClick={hideReplies}>hide replies
                             </button>}
-                            <div className={openReplies === true ?`open-reply-chain` : `close-reply-chain`}>
+                            <div className={showRepliesClass === true ?`open-reply-chain` : hideRepliesClass && `close-reply-chain`}>
                                 {update && 
                                 props.comments && 
                                 props.comments.map(comment => comment.unique === props.unique && comment.type === "reply" &&
@@ -332,7 +363,7 @@ export default function Comment(props){
                             {/* ############################################################ */}
                             {props.type === "comment" 
                             && !update
-                            && replyChain.length > 0 && <button disabled={replyDisabled && "+true"} className="show-replies" onClick={toggleReplies}> - show replies -</button>
+                            && replyChain.length > 0 && <button disabled={replyDisabled && "+true"} className="show-replies" onClick={showReplies}> - show replies -</button>
                             }
                         </div>
                     </div>
