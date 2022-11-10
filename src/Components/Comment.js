@@ -150,7 +150,7 @@ export default function Comment(props){
                 onSnapshot(q, async (snapshot) => {
                     snapshot.docs.forEach((document) => {
                         const docRef = doc(db, 'notifications', document.id)
-                        if(document.data().unique === unique){
+                        if(document.data().unique === props.unique){
                             console.log(unique)
                             updateDoc(docRef, {
                                 id: document.id
@@ -167,28 +167,7 @@ export default function Comment(props){
     const [openReplies, setOpenReplies] = useState(null);
     const [update, setUpdate] = useState(false);
     const [replyDisabled, setReplyDisabled] = useState(false);
-    
 
-    // function toggleReplies(){   
-    //     if(sessionStorage.getItem(props.unique) === props.unique){
-    //         sessionStorage.removeItem(props.unique)
-    //     } else {
-    //         sessionStorage.setItem(props.unique, props.unique)
-    //     }   
-    //     setUpdate(prevUpdate => !prevUpdate);
-    // }
-
-
-// Solve scroll animation issue
-
-// Have separate function for show reply and hide reply.
-// When show function is called it adds class that has animation starting at 0vh and ends with 100vh
-// Then sets timeout for around length of animation, when time runs out it removes the class.
-// This is done by adding a ternary for the class.
-// There will be a setShowReplyClass(false)
-// It will start as false turn on, then go back to false.
-// For setHideReply, it will also start as false, turn true and also go back to false after timeout…
-// className={showReplies ? “show-replies” : hide-replies && “hide-replies”}
 
     const [showRepliesClass, setShowRepliesClass] = useState(false);
     const [hideRepliesClass, setHideRepliesClass] = useState(false)
@@ -202,7 +181,6 @@ export default function Comment(props){
             setReplyDisabled(false)
             setShowRepliesClass(false)
         }, 1000)
-        // setUpdate(prevUpdate => !prevUpdate);
         sessionStorage.setItem(props.unique, "true")
     }
     function hideReplies(){
@@ -214,46 +192,10 @@ export default function Comment(props){
         setTimeout(() => {
             setReplyDisabled(false)
             setHideRepliesClass(false)
-            // setUpdate(prevUpdate => !prevUpdate);
             sessionStorage.setItem(props.unique, "false")
         }, 1000)
     }
 
-    // function toggleReplies(){
-    //     setReplyDisabled(true);
-    //     if(openReplies === null){
-    //         setReplyDisabled(false)
-    //         setOpenReplies(true)
-    //         if(sessionStorage.getItem(props.unique) === props.unique){
-    //             sessionStorage.removeItem(props.unique);
-    //         } else {
-    //             sessionStorage.setItem(props.unique, props.unique);
-    //         }   
-    //         setUpdate(true);
-    //     }
-    //     if(openReplies === false){
-    //         setOpenReplies(true)
-    //         setReplyDisabled(false)
-    //         if(sessionStorage.getItem(props.unique) === props.unique){
-    //             sessionStorage.removeItem(props.unique);
-    //         } else {
-    //             sessionStorage.setItem(props.unique, props.unique);
-    //         }   
-    //         setUpdate(true);
-    //     }   
-    //     if(openReplies === true) {
-    //         setOpenReplies(false);
-    //         setTimeout(() => {
-    //             setReplyDisabled(false)
-    //             if(sessionStorage.getItem(props.unique) === props.unique){
-    //                 sessionStorage.setItem(props.unique, props.unique);
-    //             } else {
-    //                 sessionStorage.removeItem(props.unique);
-    //             }   
-    //             setUpdate(false);
-    //         },1000) 
-    //     }
-    // }
     
 
     const [replyPressed, setReplyPressed] = useState(false)
@@ -338,7 +280,6 @@ export default function Comment(props){
                         } 
                         <div className="comment-chain">
                             {props.type === "comment" 
-                            // && update
                             && sessionStorage.getItem(props.unique) === "true"
                             && props.comments.filter(comment => comment.replyTo === props.id).length > 0 &&
                              <button 
@@ -347,7 +288,6 @@ export default function Comment(props){
                                 onClick={hideReplies}>hide replies
                             </button>}
                             <div className={showRepliesClass === true ?`open-reply-chain` : hideRepliesClass && `close-reply-chain`}>
-                                {/* {update &&  */}
                                 { sessionStorage.getItem(props.unique) === "true" &&
                                 props.comments && 
                                 props.comments.map(comment => comment.unique === props.unique && comment.type === "reply" &&
@@ -374,7 +314,6 @@ export default function Comment(props){
                             </div>
                             {/* ############################################################ */}
                             {props.type === "comment" 
-                            // && !update
                             && sessionStorage.getItem(props.unique) !== "true"
                             && replyChain.length > 0 && <button disabled={replyDisabled && "+true"} className="show-replies" onClick={showReplies}> - show replies -</button>
                             }
