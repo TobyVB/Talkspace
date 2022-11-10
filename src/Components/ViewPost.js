@@ -192,6 +192,7 @@ export default function ViewPost(props){
                     resetUnique={comment.unique===props.capturedUnique?resetUnique:doNothing}
                     capturedPostId={props.capturedPostId}
                     currentCommentId={props.currentCommentId}
+                    page={props.page}
                 />  
                 {props.capturedUnique===comment.unique&&<div ref={scrollTarget}></div>}
                 </div>)}

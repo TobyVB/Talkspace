@@ -289,6 +289,8 @@ function App() {
     hideMenu()
   }
 
+  
+
   return (
     <div className="App">
       {warning && <p className={transformWarning?'warning-text transform-warning':'warning-text'}>user needs to be verified</p>}
@@ -442,8 +444,6 @@ function App() {
       {auth.currentUser && page === viewPost 
       && <ViewPost 
         capturedPostId={capturedPostId}
-        // username={userData.username} 
-        // defaultPic={userData.defaultPic}
         sendUID={sendUID}
         capturedUnique={capturedUnique}
         setCapturedUnique={setCapturedUnique}

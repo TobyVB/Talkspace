@@ -14,27 +14,19 @@ export default function Comment(props){
     const db = getFirestore()
     const { body, uid, username } = props.comment;
 
+    
     const commentsRef = collection(db, 'comments');
     const notifyRef = collection(db, 'notifications');
+ 
 
     const [formValue, setFormValue] = useState('');
 
     const [approveImpactSelected, setApproveImpactSelected] = useState(false);
     const [disapproveImpactSelected, setDisapproveImpactSelected] = useState(false);
 
-    // const [foundComment, setFoundComment] = useState("")
-    // useEffect(() => {
-    //     const q = query(commentsRef, orderBy('createdAt'))
-    //     onSnapshot(q, async, (snapshot) => {
-    //         snapshot.docs.forEach((doc) => {
-    //             if(doc.data().id === props.id){
-    //                 setFoundComment({...doc.data(), id: doc.id})
-    //             }
-    //         })
-    //     })
-    // })
 
     function updateApprove(e){
+        e.preventDefault();
         e.stopPropagation();
         const docRef = doc(db, "comments", props.id)
         if(!props.approval.includes(auth.currentUser.uid)){
@@ -57,6 +49,7 @@ export default function Comment(props){
         }
     }
     function updateDisapprove(e){
+        e.preventDefault();
         e.stopPropagation();
         const docRef = doc(db, "comments", props.id)
         if(!props.disapproval.includes(auth.currentUser.uid)){
@@ -77,7 +70,6 @@ export default function Comment(props){
                 setDisapproveImpactSelected(false)
             })
         }
-        
     }
 
     // if uid in approval then add class 'voteCasted'
@@ -111,6 +103,7 @@ export default function Comment(props){
     // USE THE NEW UPDATE STYLE
     function createComment(e){
         e.preventDefault()
+        e.stopPropagation();
         addDoc(commentsRef, {
             body: formValue,
             uid: auth.currentUser.uid,
@@ -131,12 +124,12 @@ export default function Comment(props){
             onSnapshot(q, async (snapshot) => {
                 snapshot.docs.forEach((document) => {
                     const docRef = doc(db, 'comments', document.id)
-                    // if(document.data().unique === unique){
+                    if(document.data().unique === unique){
                         console.log(unique)
                         updateDoc(docRef, {
                             id: document.id
                         })
-                    // }
+                    }
                 })
             })
         })
@@ -173,12 +166,23 @@ export default function Comment(props){
     const [update, setUpdate] = useState(false);
     const [replyDisabled, setReplyDisabled] = useState(false);
     
+
+    // function toggleReplies(){   
+    //     if(sessionStorage.getItem(props.unique) === props.unique){
+    //         sessionStorage.removeItem(props.unique)
+    //     } else {
+    //         sessionStorage.setItem(props.unique, props.unique)
+    //     }   
+    //     setUpdate(prevUpdate => !prevUpdate);
+    // }
+
+    console.log("test")
+
     function toggleReplies(){
         setReplyDisabled(true);
         if(openReplies === null){
             setReplyDisabled(false)
             setOpenReplies(true)
-            // REMOVE COMMENT/REPLY TO OPEN REPLIES FOR
             if(sessionStorage.getItem(props.unique) === props.unique){
                 sessionStorage.removeItem(props.unique);
             } else {
@@ -186,12 +190,9 @@ export default function Comment(props){
             }   
             setUpdate(true);
         }
-        
-        // setInitReplies(prev => !prev)
         if(openReplies === false){
             setOpenReplies(true)
             setReplyDisabled(false)
-            // REMOVE COMMENT/REPLY TO OPEN REPLIES FOR
             if(sessionStorage.getItem(props.unique) === props.unique){
                 sessionStorage.removeItem(props.unique);
             } else {
@@ -212,15 +213,7 @@ export default function Comment(props){
             },1000) 
         }
     }
-    // function toggleReplies(){
-    //         // REMOVE COMMENT/REPLY TO OPEN REPLIES FOR
-    //     if(sessionStorage.getItem(props.unique) === props.unique){
-    //         sessionStorage.removeItem(props.unique)
-    //     } else {
-    //         sessionStorage.setItem(props.unique, props.unique)
-    //     }   
-    //     setUpdate(prev => !prev);
-    // }
+    
 
     const [replyPressed, setReplyPressed] = useState(false)
     const [showForm, setShowForm] = useState(false);
@@ -245,7 +238,7 @@ export default function Comment(props){
     return (
         <div 
             className={`comment ${props.unique===props.capturedUnique&& `targetedComment`}${props.type === 'reply'?' comment-type-reply':' comment-type-comment'}`}
-            onClick={props.resetUnique}
+            onClick={props.resetUnique} 
         >
             <div className="comment-container-main flex">    
                 
@@ -297,6 +290,7 @@ export default function Comment(props){
                                         className="sendComment-btn" 
                                         type="submit" 
                                         disabled={!formValue}
+                                        onClick={createComment}
                                     >REPLY</button>
                                 </div>
                             </form>
@@ -312,9 +306,9 @@ export default function Comment(props){
                             </button>}
                             <div className={openReplies === true ?`open-reply-chain` : `close-reply-chain`}>
                                 {update && 
-                                // {sessionStorage.getItem(props.unique) === props.unique && 
                                 props.comments && 
                                 props.comments.map(comment => comment.unique === props.unique && comment.type === "reply" &&
+
                                     <div className="reply" key={nanoid()}> 
                                         <Comment 
                                             comment={comment.body}
