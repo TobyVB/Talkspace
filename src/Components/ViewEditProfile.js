@@ -27,6 +27,7 @@ export default function ViewEditProfile(props){
     const [objURL, setObjURL] = useState("")
 
     window.scrollTo(0, 0)
+    localStorage.setItem("prevPage", "editProfile")
 
     // ########## A C C E S S   C U R R E N T   U S E R'S   D O C ##########
     useEffect(() => {
@@ -107,16 +108,11 @@ export default function ViewEditProfile(props){
 
     return (
         <div className="edit-profile profile">
-            {/* ############### S A V E   S E T T I N G S ################ */}
-            <div className="save-cancel-edit-profile">
-                <button onClick={props.cancel}>cancel</button>
-                <button onClick={save}>save</button>
-            </div>
             {/* ############### E D I T   P R O F I L E   P H O T O ################ */}
             {hideEditAboutMe && hideEditImage && <div className="edit-profile-section"><button  onClick={showEditImage}>edit profile photo</button></div>}
             {!hideEditImage && 
                 <div className="edit-profile-section">
-                    <button onClick={cancelEditImage}>cancel</button>
+                    <button className="edit-post-btn" onClick={cancelEditImage}>cancel</button>
                     <div className="edit-defaultPic">
                         <img 
                             alt="profile" 
@@ -146,9 +142,14 @@ export default function ViewEditProfile(props){
                         value={aboutMeValue}
                         onChange={(event) => setAboutMeValue(event.target.value)}
                     />
-                    <button onClick={cancelEditAboutMe}>cancel</button>
+                    <button className="edit-post-btn" onClick={cancelEditAboutMe}>cancel</button>
                 </div>
             }
+            {/* ############### S A V E   S E T T I N G S ################ */}
+            <div className="save-cancel-edit-profile">
+                <button className="edit-post-btn" onClick={props.cancel}>cancel</button>
+                <button className="edit-post-btn" onClick={save}>save</button>
+            </div>
         </div>
     )
 }

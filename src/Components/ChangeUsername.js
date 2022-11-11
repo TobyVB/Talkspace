@@ -35,7 +35,7 @@ export default function ChangeUsername(props){
         setUsernameChanged(true)
         setTimeout(() => {
             props.cancel()
-        }, 3000)
+        }, 2000)
     }
 
     

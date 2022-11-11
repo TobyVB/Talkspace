@@ -10,7 +10,7 @@ export default function ViewProfile(props){
     const auth = getAuth();
     const usersRef = collection(db, 'users');
     const [currentUser, setCurrentUser] = useState("")
-    const [image, setImage] = useState(null);
+    const [image, setImage] = useState(false);
     const [objURL, setObjURL] = useState("")
 
     useEffect(() => {
@@ -27,6 +27,14 @@ export default function ViewProfile(props){
                 }
             })
         })
+        if(localStorage.getItem("prevPage") === "editProfile"){
+            setTimeout(() => {
+                setImage(true)
+                localStorage.removeItem("prevPage")
+            },800)
+        } else {
+            setImage(true);
+        }
     },[])
 
     // ########## F I N D   U S E R'S   P O S T  D O C S ##########
@@ -64,7 +72,7 @@ export default function ViewProfile(props){
                 <img 
                     alt="profile" 
                     className="edit-profile-picture" 
-                    src={image!==null?objURL:currentUser.defaultPic}
+                    src={image && currentUser.defaultPic}
                 /> 
                 <div className='profile-info-section'>
                     <div className='flex'>

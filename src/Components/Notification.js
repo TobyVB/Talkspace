@@ -72,11 +72,6 @@ export default function Notification(props){
             }
         })
         .then(() => {
-            // For some reason session storage isn't getting the currentComment.id
-            // so fixing that is the next order of business.
-            // console.log("blahblahblah: "+currentComment.id)
-            // sessionStorage.setItem("commentId", JSON.stringify(currentComment.id))
-            // instead of using sessionStorage, send it to a capture function
             props.sendCurrentCommentId(currentComment.id)
         })
     }

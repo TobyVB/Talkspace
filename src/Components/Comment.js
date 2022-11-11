@@ -30,7 +30,6 @@ export default function Comment(props){
         // e.stopPropagation();
         const docRef = doc(db, "comments", props.id)
         if(!props.approval.includes(auth.currentUser.uid)){
-            e.preventDefault();
             updateDoc(docRef, {
                 approval: arrayUnion(auth.currentUser.uid),
                 disapproval: arrayRemove(auth.currentUser.uid)
@@ -41,7 +40,6 @@ export default function Comment(props){
                 console.log("approved")
             })
         } else {
-            e.preventDefault();
             updateDoc(docRef, {
                 approval: arrayRemove(auth.currentUser.uid)
             })
@@ -106,6 +104,7 @@ export default function Comment(props){
     function createComment(e){
         e.preventDefault()
         e.stopPropagation();
+        endShowForm();
         addDoc(commentsRef, {
             body: formValue,
             uid: auth.currentUser.uid,
@@ -136,29 +135,31 @@ export default function Comment(props){
             })
         })
         .then(() => {
-            addDoc(notifyRef, {
-                to: props.uid,
-                from: currentUser.id,
-                type: "reply",
-                message: `${currentUser.username} replied to your comment.`,
-                postId: props.capturedPostId,
-                unique: `${props.type?props.unique:unique}`,         
-                createdAt: serverTimestamp()
-            })
-            .then(() => {
-                const q = query(notifyRef, orderBy('createdAt'))
-                onSnapshot(q, async (snapshot) => {
-                    snapshot.docs.forEach((document) => {
-                        const docRef = doc(db, 'notifications', document.id)
-                        if(document.data().unique === props.unique){
-                            console.log(unique)
-                            updateDoc(docRef, {
-                                id: document.id
-                            })
-                        }
+            if(currentUser.uid !== props.uid){
+                addDoc(notifyRef, {
+                    to: props.uid,
+                    from: currentUser.id,
+                    type: "reply",
+                    message: `${currentUser.username} replied to your comment.`,
+                    postId: props.capturedPostId,
+                    unique: `${props.type?props.unique:unique}`,         
+                    createdAt: serverTimestamp()
+                })
+                .then(() => {
+                    const q = query(notifyRef, orderBy('createdAt'))
+                    onSnapshot(q, async (snapshot) => {
+                        snapshot.docs.forEach((document) => {
+                            const docRef = doc(db, 'notifications', document.id)
+                            if(document.data().unique === props.unique){
+                                console.log(unique)
+                                updateDoc(docRef, {
+                                    id: document.id
+                                })
+                            }
+                        })
                     })
                 })
-            })
+            }
         })
         setUnique(nanoid())
     }
@@ -200,14 +201,28 @@ export default function Comment(props){
 
     const [replyPressed, setReplyPressed] = useState(false)
     const [showForm, setShowForm] = useState(false);
-    function toggleShowForm(){
-        setShowForm(prevShowForm => !prevShowForm)
-        if(showForm){
-            setTextareaCols(0);
-            setFormValue("");
-        } else {
-            setFormValue(`@${props.username} `)
-        }
+    const [startCreateReply, setStartCreateReply] = useState(false);
+    const [endCreateReply, setEndCreateReply] = useState(false);
+    function startShowForm(){
+        setStartCreateReply(true)
+        setShowForm(true)
+        setTimeout(() => {
+            if(showForm){
+                setTextareaCols(0);
+                setFormValue("");
+            } else {
+                setFormValue(`@${props.username} `)
+            }
+            setStartCreateReply(false)
+        }, 500)
+        setReplyPressed(prevReplyPressed => !prevReplyPressed)
+    }
+    function endShowForm(e){
+        setEndCreateReply(true)
+        setTimeout(() => {
+            setEndCreateReply(false)
+            setShowForm(false)
+        }, 300)
         setReplyPressed(prevReplyPressed => !prevReplyPressed)
     }
 
@@ -253,10 +268,10 @@ export default function Comment(props){
                                 onClick={updateDisapprove}>👎</p>
                                 {disapproves > 0 &&<span className="numImpact">{disapproves}</span>}
                             </div>
-                            {!showForm && !replyPressed && <button className="reply-btn" onClick={toggleShowForm}>REPLY</button>}
+                            {!showForm && !replyPressed && <button className="reply-btn" onClick={startShowForm}>REPLY</button>}
                         </div>
                         {showForm && 
-                            <form className="create-reply-form" onSubmit={createComment}>
+                            <div className={`create-reply-form ${startCreateReply ? "startReplyAnimation" : endCreateReply && "endReplyAnimation"}`}>
                                 <textarea className="reply-input" 
                                     ref={ref => ref && ref.focus()}
                                     onFocus={(e) => e.currentTarget.setSelectionRange(e.currentTarget.value.length, e.currentTarget.value.length)}
@@ -268,7 +283,7 @@ export default function Comment(props){
                                     onChange={(event) => setFormValue(event.target.value)} 
                                     placeholder="Add a reply..." />
                                 <div className="reply-btns">
-                                    {showForm && <button className="cancel-reply" onClick={toggleShowForm}>CANCEL</button>}
+                                    {showForm && <button className="cancel-reply" onClick={endShowForm}>CANCEL</button>}
                                     <button 
                                         className="sendComment-btn" 
                                         type="submit" 
@@ -276,7 +291,7 @@ export default function Comment(props){
                                         onClick={createComment}
                                     >REPLY</button>
                                 </div>
-                            </form>
+                            </div>
                         } 
                         <div className="comment-chain">
                             {props.type === "comment" 

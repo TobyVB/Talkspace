@@ -27,7 +27,6 @@ export default function ViewOtherProfile(props){
     },[])
 
 
-    const [filterOn, setFilterOn] = useState(false)
     // FIND THE POST DOC
     const postsRef = collection(db, 'posts');
     const [foundPosts, setFoundPosts] = useState("")
@@ -40,7 +39,6 @@ export default function ViewOtherProfile(props){
                 }
             }))
         })
-        setFilterOn(true)
     },[foundUser])
 
     const q = query(postsRef, orderBy('createdAt'));

@@ -495,7 +495,7 @@ form {
 .edit-profile-section {
   display: flex;
   max-width: 100vw;
-  margin-bottom: 1em;
+  margin-bottom: 2.5em;
   align-items: center;
   flex-direction: column;
 }
@@ -512,6 +512,8 @@ form {
   position: absolute;
   background-color: rgb(57, 76, 95);
   min-height: 70vh;
+  display: flex;
+  flex-direction:column
 }
 .edit-user {
   position: absolute;
@@ -536,9 +538,10 @@ form {
   border-radius: 5px;
 }
 .save-cancel-edit-profile {
-  margin-top: -4em;
-  margin-bottom: 4.5em;
   justify-content: center;
+  margin: auto;
+  display: flex;
+  gap: 3em;
 }
 .fileTypeInput {
   margin: 1.5em 0;
@@ -548,12 +551,6 @@ form {
   height: 50px;
   margin-right: 1em;
   margin-bottom: 1em;
-}
-.save-cancel-edit-profile button {
-  background-color: transparent;
-  border: none;
-  color: white;
-  margin-right: 3em;
 }
 .profile-post-sections {
   display: grid;
@@ -923,6 +920,41 @@ form {
   margin: 1em 0;
   background-color: rgba(28,38,48, 0);
   border-radius: 5px;
+  max-width: auto;
+  display: flex;
+}
+.startReplyAnimation {
+  overflow-x: hidden;
+  animation-name: sReplyAnimation;
+  animation-duration: .55s;
+  animation-iteration-count: 1;
+}
+@keyframes sReplyAnimation {
+  from {
+    max-height: 0vh;
+  }
+  to {
+    max-height: 10vh;
+  }
+}
+.endReplyAnimation {
+  overflow-x: hidden;
+  animation-name: eReplyAnimation;
+  animation-duration: .35s;
+  animation-iteration-count: 1;
+}
+@keyframes eReplyAnimation {
+  from {
+    /* max-height: 20vh; */
+    margin: 1em 0;
+  }
+  to {
+    /* max-height: 0vh; */
+    margin-bottom: -15px;
+    height: 0px;
+    /* color: red;
+    background: black; */
+  }
 }
 .comment-name {
   padding-right: 1em;
