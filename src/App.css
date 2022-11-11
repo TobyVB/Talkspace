@@ -1022,6 +1022,7 @@ textarea {
   }
   to {
     max-height: 0vh;
+    background-color: rgba(0,0,0,1);
   }
 }
 .reply-btn {

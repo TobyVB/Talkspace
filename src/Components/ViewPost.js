@@ -20,7 +20,8 @@ export default function ViewPost(props){
         approval: 'approval',
         disapproval: 'disapproval',
         username: 'username',
-        body: 'body'
+        body: 'body',
+        chain: 'chain'
     })
 
     useEffect(() => {
@@ -193,6 +194,7 @@ export default function ViewPost(props){
                     capturedPostId={props.capturedPostId}
                     currentCommentId={props.currentCommentId}
                     page={props.page}
+                    chain={comment.chain}
                 />  
                 {props.capturedUnique===comment.unique&&<div ref={scrollTarget}></div>}
                 </div>)}

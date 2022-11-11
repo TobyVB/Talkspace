@@ -2,7 +2,7 @@ import {getAuth} from 'firebase/auth'
 import {arrayRemove, arrayUnion, doc,
    getFirestore, updateDoc, collection,
    query, orderBy, onSnapshot,
-   serverTimestamp, addDoc
+   serverTimestamp, addDoc, deleteDoc
 } from 'firebase/firestore'
 import React, {useState, useEffect, useRef} from 'react';
 import Clock from "./Utils/Clock.js";
@@ -12,18 +12,11 @@ import { nanoid } from 'nanoid';
 export default function Comment(props){
     const auth = getAuth();
     const db = getFirestore()
-    const { body, uid, username } = props.comment;
-
-    
     const commentsRef = collection(db, 'comments');
     const notifyRef = collection(db, 'notifications');
- 
-
     const [formValue, setFormValue] = useState('');
-
     const [approveImpactSelected, setApproveImpactSelected] = useState(false);
     const [disapproveImpactSelected, setDisapproveImpactSelected] = useState(false);
-
 
     function updateApprove(e){
         e.preventDefault();
@@ -72,14 +65,11 @@ export default function Comment(props){
         }
     }
 
-    // if uid in approval then add class 'voteCasted'
     const approveImpactClass = approveImpactSelected? 'approve-impact-selected': ''
-    // if uid in disapproval then add class 'votedCasted'
     const disapproveImpactClass = disapproveImpactSelected? 'disapprove-impact-selected': ''
 
     const approves = props.approval.length;
     const disapproves = props.disapproval.length;
-    const headCount = approves + disapproves;
 
     const [unique, setUnique] = useState(nanoid())
 
@@ -97,10 +87,6 @@ export default function Comment(props){
         })
     },[])
 
-    
-
-    // NEED TO UPDATE THE CREATE COMMENT FUNCTION HERE TO
-    // USE THE NEW UPDATE STYLE
     function createComment(e){
         e.preventDefault()
         e.stopPropagation();
@@ -112,6 +98,7 @@ export default function Comment(props){
             disapproval: [],
             createdAt: serverTimestamp(),
             replyTo: props.id,
+            chain: props.chain,    
             username: currentUser.username,
             defaultPic: currentUser.defaultPic,
             type: "reply",
@@ -142,7 +129,7 @@ export default function Comment(props){
                     type: "reply",
                     message: `${currentUser.username} replied to your comment.`,
                     postId: props.capturedPostId,
-                    unique: `${props.type?props.unique:unique}`,         
+                    unique: `${props.type?props.unique:unique}`,   
                     createdAt: serverTimestamp()
                 })
                 .then(() => {
@@ -164,12 +151,32 @@ export default function Comment(props){
         setUnique(nanoid())
     }
 
+
+    function deleteComment(){
+        const docRef = doc(db, 'comments', props.id)
+        deleteDoc(docRef)
+        .then(() => {
+            console.log("notification deleted")
+        })
+        .then(() => {
+            console.log("what's up?")
+            const q = query(commentsRef, orderBy('createdAt'))
+            onSnapshot(q, async (snapshot) => {
+                snapshot.docs.forEach((document) => {
+                    const docRef = doc(db, 'comments', document.id)
+                    if(document.data().chain === props.chain){
+                        deleteDoc(docRef)
+                    }
+                })
+            })
+
+        })
+    }
+
+
     // ACCESS REPLIES
-    const [openReplies, setOpenReplies] = useState(null);
-    const [update, setUpdate] = useState(false);
+
     const [replyDisabled, setReplyDisabled] = useState(false);
-
-
     const [showRepliesClass, setShowRepliesClass] = useState(false);
     const [hideRepliesClass, setHideRepliesClass] = useState(false)
     function showReplies(){
@@ -196,8 +203,6 @@ export default function Comment(props){
             sessionStorage.setItem(props.unique, "false")
         }, 1000)
     }
-
-    
 
     const [replyPressed, setReplyPressed] = useState(false)
     const [showForm, setShowForm] = useState(false);
@@ -226,8 +231,6 @@ export default function Comment(props){
         setReplyPressed(prevReplyPressed => !prevReplyPressed)
     }
 
-
-
     const replyChain = props.comments && props.comments.filter(comment => comment.replyTo === props.id)
 
     const [textareaCols, setTextareaCols] = useState(1);
@@ -252,6 +255,7 @@ export default function Comment(props){
                             <p className="comment-name">{props.username}</p>
                         </div>
                         <Clock createdAt={props.createdAt} type={props.type}/>
+                        <p onClick={deleteComment}>delete</p>
                     </div>
                     <div className={`container-full-comment`}>
                         <div className={`comment-chat-text`}>
@@ -323,6 +327,7 @@ export default function Comment(props){
                                             resetUnique={props.resetUnique}
                                             unique={props.unique}
                                             capturedPostId={props.capturedPostId}
+                                            chain={props.chain}
                                         />
                                     </div>
                                 )}

@@ -42,6 +42,7 @@ export default function CreateComment(props){
             replyTo: props.capturedPostId,
             username: currentUser.username,
             defaultPic: currentUser.defaultPic,
+            chain: unique,
             unique: unique,
             createdAt: serverTimestamp(),
         })

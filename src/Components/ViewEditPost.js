@@ -53,9 +53,7 @@ export default function ViewPost(props){
         updatePost();
         props.cancel();
     }
-// ###########################################################################
-
-
+// ##########################################################################
 
     const [titleValue, setTitleValue] = useState("")
     const [ postObj, setPostObj ] = useState("");
@@ -74,15 +72,8 @@ export default function ViewPost(props){
 
 
     function deleteInput(e)  {
-        if(postObj[`${`input`+e}`].type === "text"){
-            setPostObj({...postObj, [`${`input`+e}`]: {type:"text", output: postObj[`${`input`+e}`].ouput, deleting:true}})
-        }
-        if(postObj[`${`input`+e}`].type === "image"){
-            setPostObj({...postObj, [`${`input`+e}`]: {type:"image", output: postObj[`${`input`+e}`].ouput, deleting:true}})
-        }
-        if(postObj[`${`input`+e}`].type === "video"){
-            setPostObj({...postObj, [`${`input`+e}`]: {type:"video", output: postObj[`${`input`+e}`].ouput, deleting:true}})
-        }
+        const type = postObj[`${`input`+e}`].type
+        setPostObj({...postObj, [`${`input`+e}`]: {type: type, output: postObj[`${`input`+e}`].ouput, deleting:true}})
         setTimeout(() => {
             if(postObj.numInputs === 1){
                 setPostObj(current => {
@@ -116,6 +107,18 @@ export default function ViewPost(props){
     };
 
     function addText(e){
+        const type = "text"
+        addInput(e, type)
+    }
+    function addImage(e){
+        const type = "image"
+        addInput(e, type)
+    }
+    function addVideo(e){
+        const type = "video"
+        addInput(e, type)
+    }
+    function addInput(e, type){
         let copy = postObj
         let copy2 = copy
         let store = {
@@ -145,81 +148,9 @@ export default function ViewPost(props){
             prev.push(numArr.length+1)
             return prev
         })
-        setPostObj({...copy2, numInputs:numInputs+1, numArr:numArr, ["input"+JSON.stringify(e)]: {type: "text", output: "", initializing:true}});
+        setPostObj({...copy2, numInputs:numInputs+1, numArr:numArr, ["input"+JSON.stringify(e)]: {type: type, output: "", initializing:true}});
         setTimeout(() => {
-            setPostObj({...copy2, numInputs:numInputs+1, numArr:numArr, ["input"+JSON.stringify(e)]: {type: "text", output: "", initializing:false}});
-        }, 1000)
-        setShowButtons(false)
-    }
-    function addImage(e){
-        let copy = postObj
-        let copy2 = copy
-        let store = {
-            numStore: 0,
-            place: e
-        }
-        for(let i=postObj.numInputs, count = 0; i >= JSON.parse(e); i--, count++){
-            store = {...store, 
-                numStore: count+1,
-                [`${`input`+JSON.stringify(JSON.parse(e)+count+1)}`]: copy[`${`input`+JSON.stringify(JSON.parse(e)+count)}`]
-            }
-            delete copy2[`${`input`+JSON.stringify(JSON.parse(e)+count)}`];
-        }
-        copy2 = {...copy2, ["input"+JSON.stringify(e)]: {type: "image", output: ""}}
-        for(let i=store.numStore, count = 0; count < i; count++){
-            if(count === 0){
-                copy2 = {...copy2, ["input"+JSON.stringify(e)]: {type: "image", output: ""},
-                [`${`input`+JSON.stringify(JSON.parse(e)+count+1)}`]: store[`${`input`+JSON.stringify(JSON.parse(e)+count+1)}`]  
-                }
-            } else {
-                copy2 = {...copy2, [`${`input`+JSON.stringify(JSON.parse(e)+count+1)}`]: store[`${`input`+JSON.stringify(JSON.parse(e)+count+1)}`]}
-            }
-        }
-        setNumInputs(prevNumInputs => prevNumInputs+=1);
-        console.log(postObj)
-        setNumArr(prev => {
-            prev.push(numArr.length+1)
-            return prev
-        })
-        setPostObj({...copy2, numInputs:numInputs+1, numArr:numArr, ["input"+JSON.stringify(e)]: {type: "image", output: "", initializing:true}});
-        setTimeout(() => {
-            setPostObj({...copy2, numInputs:numInputs+1, numArr:numArr, ["input"+JSON.stringify(e)]: {type: "image", output: "", initializing:false}});
-        }, 1000)
-        setShowButtons(false)
-    }
-    function addVideo(e){
-        let copy = postObj
-        let copy2 = copy
-        let store = {
-            numStore: 0,
-            place: e
-        }
-        for(let i=postObj.numInputs, count = 0; i >= JSON.parse(e); i--, count++){
-            store = {...store, 
-                numStore: count+1,
-                [`${`input`+JSON.stringify(JSON.parse(e)+count+1)}`]: copy[`${`input`+JSON.stringify(JSON.parse(e)+count)}`]
-            }
-            delete copy2[`${`input`+JSON.stringify(JSON.parse(e)+count)}`];
-        }
-        copy2 = {...copy2, ["input"+JSON.stringify(e)]: {type: "video", output: ""}}
-        for(let i=store.numStore, count = 0; count < i; count++){
-            if(count === 0){
-                copy2 = {...copy2, ["input"+JSON.stringify(e)]: {type: "video", output: ""},
-                [`${`input`+JSON.stringify(JSON.parse(e)+count+1)}`]: store[`${`input`+JSON.stringify(JSON.parse(e)+count+1)}`]  
-                }
-            } else {
-                copy2 = {...copy2, [`${`input`+JSON.stringify(JSON.parse(e)+count+1)}`]: store[`${`input`+JSON.stringify(JSON.parse(e)+count+1)}`]}
-            }
-        }
-        setNumInputs(prevNumInputs => prevNumInputs+=1);
-        console.log(postObj)
-        setNumArr(prev => {
-            prev.push(numArr.length+1)
-            return prev
-        })
-        setPostObj({...copy2, numInputs:numInputs+1, numArr:numArr, ["input"+JSON.stringify(e)]: {type: "video", output: "", initializing:true}});
-        setTimeout(() => {
-            setPostObj({...copy2, numInputs:numInputs+1, numArr:numArr, ["input"+JSON.stringify(e)]: {type: "video", output: "", initializing:false}});
+            setPostObj({...copy2, numInputs:numInputs+1, numArr:numArr, ["input"+JSON.stringify(e)]: {type: type, output: "", initializing:false}});
         }, 1000)
         setShowButtons(false)
     }
@@ -248,10 +179,11 @@ export default function ViewPost(props){
     function toggleButtons(){
         setShowButtons(true)
     }
+    
 
     const inputs = (nums) => {
         return nums.map(num => 
-            postObj.numInputs > 0 && postObj[`${`input`+num}`] && postObj[`${`input`+num}`].type === "text" ?
+            postObj.numInputs > 0 && postObj[`${`input`+num}`] && 
             <div className={`insert-input ${postObj[`${`input`+num}`].output === "" ? postObj[`${`input`+num}`].initializing === true && "insert-input-animation": postObj[`${`input`+num}`].deleting === true && "delete-input-animation"}`}>
                 
                 <div className="edit-post-btns">
@@ -266,6 +198,8 @@ export default function ViewPost(props){
                         <button className="edit-post-btn post-input" onClick={()=> addVideo(num)}>video</button>
                     </>}
                 </div>
+                {postObj[`${`input`+num}`].type === "text" ?
+                <>
                 <textarea  
                     name={postObj[`${`input`+num}`]}
                     className={`create-post-video-textarea insert-input ${postObj[`${`input`+num}`].output === "" ? postObj[`${`input`+num}`].initializing === true && "insert-input-animation": postObj[`${`input`+num}`].deleting === true && "delete-input-animation"}`}
@@ -274,29 +208,9 @@ export default function ViewPost(props){
                     value={postObj[`${`input`+num}`].output} 
                     onChange={(event) => setPostObj({...postObj, [`${`input`+num}`]: { type:"text", output: event.target.value } })} 
                 />
-                <div className="input-options">
-                    {swapping === false && <button className="edit-post-btn" onClick={()=> swapFrom(num)}>swap</button>}
-                    {swapping === true && <button className="edit-post-btn" onClick={()=> swapTo(num)}>swapTo</button>}
-                    <button className="del-input-btn" onClick={()=> deleteInput(num)}>delete</button>
-                </div>
-            </div>
-            :
-            postObj[`${`input`+num}`] &&
-            postObj[`${`input`+num}`].type === "video" ?
-            <div className={`insert-input ${postObj[`${`input`+num}`].output === "" ? postObj[`${`input`+num}`].initializing === true && "insert-input-animation": postObj[`${`input`+num}`].deleting === true && "delete-input-animation"}`}>
-                
-                <div className="edit-post-btns">
-                    <>
-                    {<button onClick={toggleButtons} className={showButtons === false ? "edit-post-btn post-input" : "edit-post-btn post-input invisible-p"}>insert</button>}
-                    </>
-                    {showButtons &&
-                    <>
-                        <button className="edit-post-btn post-input cancel-insert" onClick={()=>setShowButtons(false)}>cancel</button>
-                        <button className="edit-post-btn post-input" onClick={()=> addText(num)}>text</button>
-                        <button className="edit-post-btn post-input" onClick={()=> addImage(num)}>image</button>
-                        <button className="edit-post-btn post-input" onClick={()=> addVideo(num)}>video</button>
-                    </>}
-                </div>
+                </>
+                : postObj[`${`input`+num}`].type === "video" ?
+                <>
                 <textarea
                     rows={1}
                     name={postObj[`${`input`+num}`]}
@@ -307,29 +221,9 @@ export default function ViewPost(props){
                     onChange={(event) => setPostObj({...postObj, [`${`input`+num}`]: { type:"video", output: event.target.value } })} 
                 />
                 {postObj[`${`input`+num}`].output && <iframe  className="post-video" src={`https://www.youtube.com/embed/${postObj[`${`input`+num}`].output.slice(17)}`} frameBorder="0" allowFullScreen></iframe>}
-                <div className="input-options">
-                    {swapping === false && <button className="edit-post-btn" onClick={()=> swapFrom(num)}>swap</button>}
-                    {swapping === true && <button className="edit-post-btn" onClick={()=> swapTo(num)}>swapTo</button>}
-                    <button className="del-input-btn" onClick={()=> deleteInput(num)}>delete</button>
-                </div>
-            </div>
-            :
-            postObj[`${`input`+num}`] &&
-            postObj[`${`input`+num}`].type === "image" &&
-            <div className={`insert-input ${postObj[`${`input`+num}`].output === "" ? postObj[`${`input`+num}`].initializing === true && "insert-input-animation": postObj[`${`input`+num}`].deleting === true && "delete-input-animation"}`}>
-                
-                <div className="edit-post-btns">
-                    <>
-                    {<button onClick={toggleButtons} className={showButtons === false ? "edit-post-btn post-input" : "edit-post-btn post-input invisible-p"}>insert</button>}
-                    </>
-                    {showButtons &&
-                    <>
-                        <button className="edit-post-btn post-input cancel-insert" onClick={()=>setShowButtons(false)}>cancel</button>
-                        <button className="edit-post-btn post-input" onClick={()=> addText(num)}>text</button>
-                        <button className="edit-post-btn post-input" onClick={()=> addImage(num)}>image</button>
-                        <button className="edit-post-btn post-input" onClick={()=> addVideo(num)}>video</button>
-                    </>}
-                </div>
+                </>
+                : postObj[`${`input`+num}`].type === "image" &&
+                <>
                 <textarea
                     rows={1}
                     name={postObj[`${`input`+num}`]}
@@ -340,6 +234,8 @@ export default function ViewPost(props){
                     onChange={(event) => setPostObj({...postObj, [`${`input`+num}`]: { type:"image", output: event.target.value } })} 
                 />
                 <img className={`post-image ${postObj[`${`input`+num}`].deleting === true && "delete-input-animation"}`} src={postObj[`${`input`+num}`].output}></img>
+                </>
+                }
                 <div className="input-options">
                     {swapping === false && <button className="edit-post-btn" onClick={()=> swapFrom(num)}>swap</button>}
                     {swapping === true && <button className="edit-post-btn" onClick={()=> swapTo(num)}>swapTo</button>}
@@ -396,3 +292,20 @@ export default function ViewPost(props){
         </div>
     )
 }
+// ################
+// ################
+// ################
+// ################
+// ################
+// ################
+// ################
+// ################
+// ################
+// ################
+// ################
+// ################
+// ################
+// ################
+// ################
+// ################
+// ################
