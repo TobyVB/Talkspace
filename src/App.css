@@ -733,8 +733,6 @@ form {
   background-color: transparent;
 }
 .input-options {
-  display: flex;
-  flex-direction: column;
   justify-content: space-between;
   margin-bottom: .5em;
 }
@@ -774,7 +772,6 @@ form {
 .insert-input {
   max-width: 100%;
   margin: 0;
-  display: flex;
 }
 .input-chain {
   display: flex;

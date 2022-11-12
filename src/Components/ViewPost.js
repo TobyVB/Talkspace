@@ -154,7 +154,7 @@ export default function ViewPost(props){
                     />
                 </div>
                 <h4 className="post-title">{foundPost.title}</h4>
-                <div className="post-body">
+                {/* <div className="post-body">
                     <div className="input-chain">
                     {numArr.map(num =>
                     foundPost && foundPost[`${`input`+num}`].type === "text" 
@@ -179,7 +179,7 @@ export default function ViewPost(props){
                     )}
                     </div>
                
-                </div>
+                </div> */}
                 <button className="follow-post" onClick={followPost}>{foundPost && foundPost.follows.includes(props.userDataId)?"- UNFOLLOW":"+ FOLLOW"}</button>
             </div>   
             <CreateComment 
