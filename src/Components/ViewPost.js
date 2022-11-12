@@ -132,6 +132,11 @@ export default function ViewPost(props){
         console.log(numArr)
     }, [numArr])
 
+    const fontSize1 = {fontSize : ".5rem"}
+    const fontSize2 = {fontSize : ".75rem"}
+    const fontSize3 = {fontSize : "1rem"}
+    const fontSize4 = {fontSize : "1.5rem"}
+    const fontSize5 = {fontSize : "2rem"}
 
     return (
         <div className="page-body post">
@@ -153,8 +158,16 @@ export default function ViewPost(props){
                     <div className="input-chain">
                     {numArr.map(num =>
                     foundPost && foundPost[`${`input`+num}`].type === "text" 
-                    ?
-                     <p className="post-text">{JSON.stringify(foundPost[`${`input`+num}`].output).substring(1).slice(0, JSON.stringify(foundPost[`${`input`+num}`].output).length-2)}</p>
+                    ?foundPost[`${`input`+num}`].fontSize.value ==="1" ?
+                    <p style={fontSize1} className="post-text">{JSON.stringify(foundPost[`${`input`+num}`].output).substring(1).slice(0, JSON.stringify(foundPost[`${`input`+num}`].output).length-2)}</p>
+                    :foundPost[`${`input`+num}`].fontSize.value ==="2" ?
+                    <p style={fontSize2} className="post-text">{JSON.stringify(foundPost[`${`input`+num}`].output).substring(1).slice(0, JSON.stringify(foundPost[`${`input`+num}`].output).length-2)}</p>
+                    :foundPost[`${`input`+num}`].fontSize.value ==="3" ?
+                    <p style={fontSize3} className="post-text">{JSON.stringify(foundPost[`${`input`+num}`].output).substring(1).slice(0, JSON.stringify(foundPost[`${`input`+num}`].output).length-2)}</p>
+                    :foundPost[`${`input`+num}`].fontSize.value ==="4" ?
+                    <p style={fontSize4} className="post-text">{JSON.stringify(foundPost[`${`input`+num}`].output).substring(1).slice(0, JSON.stringify(foundPost[`${`input`+num}`].output).length-2)}</p>
+                    :foundPost[`${`input`+num}`].fontSize.value ==="5" &&
+                    <p style={fontSize5} className="post-text">{JSON.stringify(foundPost[`${`input`+num}`].output).substring(1).slice(0, JSON.stringify(foundPost[`${`input`+num}`].output).length-2)}</p>
                     :
                     foundPost[`${`input`+num}`].type === "video" 
                     ?

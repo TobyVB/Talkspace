@@ -645,9 +645,6 @@ form {
   width: 100%;
   font-family: sans-serif;
 }
-.input-options {
-  margin-bottom: 2em;
-}
 .create-post-title {
   background-color: rgba(0, 0, 0, .3);
   text-align: center;
@@ -737,12 +734,14 @@ form {
 }
 .input-options {
   display: flex;
+  flex-direction: column;
   justify-content: space-between;
+  margin-bottom: .5em;
 }
 .edit-post-btns {
   display: flex;
   justify-content: left;
-  margin-bottom: 2em;
+  margin-bottom: .5em;
   border-top: 1px solid rgba(62,166,255);
 }
 .edit-post-btn {
@@ -773,24 +772,31 @@ form {
 
 
 .insert-input {
-  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  display: flex;
 }
 .input-chain {
   display: flex;
   flex-wrap: wrap;
-  gap: 2em;
+  flex-direction: column;
+  gap: .2em;
+  margin: 1em 0;
 }
 .post-image {
   width: 100%;
   flex-shrink: 0;
+  margin: 0;
 }
 .post-video {
   height: 45vw;
   width: 100%;
+  margin: 0;
 }
 .post-text {
   width: 45%;
   flex-shrink: 0;
+  margin: 0;
 }
 /* ############################################ */
 /* ############# H O M E P A G E  ############# */

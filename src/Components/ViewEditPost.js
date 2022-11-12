@@ -59,21 +59,32 @@ export default function ViewPost(props){
     const [ postObj, setPostObj ] = useState("");
     const [numArr, setNumArr] = useState([]);
     const [numInputs, setNumInputs] = useState(0);
+    const [inputArr, setInputArr] = useState([])
     useEffect(() => {
         setTitleValue(foundPost.title)
         setPostObj(foundPost)
-        for(let i = 0; i< foundPost.numInputs; i++)
-        setNumArr(prev => {
-            prev.push(foundPost.numArr[i])
-            return prev
-        })
+        for(let i = 0; i< foundPost.numInputs; i++){
+            setNumArr(prev => {
+                prev.push(foundPost.numArr[i])
+                return prev
+            })
+            if(i > 0){
+                setInputArr(prev => {
+                    prev.push([`${`input`+JSON.stringify(i)}`])
+                    return prev
+                })
+            }
+        }
         setNumInputs(foundPost.numInputs)
     }, [foundPost])
+
+    
 
 
     function deleteInput(e)  {
         const type = postObj[`${`input`+e}`].type
-        setPostObj({...postObj, [`${`input`+e}`]: {type: type, output: postObj[`${`input`+e}`].ouput, deleting:true}})
+        const fontSize = postObj[`${`input`+e}`].fontSize.value
+        setPostObj({...postObj, [`${`input`+e}`]: {type: type, fontSize:{value: fontSize}, output: postObj[`${`input`+e}`].ouput, deleting:true}})
         setTimeout(() => {
             if(postObj.numInputs === 1){
                 setPostObj(current => {
@@ -148,9 +159,9 @@ export default function ViewPost(props){
             prev.push(numArr.length+1)
             return prev
         })
-        setPostObj({...copy2, numInputs:numInputs+1, numArr:numArr, ["input"+JSON.stringify(e)]: {type: type, output: "", initializing:true}});
+        setPostObj({...copy2, numInputs:numInputs+1, numArr:numArr, ["input"+JSON.stringify(e)]: {type: type, output: "", fontSize:{value: "2"}, initializing:true}});
         setTimeout(() => {
-            setPostObj({...copy2, numInputs:numInputs+1, numArr:numArr, ["input"+JSON.stringify(e)]: {type: type, output: "", initializing:false}});
+            setPostObj({...copy2, numInputs:numInputs+1, numArr:numArr, ["input"+JSON.stringify(e)]: {type: type, output: "", fontSize:{value: "2"}, initializing:false}});
         }, 1000)
         setShowButtons(false)
     }
@@ -179,7 +190,16 @@ export default function ViewPost(props){
     function toggleButtons(){
         setShowButtons(true)
     }
-    
+
+    function changeFontSize(e, value){
+        setPostObj({...postObj, [`input`+JSON.stringify(e)]: {type: postObj[`input`+JSON.stringify(e)].type, output: postObj[`input`+JSON.stringify(e)].output, fontSize: {value}, initializing:false}} )
+    }
+
+    const fontSize1 = {fontSize : ".5rem"}
+    const fontSize2 = {fontSize : ".75rem"}
+    const fontSize3 = {fontSize : "1rem"}
+    const fontSize4 = {fontSize : "1.5rem"}
+    const fontSize5 = {fontSize : "2rem"}
 
     const inputs = (nums) => {
         return nums.map(num => 
@@ -200,14 +220,37 @@ export default function ViewPost(props){
                 </div>
                 {postObj[`${`input`+num}`].type === "text" ?
                 <>
-                <textarea  
-                    name={postObj[`${`input`+num}`]}
+                {postObj[`${`input`+num}`] && <input name="fontSize" type="range" min="1" max="5" value={postObj[`${`input`+num}`].fontSize.value} onChange={event => changeFontSize(num, event.target.value)}></input>}
+                {postObj[`${`input`+num}`].fontSize.value === "1" ?
+                <div name={postObj[`${`input`+num}`]} style={fontSize1}
                     className={`create-post-video-textarea insert-input ${postObj[`${`input`+num}`].output === "" ? postObj[`${`input`+num}`].initializing === true && "insert-input-animation": postObj[`${`input`+num}`].deleting === true && "delete-input-animation"}`}
-                    rows={5}
-                    placeholder="Add post body..." 
-                    value={postObj[`${`input`+num}`].output} 
-                    onChange={(event) => setPostObj({...postObj, [`${`input`+num}`]: { type:"text", output: event.target.value } })} 
-                />
+                    rows={3} placeholder="Add post body..."
+                    onChange={(event) => setPostObj({...postObj, [`${`input`+num}`]: { type:"text", fontSize:{value: "1"}, output: event.target.value } })} 
+                contentEditable suppressContentEditableWarning={true}>{postObj[`${`input`+num}`].output}</div> 
+                :postObj[`${`input`+num}`].fontSize.value === "2" ?
+                <div name={postObj[`${`input`+num}`]} style={fontSize2}
+                    className={`create-post-video-textarea insert-input ${postObj[`${`input`+num}`].output === "" ? postObj[`${`input`+num}`].initializing === true && "insert-input-animation": postObj[`${`input`+num}`].deleting === true && "delete-input-animation"}`}
+                    rows={3} placeholder="Add post body..."
+                    onChange={(event) => setPostObj({...postObj, [`${`input`+num}`]: { type:"text", fontSize:{value: "1"}, output: event.target.value } })} 
+                contentEditable suppressContentEditableWarning={true}>{postObj[`${`input`+num}`].output}</div> 
+                :postObj[`${`input`+num}`].fontSize.value === "3" ?
+                <div name={postObj[`${`input`+num}`]} style={fontSize3}
+                    className={`create-post-video-textarea insert-input ${postObj[`${`input`+num}`].output === "" ? postObj[`${`input`+num}`].initializing === true && "insert-input-animation": postObj[`${`input`+num}`].deleting === true && "delete-input-animation"}`}
+                    rows={3} placeholder="Add post body..."
+                    onChange={(event) => setPostObj({...postObj, [`${`input`+num}`]: { type:"text", fontSize:{value: "1"}, output: event.target.value } })} 
+                contentEditable suppressContentEditableWarning={true}>{postObj[`${`input`+num}`].output}</div> 
+                :postObj[`${`input`+num}`].fontSize.value === "4" ?
+                <div name={postObj[`${`input`+num}`]} style={fontSize4}
+                    className={`create-post-video-textarea insert-input ${postObj[`${`input`+num}`].output === "" ? postObj[`${`input`+num}`].initializing === true && "insert-input-animation": postObj[`${`input`+num}`].deleting === true && "delete-input-animation"}`}
+                    rows={3} placeholder="Add post body..."
+                    onChange={(event) => setPostObj({...postObj, [`${`input`+num}`]: { type:"text", fontSize:{value: "1"}, output: event.target.value } })} 
+                contentEditable suppressContentEditableWarning={true}>{postObj[`${`input`+num}`].output}</div>  
+                :postObj[`${`input`+num}`].fontSize.value === "5" &&
+                <div name={postObj[`${`input`+num}`]} style={fontSize5}
+                    className={`create-post-video-textarea insert-input ${postObj[`${`input`+num}`].output === "" ? postObj[`${`input`+num}`].initializing === true && "insert-input-animation": postObj[`${`input`+num}`].deleting === true && "delete-input-animation"}`}
+                    rows={3} placeholder="Add post body..."
+                    onChange={(event) => setPostObj({...postObj, [`${`input`+num}`]: { type:"text", fontSize:{value: "1"}, output: event.target.value } })} 
+                contentEditable suppressContentEditableWarning={true}>{postObj[`${`input`+num}`].output}</div> }
                 </>
                 : postObj[`${`input`+num}`].type === "video" ?
                 <>
@@ -292,6 +335,12 @@ export default function ViewPost(props){
         </div>
     )
 }
+// ################
+// ################
+// ################
+// ################
+// ################
+// ################
 // ################
 // ################
 // ################

@@ -142,9 +142,9 @@ export default function CreatePost(props){
             prev.push(numArr.length+1)
             return prev
         })
-        setPostObj({...copy2, numInputs:numInputs+1, numArr:numArr, ["input"+JSON.stringify(e)]: {type: type, output: "", initializing:true}});
+        setPostObj({...copy2, numInputs:numInputs+1, numArr:numArr, ["input"+JSON.stringify(e)]: {type: type, output: "", fontSize:{value: "2"}, initializing:true}});
         setTimeout(() => {
-            setPostObj({...copy2, numInputs:numInputs+1, numArr:numArr, ["input"+JSON.stringify(e)]: {type: type, output: "", initializing:false}});
+            setPostObj({...copy2, numInputs:numInputs+1, numArr:numArr, ["input"+JSON.stringify(e)]: {type: type, output: "", fontSize:{value: "2"}, initializing:false}});
         }, 1000)
         setShowButtons(false)
     }
@@ -175,6 +175,16 @@ export default function CreatePost(props){
         setShowButtons(true)
     }
 
+    function changeFontSize(e, value){
+        setPostObj({...postObj, [`input`+JSON.stringify(e)]: {type: postObj[`input`+JSON.stringify(e)].type, output: postObj[`input`+JSON.stringify(e)].output, fontSize: {value}, initializing:false}} )
+    }
+
+    const fontSize1 = {fontSize : ".5rem"}
+    const fontSize2 = {fontSize : ".75rem"}
+    const fontSize3 = {fontSize : "1rem"}
+    const fontSize4 = {fontSize : "1.5rem"}
+    const fontSize5 = {fontSize : "2rem"}
+
     const inputs = (nums) => {
         return nums.map(num => 
             postObj.numInputs > 0 && postObj[`${`input`+num}`] && 
@@ -194,14 +204,37 @@ export default function CreatePost(props){
                 </div>
                 {postObj[`${`input`+num}`].type === "text" ?
                 <>
-                <textarea  
-                    name={postObj[`${`input`+num}`]}
+                <input name="fontSize" type="range" min="1" max="5" onChange={event => changeFontSize(num, event.target.value)}></input>
+                {postObj[`${`input`+num}`].fontSize.value === "1" ?
+                <textarea name={postObj[`${`input`+num}`]} style={fontSize1}
                     className={`create-post-video-textarea insert-input ${postObj[`${`input`+num}`].output === "" ? postObj[`${`input`+num}`].initializing === true && "insert-input-animation": postObj[`${`input`+num}`].deleting === true && "delete-input-animation"}`}
-                    rows={5}
-                    placeholder="Add post body..." 
-                    value={postObj[`${`input`+num}`].output} 
-                    onChange={(event) => setPostObj({...postObj, [`${`input`+num}`]: { type:"text", output: event.target.value } })} 
-                />
+                    rows={3} placeholder="Add post body..." value={postObj[`${`input`+num}`].output} 
+                    onChange={(event) => setPostObj({...postObj, [`${`input`+num}`]: { type:"text", fontSize:{value: "1"}, output: event.target.value } })} 
+                /> 
+                :postObj[`${`input`+num}`].fontSize.value === "2" ?
+                <textarea name={postObj[`${`input`+num}`]} style={fontSize2}
+                    className={`create-post-video-textarea insert-input ${postObj[`${`input`+num}`].output === "" ? postObj[`${`input`+num}`].initializing === true && "insert-input-animation": postObj[`${`input`+num}`].deleting === true && "delete-input-animation"}`}
+                    rows={3} placeholder="Add post body..." value={postObj[`${`input`+num}`].output} 
+                    onChange={(event) => setPostObj({...postObj, [`${`input`+num}`]: { type:"text", fontSize:{value: "2"}, output: event.target.value } })} 
+                /> 
+                :postObj[`${`input`+num}`].fontSize.value === "3" ?
+                <textarea name={postObj[`${`input`+num}`]} style={fontSize3}
+                    className={`create-post-video-textarea insert-input ${postObj[`${`input`+num}`].output === "" ? postObj[`${`input`+num}`].initializing === true && "insert-input-animation": postObj[`${`input`+num}`].deleting === true && "delete-input-animation"}`}
+                    rows={3} placeholder="Add post body..." value={postObj[`${`input`+num}`].output} 
+                    onChange={(event) => setPostObj({...postObj, [`${`input`+num}`]: { type:"text", fontSize:{value: "3"}, output: event.target.value } })} 
+                /> 
+                :postObj[`${`input`+num}`].fontSize.value === "4" ?
+                <textarea name={postObj[`${`input`+num}`]} style={fontSize4}
+                    className={`create-post-video-textarea insert-input ${postObj[`${`input`+num}`].output === "" ? postObj[`${`input`+num}`].initializing === true && "insert-input-animation": postObj[`${`input`+num}`].deleting === true && "delete-input-animation"}`}
+                    rows={3} placeholder="Add post body..." value={postObj[`${`input`+num}`].output} 
+                    onChange={(event) => setPostObj({...postObj, [`${`input`+num}`]: { type:"text", fontSize:{value: "4"}, output: event.target.value } })} 
+                /> 
+                :postObj[`${`input`+num}`].fontSize.value === "5" &&
+                <textarea name={postObj[`${`input`+num}`]} style={fontSize5}
+                    className={`create-post-video-textarea insert-input ${postObj[`${`input`+num}`].output === "" ? postObj[`${`input`+num}`].initializing === true && "insert-input-animation": postObj[`${`input`+num}`].deleting === true && "delete-input-animation"}`}
+                    rows={3} placeholder="Add post body..." value={postObj[`${`input`+num}`].output} 
+                    onChange={(event) => setPostObj({...postObj, [`${`input`+num}`]: { type:"text", fontSize:{value: "5"}, output: event.target.value } })} 
+                />}
                 </>
                 : postObj[`${`input`+num}`].type === "video" ?
                 <>
@@ -295,3 +328,44 @@ export default function CreatePost(props){
         </>
     )
 }
+
+
+
+// const fontSize1 = {fontSize : ".5rem"}
+// const fontSize2 = {fontSize : ".75rem"}
+// const fontSize3 = {fontSize : "1rem"}
+// const fontSize4 = {fontSize : "1.5rem"}
+// const fontSize5 = {fontSize : "2rem"}
+
+
+
+//                 {postObj[`${`input`+num}`].fontSize === "1" ?
+//                 <textarea name={postObj[`${`input`+num}`]} style={fontSize1}
+//                     className={`create-post-video-textarea insert-input ${postObj[`${`input`+num}`].output === "" ? postObj[`${`input`+num}`].initializing === true && "insert-input-animation": postObj[`${`input`+num}`].deleting === true && "delete-input-animation"}`}
+//                     rows={3} placeholder="Add post body..." value={postObj[`${`input`+num}`].output} 
+//                     onChange={(event) => setPostObj({...postObj, [`${`input`+num}`]: { type:"text", output: event.target.value } })} 
+//                 /> 
+//                 :postObj[`${`input`+num}`].fontSize === "2" ?
+//                 <textarea name={postObj[`${`input`+num}`]} style={fontSize2}
+//                     className={`create-post-video-textarea insert-input ${postObj[`${`input`+num}`].output === "" ? postObj[`${`input`+num}`].initializing === true && "insert-input-animation": postObj[`${`input`+num}`].deleting === true && "delete-input-animation"}`}
+//                     rows={3} placeholder="Add post body..." value={postObj[`${`input`+num}`].output} 
+//                     onChange={(event) => setPostObj({...postObj, [`${`input`+num}`]: { type:"text", output: event.target.value } })} 
+//                 /> 
+//                 :postObj[`${`input`+num}`].fontSize === "3" ?
+//                 <textarea name={postObj[`${`input`+num}`]} style={fontSize3}
+//                     className={`create-post-video-textarea insert-input ${postObj[`${`input`+num}`].output === "" ? postObj[`${`input`+num}`].initializing === true && "insert-input-animation": postObj[`${`input`+num}`].deleting === true && "delete-input-animation"}`}
+//                     rows={3} placeholder="Add post body..." value={postObj[`${`input`+num}`].output} 
+//                     onChange={(event) => setPostObj({...postObj, [`${`input`+num}`]: { type:"text", output: event.target.value } })} 
+//                 /> 
+//                 :postObj[`${`input`+num}`].fontSize === "4" ?
+//                 <textarea name={postObj[`${`input`+num}`]} style={fontSize4}
+//                     className={`create-post-video-textarea insert-input ${postObj[`${`input`+num}`].output === "" ? postObj[`${`input`+num}`].initializing === true && "insert-input-animation": postObj[`${`input`+num}`].deleting === true && "delete-input-animation"}`}
+//                     rows={3} placeholder="Add post body..." value={postObj[`${`input`+num}`].output} 
+//                     onChange={(event) => setPostObj({...postObj, [`${`input`+num}`]: { type:"text", output: event.target.value } })} 
+//                 /> 
+//                 :postObj[`${`input`+num}`].fontSize === "5" &&
+//                 <textarea name={postObj[`${`input`+num}`]} style={fontSize5}
+//                     className={`create-post-video-textarea insert-input ${postObj[`${`input`+num}`].output === "" ? postObj[`${`input`+num}`].initializing === true && "insert-input-animation": postObj[`${`input`+num}`].deleting === true && "delete-input-animation"}`}
+//                     rows={3} placeholder="Add post body..." value={postObj[`${`input`+num}`].output} 
+//                     onChange={(event) => setPostObj({...postObj, [`${`input`+num}`]: { type:"text", output: event.target.value } })} 
+//                 />}
