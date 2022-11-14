@@ -629,12 +629,12 @@ form {
 }
 @keyframes deleteInputAnimation {
   from {
-    transform: rotateX(180deg);
+    /* transform: rotateX(180deg); */
+    max-height: 30vh;
+    background: black;
   }
   to {
-    transform: rotateX(90deg);
-    margin-top: -10vh;
-    margin-bottom: -10vh;
+    max-height: 0vh;
   }
 }
 .input-textarea {

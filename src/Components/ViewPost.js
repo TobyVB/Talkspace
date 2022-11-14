@@ -24,8 +24,10 @@ export default function ViewPost(props){
         chain: 'chain'
     })
 
+    const [pagePause, setPagePause] = useState(true)
     useEffect(() => {
         window.scrollTo(0, 0)
+        setTimeout(()=>{setPagePause(false)},250)
     }, [])
 
     // FIND THE POST DOC
@@ -109,7 +111,7 @@ export default function ViewPost(props){
 
     return (
         <div className="page-body post">
-            { auth.currentUser.uid === foundPost.uid && <button className="edit-post-btn" onClick={editPost}>edit post</button>}
+            { auth.currentUser.uid === foundPost.uid && <button className="edit-post-btn" disabled={pagePause && "+true"} onClick={editPost}>edit post</button>}
             <div className="view-post-container">
                 <div className="post-header">
                     <p 
