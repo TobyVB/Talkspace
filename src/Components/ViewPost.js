@@ -102,41 +102,10 @@ export default function ViewPost(props){
         props.editPost();
     }
 
-    const [link, setLink] = useState("")
-    const [startLink, setStartLink] = useState(false)
-
-    useEffect(() => {
-        if(startLink === true){
-            setLink(prevLink => prevLink.slice(17));
-        }
-        setStartLink(false);
-    }, [startLink])
-
-    useEffect(()=> {
-        foundPost.video && setLink(foundPost.video.slice(17))
-    }, [foundPost])
-
     // if text includes https://youtu.be/ copy the text until the next " " and put it in a variable
     // also hide or remove text that matches the created variable
     // where the removed or hidden text was, put in an iframe
 
-    const [numArr, setNumArr] = useState([]);
-    useEffect(() => {
-        let arr = []
-        for(let i=0; i<foundPost.numInputs; i++){
-            arr.push(arr.length+1)
-        }
-        setNumArr(arr)
-    },[foundPost])
-    useEffect(() => {
-        console.log(numArr)
-    }, [numArr])
-
-    const fontSize1 = {fontSize : ".5rem"}
-    const fontSize2 = {fontSize : ".75rem"}
-    const fontSize3 = {fontSize : "1rem"}
-    const fontSize4 = {fontSize : "1.5rem"}
-    const fontSize5 = {fontSize : "2rem"}
 
     return (
         <div className="page-body post">
@@ -154,32 +123,23 @@ export default function ViewPost(props){
                     />
                 </div>
                 <h4 className="post-title">{foundPost.title}</h4>
-                {/* <div className="post-body">
+                <div className="post-body">
                     <div className="input-chain">
-                    {numArr.map(num =>
-                    foundPost && foundPost[`${`input`+num}`].type === "text" 
-                    ?foundPost[`${`input`+num}`].fontSize.value ==="1" ?
-                    <p style={fontSize1} className="post-text">{JSON.stringify(foundPost[`${`input`+num}`].output).substring(1).slice(0, JSON.stringify(foundPost[`${`input`+num}`].output).length-2)}</p>
-                    :foundPost[`${`input`+num}`].fontSize.value ==="2" ?
-                    <p style={fontSize2} className="post-text">{JSON.stringify(foundPost[`${`input`+num}`].output).substring(1).slice(0, JSON.stringify(foundPost[`${`input`+num}`].output).length-2)}</p>
-                    :foundPost[`${`input`+num}`].fontSize.value ==="3" ?
-                    <p style={fontSize3} className="post-text">{JSON.stringify(foundPost[`${`input`+num}`].output).substring(1).slice(0, JSON.stringify(foundPost[`${`input`+num}`].output).length-2)}</p>
-                    :foundPost[`${`input`+num}`].fontSize.value ==="4" ?
-                    <p style={fontSize4} className="post-text">{JSON.stringify(foundPost[`${`input`+num}`].output).substring(1).slice(0, JSON.stringify(foundPost[`${`input`+num}`].output).length-2)}</p>
-                    :foundPost[`${`input`+num}`].fontSize.value ==="5" &&
-                    <p style={fontSize5} className="post-text">{JSON.stringify(foundPost[`${`input`+num}`].output).substring(1).slice(0, JSON.stringify(foundPost[`${`input`+num}`].output).length-2)}</p>
+                    {foundPost && foundPost.inputs.map(input =>
+                    foundPost && input.type === "text"?
+                    <p className="post-text">{input.output}</p>
                     :
-                    foundPost[`${`input`+num}`].type === "video" 
+                    input.type === "video" 
                     ?
-                    foundPost[`${`input`+num}`].output && <iframe className="post-video"  src={`https://www.youtube.com/embed/${foundPost[`${`input`+num}`].output.slice(17)}`} frameBorder="0" allowFullScreen ></iframe>
+                    input.output && <iframe className="post-video"  src={`https://www.youtube.com/embed/${input.output.slice(17)}`} frameBorder="0" allowFullScreen ></iframe>
                     :
-                    foundPost[`${`input`+num}`].type === "image" 
+                    input.type === "image" 
                     &&
-                    <img className="post-image" src={foundPost[`${`input`+num}`].output}></img>
+                    <img className="post-image" src={input.output}></img>
                     )}
                     </div>
                
-                </div> */}
+                </div>
                 <button className="follow-post" onClick={followPost}>{foundPost && foundPost.follows.includes(props.userDataId)?"- UNFOLLOW":"+ FOLLOW"}</button>
             </div>   
             <CreateComment 

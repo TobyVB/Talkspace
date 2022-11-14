@@ -1,4 +1,4 @@
-import React, {useEffect, useState, useLayoutEffect} from "react";
+import React, {useEffect, useState} from "react";
 import { query, orderBy, onSnapshot, 
     collection, getFirestore, doc, 
     updateDoc
@@ -26,7 +26,6 @@ export default function ViewPost(props){
             }))
         })
     },[])
-
     // FIND THE USER DOC
     const usersRef = collection(db, 'users');
     const [foundUser, setFoundUser] = useState("")
@@ -40,235 +39,213 @@ export default function ViewPost(props){
             }))
         })
     },[foundPost])
-
-    // async function updatePost(){
-    //     const docRef = doc(db, 'posts', foundPost.id)
-    //     await updateDoc(docRef, {...postObj, numArr: numArr})
-    // }
-    // function cancel(){
-    //     props.cancel();
-    // }
-    // function save(){
-    //     updatePost();
-    //     props.cancel();
-    // }
 // ##########################################################################
-
-    const [titleValue, setTitleValue] = useState("")
-    // postObj contains found post
+    async function updatePost(){
+        const docRef = doc(db, 'posts', foundPost.id)
+        await updateDoc(docRef, postObj)
+    }
+    function cancel(){
+        props.cancel();
+    }
+    function save(){
+        updatePost();
+        props.cancel();
+    }
+// ##########################################################################
     const [ postObj, setPostObj ] = useState("")
-    // unorderedInputArr contains just all the inputs from postObj.inputs array
-    const [unorderedInputArr, setUnorderedInputArr] = useState()
-    // sortedInputArr contains all the inputs from unorderedInputArray in a sorted fashion
-    const [orderedInputArr, setOrderedInputArr] = useState([])
-
     // This effect updates the postObj when the post is found
     useEffect(() => {
-        setTitleValue(foundPost.title)
-        setPostObj(foundPost)
-    }, [foundPost])
-    useEffect(() => {
-        setUnorderedInputArr(postObj.inputs)
-    }, [postObj])
-    useEffect(() => {
-        if(unorderedInputArr && unorderedInputArr.length > 1){
-            const sorted = unorderedInputArr.sort(function(a, b) {
+        if(foundPost){
+            // sorted creates array foundpost.inputs that have been ordered by their .place value
+            const sorted = foundPost.inputs.sort(function(a, b) {
                 return a.place - b.place
             })
-            setOrderedInputArr(sorted)
+            // here the newly sorted array value replaces the foundPost.inputs value and is inserted in postObj
+            setPostObj({...foundPost, inputs:sorted, numInputs: sorted.length})
+        }  
+    }, [foundPost])
+
+
+    function addInput(loc, type){
+        let newArray = []
+        let newArray2 = []
+        let newArray3 = []
+        let finalArray = []
+        const beforeLoc = postObj.inputs.filter(input => input.place < loc)
+        const afterLoc = postObj.inputs.filter(input => input.place >= loc)
+        const shiftedAfterLoc = afterLoc.map((input, i)=> {return{...input, place: input.place+1}} )
+        const newInput = {type: type, output: "", place: loc, fontSize: "3rem", initializing: true}
+        if (postObj.inputs.length > 1 || postObj.inputs.length === 0){
+            newArray2 = newArray.concat(beforeLoc)
+            newArray3 = newArray2.concat(newInput)
+            finalArray = newArray3.concat(shiftedAfterLoc)
+        } 
+        if (postObj.inputs.length === 1) { 
+            if(loc === 0){
+                newArray2 = newArray.concat(newInput)
+                finalArray = newArray2.concat(shiftedAfterLoc)
+            } else {
+                newArray2 = newArray.concat(beforeLoc)
+                finalArray = newArray2.concat(newInput)
+            }
         }
-    }, [unorderedInputArr])
-    useEffect(() => {
-        console.log(orderedInputArr)
-    }, [orderedInputArr])
-    
-    // function deleteInput(e)  {
-    //     const type = postObj[`${`input`+e}`].type
-    //     const fontSize = postObj[`${`input`+e}`].fontSize.value
-    //     setPostObj({...postObj, [`${`input`+e}`]: {type: type, fontSize:{value: fontSize}, output: postObj[`${`input`+e}`].ouput, deleting:true}})
-    //     setTimeout(() => {
-    //         if(postObj.numInputs === 1){
-    //             setPostObj(current => {
-    //                 const copy = {...current, numInputs: numInputs-1};
-    //                 delete copy[`${`input`+e}`];
-    //                 return copy;
-    //             })
-    //         }
-    //         if(postObj.numInputs > 1){
-    //             setPostObj(current => {
-    //                 return({...current, numInputs: numInputs-1})
-    //             })
-    //             let copy = postObj
-    //             let copy2 = copy
-    //             for(let i=postObj.numInputs, count = 0; i >= JSON.parse(e); i--, count++){
-    //                 delete copy2[`${`input`+JSON.stringify(JSON.parse(e)+count)}`];
-    //                 copy2 = {...copy2, 
-    //                     [`${`input`+JSON.stringify(JSON.parse(e)+count)}`]: copy[`${`input`+JSON.stringify(JSON.parse(e)+1+count)}`]
-    //                 }
-    //             }
-    //             delete copy2[`${`input`+JSON.stringify(numInputs)}`]
-    //             setPostObj({...copy2, numInputs:numInputs-1});
-    //         }
-    //         console.log(postObj)
-    //         setNumArr(prev => {
-    //             prev.pop(numArr.length+1)
-    //             return prev
-    //         })
-    //         setNumInputs(prev => prev-=1);
-    //     }, 250)
-    // };
-
-    // function addText(e){
-    //     const type = "text"
-    //     addInput(e, type)
-    // }
-    // function addImage(e){
-    //     const type = "image"
-    //     addInput(e, type)
-    // }
-    // function addVideo(e){
-    //     const type = "video"
-    //     addInput(e, type)
-    // }
-    // function addInput(e, type){
-    //     let copy = postObj
-    //     let copy2 = copy
-    //     let store = {
-    //         numStore: 0,
-    //         place: e
-    //     }
-    //     for(let i=postObj.numInputs, count = 0; i >= JSON.parse(e); i--, count++){
-    //         store = {...store, 
-    //             numStore: count+1,
-    //             [`${`input`+JSON.stringify(JSON.parse(e)+count+1)}`]: copy[`${`input`+JSON.stringify(JSON.parse(e)+count)}`]
-    //         }
-    //         delete copy2[`${`input`+JSON.stringify(JSON.parse(e)+count)}`];
-    //     }
-    //     copy2 = {...copy2, ["input"+JSON.stringify(e)]: {type: "text", output: ""}}
-    //     for(let i=store.numStore, count = 0; count < i; count++){
-    //         if(count === 0){
-    //             copy2 = {...copy2, ["input"+JSON.stringify(e)]: {type: "text", output: ""},
-    //             [`${`input`+JSON.stringify(JSON.parse(e)+count+1)}`]: store[`${`input`+JSON.stringify(JSON.parse(e)+count+1)}`]  
-    //             }
-    //         } else {
-    //             copy2 = {...copy2, [`${`input`+JSON.stringify(JSON.parse(e)+count+1)}`]: store[`${`input`+JSON.stringify(JSON.parse(e)+count+1)}`]}
-    //         }
-    //     }
-    //     setNumInputs(prevNumInputs => prevNumInputs+=1);
-    //     console.log(postObj)
-    //     setNumArr(prev => {
-    //         prev.push(numArr.length+1)
-    //         return prev
-    //     })
-    //     setPostObj({...copy2, numInputs:numInputs+1, numArr:numArr, ["input"+JSON.stringify(e)]: {type: type, output: "", fontSize:{value: "2"}, initializing:true}});
-    //     setTimeout(() => {
-    //         setPostObj({...copy2, numInputs:numInputs+1, numArr:numArr, ["input"+JSON.stringify(e)]: {type: type, output: "", fontSize:{value: "2"}, initializing:false}});
-    //     }, 1000)
-    //     setShowButtons(false)
-    // }
-
-
-    const [selectedSwapKey, setSelectedSwapKey] = useState();
-    const [selectedSwapValue, setSelectedSwapValue] = useState();
-    const [swapping, setSwapping] = useState(false);
-    function swapFrom(e){
-        setSelectedSwapKey(`input`+JSON.stringify(e))
-        setSelectedSwapValue(postObj[`${`input`+JSON.stringify(e)}`])
-        setSwapping(true)
-        console.log(postObj[`${`input`+JSON.stringify(e)}`])
+        setPostObj(prev => {
+            return {...prev, inputs: finalArray, numInputs: prev.numInputs+1}
+        })
+        // setShowButtons(false)
+        setTimeout(() => {
+            const initializedInputs = finalArray.map(input => input.place === loc ? {...input, initializing: false} : input)
+            setPostObj(prev => {
+                return {...prev, inputs: initializedInputs}
+            })
+        },1000)
     }
-    function swapTo(e){
-        let copy = postObj;
-        copy = {
-            ...copy,
-            [`${selectedSwapKey}`]: postObj[`${`input`+JSON.stringify(e)}`],
-            [`input`+JSON.stringify(e)] : selectedSwapValue
-        }
-        setPostObj(copy);
+    function deleteInput(loc){
+        let newArray = []
+        let newArray2 = []
+        let finalArray = []
+        const beforeLoc = postObj.inputs.filter(input => input.place < loc)
+        const afterLoc = postObj.inputs.filter(input => input.place > loc)
+        const shiftedAfterLoc = afterLoc.map((input, i)=> {return{...input, place: input.place-1}} )
+        newArray2 = newArray.concat(beforeLoc)
+        finalArray = newArray2.concat(shiftedAfterLoc)
+        const delInputArr = finalArray.map(input => input.place === loc ? {...input, deleting: true} : input)
+        setPostObj(prev => {
+            return{...prev, inputs: delInputArr, numInputs: prev.numInputs-1}
+        })
+        setTimeout(() => {
+            setPostObj(prev => {
+                return {...prev, inputs: finalArray}
+            })
+        }, 250)
+    }
+
+    const [swapStart, setSwapStart] = useState()
+    const [swapping, setSwapping] = useState(false)
+    const [swappingFrom, setSwappingFrom] = useState()
+    function swapFrom(loc){
+        setSwapStart(loc)
+        setSwapping(true)
+        setSwappingFrom(loc)
+    }
+    function swapTo(loc){
+        let nonSwappersArr = postObj.inputs.filter(input => input.place !== loc)
+        let nonSwappersArr2 = nonSwappersArr.filter(input => input.place !== swapStart)
+        let swapper1 = postObj.inputs.find(input => input.place === loc)
+        let swapper2 = postObj.inputs.find(input => input.place === swapStart)
+        swapper1 =  {...swapper1, place:swapStart}
+        swapper2 = {...swapper2, place:loc}
+        let swappers = [swapper1, swapper2]
+        let fullArr = nonSwappersArr2.concat(swappers)
+        const sorted = fullArr.sort(function(a, b) {
+            return a.place - b.place
+        })
+        setPostObj(prev => {
+            return {...prev, inputs: sorted}
+        })
         setSwapping(false)
     }
+
     const [showButtons, setShowButtons] = useState(false);
     function toggleButtons(){
         setShowButtons(true)
     }
 
-    function changeFontSize(e, value){
-        setPostObj({...postObj, [`input`+JSON.stringify(e)]: {type: postObj[`input`+JSON.stringify(e)].type, output: postObj[`input`+JSON.stringify(e)].output, fontSize: {value}, initializing:false}} )
+    function changeFontSize(place, value){
+        const updatedFontSize = postObj.inputs.map(input => input.place === place ? {...input, fontSize: value+"rem", initializing: false} : input )
+        setPostObj(prev => {
+            return {...prev, inputs: updatedFontSize}
+        })
     }
 
-    const fontSize1 = {fontSize : ".5rem"}
-    const fontSize2 = {fontSize : ".75rem"}
-    const fontSize3 = {fontSize : "1rem"}
-    const fontSize4 = {fontSize : "1.5rem"}
-    const fontSize5 = {fontSize : "2rem"}
+    function updateInputOutput(place, value){
+        const updatedInput = postObj.inputs.map(input => input.place === place ? {...input, output: value, initializing: false} : input )
+        setPostObj(prev => {
+            return {...prev, inputs: updatedInput}
+        })
+    }
 
-    const inputs = (nums) => {
-        // return nums.map(num => 
-        //     postObj.numInputs > 0 && postObj[`${`input`+num}`] && 
-        //     <div className={`insert-input ${postObj[`${`input`+num}`].output === "" ? postObj[`${`input`+num}`].initializing === true && "insert-input-animation": postObj[`${`input`+num}`].deleting === true && "delete-input-animation"}`}>
-                
-        //         <div className="edit-post-btns">
-        //             <>
-        //             {<button onClick={toggleButtons} className={showButtons === false ? "edit-post-btn post-input" : "edit-post-btn post-input invisible-p"}>insert</button>}
-        //             </>
-        //             {showButtons &&
-        //             <>
-        //                 <button className="edit-post-btn post-input cancel-insert" onClick={()=>setShowButtons(false)}>cancel</button>
-        //                 <button className="edit-post-btn post-input" onClick={()=> addText(num)}>text</button>
-        //                 <button className="edit-post-btn post-input" onClick={()=> addImage(num)}>image</button>
-        //                 <button className="edit-post-btn post-input" onClick={()=> addVideo(num)}>video</button>
-        //             </>}
-        //         </div>
-        //         {postObj[`${`input`+num}`].type === "text" ?
-        //         <>
-        //         {postObj[`${`input`+num}`] && <input name="fontSize" type="range" min="1" max="5" value={postObj[`${`input`+num}`].fontSize.value} onChange={event => changeFontSize(num, event.target.value)}></input>}
-        //         {postObj[`${`input`+num}`].fontSize.value === "1" &&
-        //         <div name={postObj[`${`input`+num}`]} style={fontSize1}
-        //             className={`create-post-video-textarea insert-input ${postObj[`${`input`+num}`].output === "" ? postObj[`${`input`+num}`].initializing === true && "insert-input-animation": postObj[`${`input`+num}`].deleting === true && "delete-input-animation"}`}
-        //             rows={3} placeholder="Add post body..."
-        //             onChange={(event) => setPostObj({...postObj, [`${`input`+num}`]: { type:"text", fontSize:{value: "1"}, output: event.target.value } })} 
-        //         contentEditable suppressContentEditableWarning={true}>{postObj[`${`input`+num}`].output}</div> }
-        //         </>
-        //         : postObj[`${`input`+num}`].type === "video" ?
-        //         <>
-        //         <textarea
-        //             rows={1}
-        //             name={postObj[`${`input`+num}`]}
-        //             className={`create-post-video-textarea insert-input ${postObj[`${`input`+num}`].output === "" ? postObj[`${`input`+num}`].initializing === true && "insert-input-animation": postObj[`${`input`+num}`].deleting === true && "delete-input-animation"}`}
-        //             type="text" 
-        //             placeholder="youtube link..."
-        //             value={postObj[`${`input`+num}`].output} 
-        //             onChange={(event) => setPostObj({...postObj, [`${`input`+num}`]: { type:"video", output: event.target.value } })} 
-        //         />
-        //         {postObj[`${`input`+num}`].output && <iframe  className="post-video" src={`https://www.youtube.com/embed/${postObj[`${`input`+num}`].output.slice(17)}`} frameBorder="0" allowFullScreen></iframe>}
-        //         </>
-        //         : postObj[`${`input`+num}`].type === "image" &&
-        //         <>
-        //         <textarea
-        //             rows={1}
-        //             name={postObj[`${`input`+num}`]}
-        //             className={`create-post-video-textarea insert-input ${postObj[`${`input`+num}`].output === "" ? postObj[`${`input`+num}`].initializing === true && "insert-input-animation": postObj[`${`input`+num}`].deleting === true && "delete-input-animation"}`}
-        //             type="text" 
-        //             placeholder="image url goes here"
-        //             value={postObj[`${`input`+num}`].output} 
-        //             onChange={(event) => setPostObj({...postObj, [`${`input`+num}`]: { type:"image", output: event.target.value } })} 
-        //         />
-        //         <img className={`post-image ${postObj[`${`input`+num}`].deleting === true && "delete-input-animation"}`} src={postObj[`${`input`+num}`].output}></img>
-        //         </>
-        //         }
-        //         <div className="input-options">
-        //             {swapping === false && <button className="edit-post-btn" onClick={()=> swapFrom(num)}>swap</button>}
-        //             {swapping === true && <button className="edit-post-btn" onClick={()=> swapTo(num)}>swapTo</button>}
-        //             <button className="del-input-btn" onClick={()=> deleteInput(num)}>delete</button>
-        //         </div>
-        //     </div>
-        // )
+    const inputs = (inputs) => {
+        return inputs.map((input, index) => 
+            postObj.numInputs > 0 &&
+            <div className={`insert-input ${input.initializing === true ? "insert-input-animation"
+            : input.deleting === true && "delete-input-animation"}`}> 
+                <div className="edit-post-btns">
+                    <>
+                    {<button onClick={toggleButtons} className={showButtons === false ? "edit-post-btn post-input" 
+                        : "edit-post-btn post-input invisible-p"}>insert</button>}
+                    </>
+                    {showButtons &&
+                    <>
+                        <button className="post-input cancel-insert" onClick={()=>setShowButtons(false)}>cancel</button>
+                        <button className="post-input" onClick={()=> addInput(input.place, "text")}>text</button>
+                        <button className="post-input" onClick={()=> addInput(input.place, "image")}>image</button>
+                        <button className="post-input" onClick={()=> addInput(input.place, "video")}>video</button>
+                    </>}
+                </div>
+                {input.type === "text" ?
+                    <>{input && 
+                        <input name="fontSize" type="range" min="1" max="5" value={input.fontSize.slice(0, -3)} 
+                            onChange={event => changeFontSize(input.place, event.target.value)}>
+                        </input>}
+                        <textarea
+                            name={"input"+JSON.stringify(index)}
+                            className={`input-textarea insert-input ${input.output === "" 
+                                ? input.initializing === true && "insert-input-animation"
+                                : input.deleting === true && "delete-input-animation"}`}
+                            rows={3} placeholder="Add post body..."
+                            onChange={event => updateInputOutput(input.place, event.target.value)}
+                            value={input.output}/> 
+                    </>
+                : input.type === "video" ?
+                <>
+                    <textarea
+                        rows={1}
+                        name={"input"+JSON.stringify(index)}
+                        className={`input-textarea insert-input ${input.output === "" 
+                            ? input.initializing === true && "insert-input-animation"
+                            : input.deleting === true && "delete-input-animation"}`}
+                        type="text" 
+                        placeholder="youtube link..."
+                        value={input.output} 
+                        onChange={event => updateInputOutput(input.place, event.target.value)}
+                    />
+                    {input.output && <iframe  className="post-video" 
+                    src={`https://www.youtube.com/embed/${input.output.slice(17)}`} 
+                    frameBorder="0" allowFullScreen></iframe>}
+                    </>
+                : input.type === "image" &&
+                <>
+                    <textarea
+                        rows={1}
+                        name={"input"+JSON.stringify(index)}
+                        className={`input-textarea insert-input ${input.output === "" 
+                            ? input.initializing === true && "insert-input-animation"
+                            : input.deleting === true && "delete-input-animation"}`}
+                        type="text" 
+                        placeholder="image url goes here"
+                        value={input.output} 
+                        onChange={event => updateInputOutput(input.place, event.target.value)}
+                    />
+                    <img className={`post-image ${input.deleting === true && "delete-input-animation"}`} src={input.output}></img>
+                </>
+                }
+                <div className="input-options">
+                    {swapping === false && 
+                        <button className="edit-post-btn" onClick={()=> swapFrom(input.place)}>swap</button>}
+                    {swapping === true && 
+                        <><button className="edit-post-btn" onClick={()=> swapTo(input.place)} disabled={swappingFrom === input.place && "+true"}>swapTo</button>
+                        <button className="edit-post-btn" onClick={()=> setSwapping(false)}>cancel</button></>}
+                    <button className="del-input-btn" onClick={()=> deleteInput(input.place)}>delete</button>
+                </div>
+            </div>
+        )
     }
     
     return (
         <div className="page-body post">
-            {/* <button className="edit-post-btn" onClick={cancel}>cancel</button>
-            <button className="edit-post-btn" onClick={save}>save</button> */}
+            <button className="edit-post-btn" onClick={cancel}>cancel</button>
+            <button className="edit-post-btn" onClick={save}>save</button>
             <div className="view-post-container">
                 <p 
                     className="post-author"
@@ -282,56 +259,33 @@ export default function ViewPost(props){
                     onChange={(event) => setPostObj({...postObj, title: event.target.value})}
                 />
                 <div className="post-body">
-                    {/* {numArr.length === 0 &&
+                    {postObj.numInputs === 0 &&
                     <div className="insert-input">
                         <p>Add input(s)</p>
-                        <button onClick={()=>addText(1)}>text</button>
-                        <button onClick={()=> addImage(1)}>image</button>
-                        <button onClick={()=>addVideo(1)}>video</button>
+                        <button className="edit-post-btn" onClick={()=>addInput(0, "text")}>text</button>
+                        <button className="edit-post-btn" onClick={()=> addInput(0, "image")}>image</button>
+                        <button className="edit-post-btn" onClick={()=>addInput(0, "video")}>video</button>
                     </div>
-                    } */}
-                    {/* <div className="input-chain">
-                        {inputs(numArr)}
-                    </div> */}
-                    {/* {numArr.length > 0 &&
+                    }
+                    <div className="input-chain">
+                        {postObj && postObj.inputs.length > 0 && inputs(postObj.inputs)}
+                    </div>
+                    {postObj && postObj.inputs.length > 0 &&
                         <div className="edit-post-btns">
-                        <>
-                        {<button onClick={toggleButtons} className={showButtons === false ? "edit-post-btn post-input" : "edit-post-btn post-input invisible-p"}>insert</button>}
-                        </>
+                        <button onClick={toggleButtons} className={showButtons === false ? "post-input" 
+                            : "post-input invisible-p"}>insert
+                        </button>
                         {showButtons &&
                         <>
-                            <button className="edit-post-btn post-input cancel-insert" onClick={()=>setShowButtons(false)}>cancel</button>
-                            <button className="edit-post-btn post-input" onClick={()=> addText(numArr.length+1)}>text</button>
-                            <button className="edit-post-btn post-input" onClick={()=> addImage(numArr.length+1)}>image</button>
-                            <button className="edit-post-btn post-input" onClick={()=> addVideo(numArr.length+1)}>video</button>
+                            <button className="post-input cancel-insert" onClick={()=>setShowButtons(false)}>cancel</button>
+                            <button className="post-input" onClick={()=> addInput(postObj.inputs.length, "text")}>text</button>
+                            <button className="post-input" onClick={()=> addInput(postObj.inputs.length, "image")}>image</button>
+                            <button className="post-input" onClick={()=> addInput(postObj.inputs.length, "video")}>video</button>
                         </>}
                     </div>
-                    } */}
+                    }
                 </div>
             </div>
         </div>
     )
 }
-// ################
-// ################
-// ################
-// ################
-// ################
-// ################
-// ################
-// ################
-// ################
-// ################
-// ################
-// ################
-// ################
-// ################
-// ################
-// ################
-// ################
-// ################
-// ################
-// ################
-// ################
-// ################
-// ################

@@ -637,7 +637,7 @@ form {
     margin-bottom: -10vh;
   }
 }
-.create-post-video-textarea {
+.input-textarea {
   border: none;
   color: white;
   margin: 2em 0em 0em 0em;
@@ -733,6 +733,7 @@ form {
   background-color: transparent;
 }
 .input-options {
+  display: flex;
   justify-content: space-between;
   margin-bottom: .5em;
 }
@@ -749,16 +750,25 @@ form {
   border-radius: 5px;
   margin: 0 1em 1em 0;
 }
-.cancel-insert {
-  margin-right: 3em;
-}
+
 
 .post-input{
+  background-color: rgba(62,166,255, .5);
+  border: 1px solid rgba(62,166,255);
+  color: rgba(255, 255, 255, .75);
+  margin: 0 1em 1em 0;
   border-top: none;
   border-top-left-radius: 0;
   border-top-right-radius: 0;
   border-bottom-left-radius: 5px;
   border-bottom-right-radius: 5px;
+}
+
+.cancel-insert {
+  margin-right: 5em;
+  background-color: rgba(255, 101, 62, 0.5);
+  border: 1px solid rgb(255, 62, 133);
+  border-top: none;
 }
 .del-input-btn {
   background-color: rgba(255, 101, 62, 0.5);
@@ -767,15 +777,12 @@ form {
   border-radius: 5px;
   margin: 0em 0em 1em 0;
 }
-
-
 .insert-input {
   max-width: 100%;
   margin: 0;
 }
 .input-chain {
   display: flex;
-  flex-wrap: wrap;
   flex-direction: column;
   gap: .2em;
   margin: 1em 0;
