@@ -1,7 +1,6 @@
 import React, {useEffect, useState} from "react";
-import { query, orderBy, onSnapshot, 
-    collection, getFirestore, doc, 
-    updateDoc
+import { query, orderBy, onSnapshot, collection, 
+    getFirestore, doc, updateDoc
 } from "firebase/firestore";
 import { getAuth} from "firebase/auth";
 
@@ -54,51 +53,27 @@ export default function ViewPost(props){
     }
 // ##########################################################################
     const [ postObj, setPostObj ] = useState("")
-    // This effect updates the postObj when the post is found
     useEffect(() => {
         if(foundPost){
-            // sorted creates array foundpost.inputs that have been ordered by their .place value
-            const sorted = foundPost.inputs.sort(function(a, b) {
-                return a.place - b.place
-            })
-            // here the newly sorted array value replaces the foundPost.inputs value and is inserted in postObj
-            setPostObj({...foundPost, inputs:sorted, numInputs: sorted.length})
+            setPostObj({...foundPost, numInputs: foundPost.inputs.length})
         }  
     }, [foundPost])
 // ##########################################################################
-const [inputDisabled, setInputDisabled] = useState(false)
+    const [inputDisabled, setInputDisabled] = useState(false)
     function addInput(loc, type){
-        let newArray = []
-        let newArray2 = []
-        let newArray3 = []
-        let finalArray = []
-        const beforeLoc = postObj.inputs.filter(input => input.place < loc)
-        const afterLoc = postObj.inputs.filter(input => input.place >= loc)
-        const shiftedAfterLoc = afterLoc.map((input, i)=> {return{...input, place: input.place+1}} )
-        const newInput = {type: type, output: "", place: loc, fontSize: "3rem", initializing: true}
-        if (postObj.inputs.length > 1 || postObj.inputs.length === 0){
-            newArray2 = newArray.concat(beforeLoc)
-            newArray3 = newArray2.concat(newInput)
-            finalArray = newArray3.concat(shiftedAfterLoc)
-        } 
-        if (postObj.inputs.length === 1) { 
-            if(loc === 0){
-                newArray2 = newArray.concat(newInput)
-                finalArray = newArray2.concat(shiftedAfterLoc)
-            } else {
-                newArray2 = newArray.concat(beforeLoc)
-                finalArray = newArray2.concat(newInput)
-            }
-        }
+        const newInitInput = {type: type, output: "", fontSize: "3rem", initializing: true, deleting: false}
+        const newInput = {type: type, output: "", fontSize: "3rem", initializing: false, deleting: false}
+        const initArr = postObj.inputs
+        const completedArr = postObj.inputs
+        initArr.splice(loc, 0, newInitInput)
         setPostObj(prev => {
-            return {...prev, inputs: finalArray, numInputs: prev.numInputs+1}
+            return {...prev, inputs: initArr, numInputs: prev.numInputs+1}
         })
-        // setShowButtons(false)
         setInputDisabled(true)
         setTimeout(() => {
-            const initializedInputs = finalArray.map(input => input.place === loc ? {...input, initializing: false} : input)
+            completedArr.splice(loc, 1, newInput)
             setPostObj(prev => {
-                return {...prev, inputs: initializedInputs}
+                return {...prev, inputs: completedArr}
             })
             setInputDisabled(false)
         },500)
@@ -106,23 +81,18 @@ const [inputDisabled, setInputDisabled] = useState(false)
 // ##########################################################################
     const [deleteDisabled, setDeleteDisabled] = useState(false)
     function deleteInput(loc){
-        let newArray = []
-        let newArray2 = []
-        let finalArray = []
-        const beforeLoc = postObj.inputs.filter(input => input.place < loc)
-        const afterLoc = postObj.inputs.filter(input => input.place > loc)
-        const shiftedAfterLoc = afterLoc.map((input, i)=> {return{...input, place: input.place-1}} )
-        newArray2 = newArray.concat(beforeLoc)
-        finalArray = newArray2.concat(shiftedAfterLoc)
-        const delInputArr = postObj.inputs.map(input => input.place === loc ? {...input, deleting: true} : input)
-        const inputArr = finalArray.map(input => input.place === loc ? {...input, deleting: false} : input)
+        const caughtItem = postObj.inputs[loc]
+        const newArr = postObj.inputs
+        const delArr = postObj.inputs
+        delArr.splice(loc, 1, {...caughtItem, deleting: true})
         setPostObj(prev => {
-            return{...prev, inputs: delInputArr}
+            return{...prev, inputs: delArr}
         })
         setDeleteDisabled(true)
         setTimeout(() => {
+            newArr.splice(loc, 1)
             setPostObj(prev => {
-                return {...prev, inputs: inputArr, numInputs: prev.numInputs-1}
+                return {...prev, inputs: newArr, numInputs: prev.numInputs-1}
             })
             setDeleteDisabled(false)
         }, 550)
@@ -130,26 +100,18 @@ const [inputDisabled, setInputDisabled] = useState(false)
 // ##########################################################################
     const [swapStart, setSwapStart] = useState()
     const [swapping, setSwapping] = useState(false)
-    const [swappingFrom, setSwappingFrom] = useState()
     function swapFrom(loc){
         setSwapStart(loc)
         setSwapping(true)
-        setSwappingFrom(loc)
     }
     function swapTo(loc){
-        let nonSwappersArr = postObj.inputs.filter(input => input.place !== loc)
-        let nonSwappersArr2 = nonSwappersArr.filter(input => input.place !== swapStart)
-        let swapper1 = postObj.inputs.find(input => input.place === loc)
-        let swapper2 = postObj.inputs.find(input => input.place === swapStart)
-        swapper1 =  {...swapper1, place:swapStart}
-        swapper2 = {...swapper2, place:loc}
-        let swappers = [swapper1, swapper2]
-        let fullArr = nonSwappersArr2.concat(swappers)
-        const sorted = fullArr.sort(function(a, b) {
-            return a.place - b.place
-        })
+        const newArr = postObj.inputs
+        Array.prototype.swapItems = function(a, b){
+            this[a] = this.splice(b, 1, this[a])[0]
+            return this;
+        }
         setPostObj(prev => {
-            return {...prev, inputs: sorted}
+            return {...prev, inputs: newArr.swapItems(swapStart,loc)}
         })
         setSwapping(false)
     }
@@ -166,10 +128,11 @@ const [inputDisabled, setInputDisabled] = useState(false)
         })
     }
 // ##########################################################################
-    function updateInputOutput(place, value){
-        const updatedInput = postObj.inputs.map(input => input.place === place ? {...input, output: value, initializing: false} : input )
+    function updateInputOutput(loc, value){
+        const arr = postObj.inputs
+        arr.splice(loc, 1, {...postObj.inputs[loc], output: value, initializing: false})
         setPostObj(prev => {
-            return {...prev, inputs: updatedInput}
+            return {...prev, inputs: arr}
         })
     }
 // ##########################################################################
@@ -177,11 +140,11 @@ const [inputDisabled, setInputDisabled] = useState(false)
         return (
             <>{!props.inputStart &&<button className="post-input cancel-insert" onClick={()=>setShowButtons(false)}>cancel</button>}
             <button disabled={inputDisabled && "+true"} className={!props.inputStart?"post-input":"edit-post-btn"} 
-                onClick={()=> addInput(props.place, "text")}>text</button>
+                onClick={()=> addInput(props.index, "text")}>text</button>
             <button disabled={inputDisabled && "+true"} className={!props.inputStart?"post-input":"edit-post-btn"} 
-                onClick={()=> addInput(props.place, "image")}>image</button>
+                onClick={()=> addInput(props.index, "image")}>image</button>
             <button disabled={inputDisabled && "+true"} className={!props.inputStart?"post-input":"edit-post-btn"} 
-                onClick={()=> addInput(props.place, "video")}>video</button></>
+                onClick={()=> addInput(props.index, "video")}>video</button></>
         )
     }
     const inputs = (inputs) => {
@@ -194,11 +157,11 @@ const [inputDisabled, setInputDisabled] = useState(false)
                     {<button onClick={toggleButtons} className={showButtons === false ? "edit-post-btn post-input" 
                         : "edit-post-btn post-input invisible-p"}>insert</button>}
                     </>
-                    {showButtons && <InsertBtns place={input.place} />}
+                    {showButtons && <InsertBtns index={index} />}
                 </div>
                 {input.type === "text" ?<>
                 <input name="fontSize" type="range" min="1" max="5" value={input.fontSize.slice(0, -3)} 
-                    onChange={event => changeFontSize(input.place, event.target.value)}>
+                    onChange={event => changeFontSize(index, event.target.value)}>
                 </input>
                 {!input.deleting ?
                 <textarea
@@ -206,7 +169,7 @@ const [inputDisabled, setInputDisabled] = useState(false)
                     className={`input-textarea insert-input`}
                     rows={3} placeholder={"Add post body..."}
                     value={input.output}
-                    onChange={event => updateInputOutput(input.place, event.target.value)}/>
+                    onChange={event => updateInputOutput(index, event.target.value)}/>
                     :<div></div>}
                 </>
                 : input.type === "video" ?<>
@@ -216,7 +179,7 @@ const [inputDisabled, setInputDisabled] = useState(false)
                     className={`input-textarea insert-input`}
                     rows={1} placeholder={"Add youtube link"}
                     value={input.output}
-                    onChange={event => updateInputOutput(input.place, event.target.value)}/>
+                    onChange={event => updateInputOutput(index, event.target.value)}/>
                     :<div></div>}
                     <iframe  className="post-video" 
                         src={`https://www.youtube.com/embed/${input.output.slice(17)}`} 
@@ -229,17 +192,17 @@ const [inputDisabled, setInputDisabled] = useState(false)
                     className={`input-textarea insert-input`}
                     rows={1} placeholder={"image url goes here"}
                     value={input.output}
-                    onChange={event => updateInputOutput(input.place, event.target.value)}/>
+                    onChange={event => updateInputOutput(index, event.target.value)}/>
                     :<div></div>}
                     <img className={`post-image`} src={input.output}></img></>
                 }
                 <div className="input-options">
                     {swapping === false && 
-                        <button className="edit-post-btn" onClick={()=> swapFrom(input.place)}>swap</button>}
+                        <button className="edit-post-btn" onClick={()=> swapFrom(index)}>swap</button>}
                     {swapping === true && 
-                        <><button className="edit-post-btn" onClick={()=> swapTo(input.place)} disabled={swappingFrom === input.place && "+true"}>swapTo</button>
+                        <><button className="edit-post-btn" onClick={()=> swapTo(index)} disabled={swapStart === index && "+true"}>swapTo</button>
                         <button className="edit-post-btn" onClick={()=> setSwapping(false)}>cancel</button></>}
-                    <button disabled={deleteDisabled&&"+true"} className="del-input-btn" onClick={()=> deleteInput(input.place)}>delete</button>
+                    <button disabled={deleteDisabled&&"+true"} className="del-input-btn" onClick={()=> deleteInput(index)}>delete</button>
                 </div>
             </div>
         )
@@ -262,7 +225,7 @@ const [inputDisabled, setInputDisabled] = useState(false)
                     onChange={(event) => setPostObj({...postObj, title: event.target.value})}
                 />
                 <div className="post-body">
-                    {postObj.numInputs === 0 && <InsertBtns place={0} inputStart={true} />}
+                    {postObj.numInputs === 0 && <InsertBtns index={0} inputStart={true} />}
                     <div className="input-chain">
                         {postObj && postObj.inputs.length > 0 && inputs(postObj.inputs)}
                     </div>
@@ -271,7 +234,7 @@ const [inputDisabled, setInputDisabled] = useState(false)
                         <button onClick={toggleButtons} className={showButtons === false ? "post-input" 
                             : "post-input invisible-p"}>insert
                         </button>
-                        {showButtons && <InsertBtns place={postObj.inputs.length} />}
+                        {showButtons && <InsertBtns index={postObj.inputs.length} />}
                     </div>
                     }
                 </div>

@@ -164,8 +164,11 @@ export default function Comment(props){
             onSnapshot(q, async (snapshot) => {
                 snapshot.docs.forEach((document) => {
                     const docRef = doc(db, 'comments', document.id)
-                    if(document.data().chain === props.chain){
+                    if(document.data().chain === props.chain && document.data().type == "comment"){
                         deleteDoc(docRef)
+                    } 
+                    if(document.data().id === props.id){
+                        // deleteDoc(docRef)
                     }
                 })
             })
