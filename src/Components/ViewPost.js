@@ -129,7 +129,7 @@ export default function ViewPost(props){
                     <div className="input-chain">
                     {foundPost && foundPost.inputs.map(input =>
                     foundPost && input.type === "text"?
-                    <p className="post-text">{input.output}</p>
+                    <p className="post-text" style={{fontSize: input.fontSize, marginTop: input.topMargin}}>{input.output}</p>
                     :
                     input.type === "video" 
                     ?

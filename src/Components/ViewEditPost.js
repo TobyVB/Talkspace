@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useState, useRef} from "react";
 import { query, orderBy, onSnapshot, collection, 
     getFirestore, doc, updateDoc
 } from "firebase/firestore";
@@ -61,8 +61,8 @@ export default function ViewPost(props){
 // ##########################################################################
     const [inputDisabled, setInputDisabled] = useState(false)
     function addInput(loc, type){
-        const newInitInput = {type: type, output: "", fontSize: "3rem", initializing: true, deleting: false}
-        const newInput = {type: type, output: "", fontSize: "3rem", initializing: false, deleting: false}
+        const newInitInput = {type: type, output: "", fontSize: "1rem", topMargin: "1rem", initializing: true, deleting: false}
+        const newInput = {type: type, output: "", fontSize: "1rem", topMargin: "1rem", initializing: false, deleting: false}
         const initArr = postObj.inputs
         const completedArr = postObj.inputs
         initArr.splice(loc, 0, newInitInput)
@@ -121,20 +121,45 @@ export default function ViewPost(props){
         setShowButtons(true)
     }
 // ##########################################################################
-    function changeFontSize(place, value){
-        const updatedFontSize = postObj.inputs.map(input => input.place === place ? {...input, fontSize: value+"rem", initializing: false} : input )
+    function changeFontSize(loc, value){
+        // modify this to work for new method of handling inputs
+        const arr = postObj.inputs
+        arr.splice(loc, 1, {...postObj.inputs[loc], fontSize: value+"rem", initializing: false})
         setPostObj(prev => {
-            return {...prev, inputs: updatedFontSize}
+            return {...prev, inputs: arr}
         })
     }
 // ##########################################################################
+    function changeTopMargin(loc, value){
+        // modify this to work for new method of handling inputs
+        const arr = postObj.inputs
+        arr.splice(loc, 1, {...postObj.inputs[loc], topMargin: value+"rem", initializing: false})
+        setPostObj(prev => {
+            return {...prev, inputs: arr}
+        })
+    }
+// ##########################################################################
+    const [updater, setUpdater] = useState(false);
+    const [rows, setRows] = useState(1);
     function updateInputOutput(loc, value){
+        setUpdater(prev => !prev)
         const arr = postObj.inputs
         arr.splice(loc, 1, {...postObj.inputs[loc], output: value, initializing: false})
         setPostObj(prev => {
             return {...prev, inputs: arr}
         })
     }
+    function handleKeyDown(e) {
+        e.target.style.height = 'inherit';
+        e.target.style.height = `${e.target.scrollHeight}px`; 
+        // In case you have a limitation
+        // e.target.style.height = `${Math.min(e.target.scrollHeight, limit)}px`;
+    }
+
+    const applyTextSize = {
+        height : 'inherit',
+    }
+
 // ##########################################################################
     function InsertBtns(props){
         return (
@@ -147,9 +172,20 @@ export default function ViewPost(props){
                 onClick={()=> addInput(props.index, "video")}>video</button></>
         )
     }
+
+
+    const textarea = useRef();
+
+    useEffect(()=> {
+        if(postObj && textarea.current){
+            textarea.current.style.height = 'inherit';
+            textarea.current.style.height = `${textarea.current.scrollHeight}px`; 
+        }
+    }, [postObj])
+    
     const inputs = (inputs) => {
         return inputs.map((input, index) => 
-            postObj.numInputs > 0 &&
+            postObj.numInputs > 0 && 
             <div className={`insert-input ${input.initializing === true ? "insert-input-animation"
             : input.deleting === true && "delete-input-animation"}`}> 
                 <div className="edit-post-btns">
@@ -160,14 +196,22 @@ export default function ViewPost(props){
                     {showButtons && <InsertBtns index={index} />}
                 </div>
                 {input.type === "text" ?<>
-                <input name="fontSize" type="range" min="1" max="5" value={input.fontSize.slice(0, -3)} 
+                <input name="fontSize" type="range" min=".5" max="10" step=".1" value={input.fontSize.slice(0, -3)} 
                     onChange={event => changeFontSize(index, event.target.value)}>
                 </input>
-                {!input.deleting ?
+                <input name="topMargin" type="range" min="0" max="10" step=".1" value={input.topMargin.slice(0, -3)} 
+                    onChange={event => changeTopMargin(index, event.target.value)}>
+                </input>
+                {!input.deleting ? 
                 <textarea
+                    key={index}
+                    placeholder="write text here"
+                    onKeyDown={e => handleKeyDown(e)}
+                    ref={textarea}
+                    style={{height: "inherit", fontSize : input.fontSize, marginTop: input.topMargin, overflow:"hidden"}}
                     name={"input"+JSON.stringify(index)}
                     className={`input-textarea insert-input`}
-                    rows={3} placeholder={"Add post body..."}
+                    rows={rows}
                     value={input.output}
                     onChange={event => updateInputOutput(index, event.target.value)}/>
                     :<div></div>}

@@ -72,8 +72,8 @@ export default function CreatePost(props){
 // ##########################################################################
     const [inputDisabled, setInputDisabled] = useState(false)
     function addInput(loc, type){
-        const newInitInput = {type: type, output: "", fontSize: "3rem", initializing: true, deleting: false}
-        const newInput = {type: type, output: "", fontSize: "3rem", initializing: false, deleting: false}
+        const newInitInput = {type: type, output: "", fontSize: "1rem", topMargin: "1rem", initializing: true, deleting: false}
+        const newInput = {type: type, output: "", fontSize: "1rem", topMargin: "1rem", initializing: false, deleting: false}
         const initArr = postObj.inputs
         const completedArr = postObj.inputs
         initArr.splice(loc, 0, newInitInput)
@@ -113,92 +113,112 @@ export default function CreatePost(props){
         setShowButtons(true)
     }
 // ##########################################################################
-    function changeFontSize(place, value){
-        const updatedFontSize = postObj.inputs.map(input => input.place === place ? {...input, fontSize: value+"rem", initializing: false} : input )
+    function changeFontSize(loc, value){
+        // modify this to work for new method of handling inputs
+        const arr = postObj.inputs
+        arr.splice(loc, 1, {...postObj.inputs[loc], fontSize: value+"rem", initializing: false})
         setPostObj(prev => {
-            return {...prev, inputs: updatedFontSize}
+            return {...prev, inputs: arr}
         })
     }
 // ##########################################################################
-function updateInputOutput(loc, value){
-    const arr = postObj.inputs
-    arr.splice(loc, 1, {...postObj.inputs[loc], output: value, initializing: false})
-    setPostObj(prev => {
-        return {...prev, inputs: arr}
-    })
-}
+    function changeTopMargin(loc, value){
+        // modify this to work for new method of handling inputs
+        const arr = postObj.inputs
+        arr.splice(loc, 1, {...postObj.inputs[loc], topMargin: value+"rem", initializing: false})
+        setPostObj(prev => {
+            return {...prev, inputs: arr}
+        })
+    }
 // ##########################################################################
-function InsertBtns(props){
-    return (
-        <>{!props.inputStart &&<button className="post-input cancel-insert" onClick={()=>setShowButtons(false)}>cancel</button>}
-        <button disabled={inputDisabled && "+true"} className={!props.inputStart?"post-input":"edit-post-btn"} 
-            onClick={()=> addInput(props.index, "text")}>text</button>
-        <button disabled={inputDisabled && "+true"} className={!props.inputStart?"post-input":"edit-post-btn"} 
-            onClick={()=> addInput(props.index, "image")}>image</button>
-        <button disabled={inputDisabled && "+true"} className={!props.inputStart?"post-input":"edit-post-btn"} 
-            onClick={()=> addInput(props.index, "video")}>video</button></>
-    )
-}
-const inputs = (inputs) => {
-    return inputs.map((input, index) => 
-        postObj.numInputs > 0 &&
-        <div className={`insert-input ${input.initializing === true ? "insert-input-animation"
-        : input.deleting === true && "delete-input-animation"}`}> 
-            <div className="edit-post-btns">
-                <>
-                {<button onClick={toggleButtons} className={showButtons === false ? "edit-post-btn post-input" 
-                    : "edit-post-btn post-input invisible-p"}>insert</button>}
+    const [rows, setRows] = useState(1);
+    function updateInputOutput(loc, value){
+        const arr = postObj.inputs
+        arr.splice(loc, 1, {...postObj.inputs[loc], output: value, initializing: false})
+        setPostObj(prev => {
+            return {...prev, inputs: arr}
+        })
+        const newLines = value.match(/\n/g)?.length;
+        if(!newLines) setRows(1);
+        else if(newLines < 8) setRows(newLines + 1);
+        else setRows(8);
+    }
+// ##########################################################################
+    function InsertBtns(props){
+        return (
+            <>{!props.inputStart &&<button className="post-input cancel-insert" onClick={()=>setShowButtons(false)}>cancel</button>}
+            <button disabled={inputDisabled && "+true"} className={!props.inputStart?"post-input":"edit-post-btn"} 
+                onClick={()=> addInput(props.index, "text")}>text</button>
+            <button disabled={inputDisabled && "+true"} className={!props.inputStart?"post-input":"edit-post-btn"} 
+                onClick={()=> addInput(props.index, "image")}>image</button>
+            <button disabled={inputDisabled && "+true"} className={!props.inputStart?"post-input":"edit-post-btn"} 
+                onClick={()=> addInput(props.index, "video")}>video</button></>
+        )
+    }
+    const inputs = (inputs) => {
+        return inputs.map((input, index) => 
+            postObj.numInputs > 0 &&
+            <div className={`insert-input ${input.initializing === true ? "insert-input-animation"
+            : input.deleting === true && "delete-input-animation"}`}> 
+                <div className="edit-post-btns">
+                    <>
+                    {<button onClick={toggleButtons} className={showButtons === false ? "edit-post-btn post-input" 
+                        : "edit-post-btn post-input invisible-p"}>insert</button>}
+                    </>
+                    {showButtons && <InsertBtns index={index} />}
+                </div>
+                {input.type === "text" ?<>
+                <input name="fontSize" type="range" min=".5" max="10" step=".1" value={input.fontSize.slice(0, -3)} 
+                    onChange={event => changeFontSize(index, event.target.value)}>
+                </input>
+                <input name="topMargin" type="range" min=".1" max="10" step=".1" value={input.topMargin.slice(0, -3)} 
+                    onChange={event => changeTopMargin(index, event.target.value)}>
+                </input>
+                {!input.deleting ?
+                <textarea
+                    style={{fontSize : input.fontSize}}
+                    name={"input"+JSON.stringify(index)}
+                    className={`input-textarea insert-input`}
+                    rows={rows} placeholder={"Add post body..."}
+                    value={input.output}
+                    onChange={event => updateInputOutput(index, event.target.value)}/>
+                    :<div></div>}
                 </>
-                {showButtons && <InsertBtns index={index} />}
+                : input.type === "video" ?<>
+                {!input.deleting ?
+                <textarea
+                    name={"input"+JSON.stringify(index)}
+                    className={`input-textarea insert-input`}
+                    rows={1} placeholder={"Add youtube link"}
+                    value={input.output}
+                    onChange={event => updateInputOutput(index, event.target.value)}/>
+                    :<div></div>}
+                    <iframe  className="post-video" 
+                        src={`https://www.youtube.com/embed/${input.output.slice(17)}`} 
+                        frameBorder="0" allowFullScreen>
+                    </iframe></>
+                : input.type === "image" &&<>
+                {!input.deleting ?
+                <textarea
+                    name={"input"+JSON.stringify(index)}
+                    className={`input-textarea insert-input`}
+                    rows={1} placeholder={"image url goes here"}
+                    value={input.output}
+                    onChange={event => updateInputOutput(index, event.target.value)}/>
+                    :<div></div>}
+                    <img className={`post-image`} src={input.output}></img></>
+                }
+                <div className="input-options">
+                    {swapping === false && 
+                        <button className="edit-post-btn" onClick={()=> swapFrom(index)}>swap</button>}
+                    {swapping === true && 
+                        <><button className="edit-post-btn" onClick={()=> swapTo(index)} disabled={swapStart === index && "+true"}>swapTo</button>
+                        <button className="edit-post-btn" onClick={()=> setSwapping(false)}>cancel</button></>}
+                    <button disabled={deleteDisabled&&"+true"} className="del-input-btn" onClick={()=> deleteInput(index)}>delete</button>
+                </div>
             </div>
-            {input.type === "text" ?<>
-            <input name="fontSize" type="range" min="1" max="5" value={input.fontSize.slice(0, -3)} 
-                onChange={event => changeFontSize(index, event.target.value)}>
-            </input>
-            {!input.deleting ?
-            <textarea
-                name={"input"+JSON.stringify(index)}
-                className={`input-textarea insert-input`}
-                rows={3} placeholder={"Add post body..."}
-                value={input.output}
-                onChange={event => updateInputOutput(index, event.target.value)}/>
-                :<div></div>}
-            </>
-            : input.type === "video" ?<>
-            {!input.deleting ?
-            <textarea
-                name={"input"+JSON.stringify(index)}
-                className={`input-textarea insert-input`}
-                rows={1} placeholder={"Add youtube link"}
-                value={input.output}
-                onChange={event => updateInputOutput(index, event.target.value)}/>
-                :<div></div>}
-                <iframe  className="post-video" 
-                    src={`https://www.youtube.com/embed/${input.output.slice(17)}`} 
-                    frameBorder="0" allowFullScreen>
-                </iframe></>
-            : input.type === "image" &&<>
-            {!input.deleting ?
-            <textarea
-                name={"input"+JSON.stringify(index)}
-                className={`input-textarea insert-input`}
-                rows={1} placeholder={"image url goes here"}
-                value={input.output}
-                onChange={event => updateInputOutput(index, event.target.value)}/>
-                :<div></div>}
-                <img className={`post-image`} src={input.output}></img></>
-            }
-            <div className="input-options">
-                {swapping === false && 
-                    <button className="edit-post-btn" onClick={()=> swapFrom(index)}>swap</button>}
-                {swapping === true && 
-                    <><button className="edit-post-btn" onClick={()=> swapTo(index)} disabled={swapStart === index && "+true"}>swapTo</button>
-                    <button className="edit-post-btn" onClick={()=> setSwapping(false)}>cancel</button></>}
-                <button disabled={deleteDisabled&&"+true"} className="del-input-btn" onClick={()=> deleteInput(index)}>delete</button>
-            </div>
-        </div>
-    )
-}
+        )
+    }
     
     return (
         <>

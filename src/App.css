@@ -638,12 +638,15 @@ form {
   }
 }
 .input-textarea {
+  background-color: rgba(255, 255, 255, 0);
   border: none;
   color: white;
   margin: 2em 0em 0em 0em;
-  padding: .5em .5em .5em .5em;
+  padding: 0;
   width: 100%;
   font-family: sans-serif;
+  font-weight: 400;
+  letter-spacing: .025rem;
 }
 .create-post-title {
   background-color: rgba(0, 0, 0, .3);
@@ -798,7 +801,7 @@ form {
   margin: 0;
 }
 .post-text {
-  width: 45%;
+  white-space:pre-wrap;
   flex-shrink: 0;
   margin: 0;
 }
