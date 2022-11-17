@@ -77,6 +77,7 @@ export default function ViewPost(props){
             })
             setInputDisabled(false)
         },500)
+        setShowButtons(false)
     }
 // ##########################################################################
     const [deleteDisabled, setDeleteDisabled] = useState(false)
@@ -116,18 +117,19 @@ export default function ViewPost(props){
         setSwapping(false)
     }
 // ##########################################################################
-    const [showButtons, setShowButtons] = useState(false);
-    function toggleButtons(){
-        setShowButtons(true)
+    const [showButtons, setShowButtons] = useState();
+    function toggleButtons(loc){
+        setShowButtons(loc)
     }
 // ##########################################################################
     function changeFontSize(loc, value){
         // modify this to work for new method of handling inputs
         const arr = postObj.inputs
-        arr.splice(loc, 1, {...postObj.inputs[loc], fontSize: value+"rem", initializing: false})
+        arr.splice(loc, 1, {...postObj.inputs[loc], height:"inherit", fontSize: value+"rem", initializing: false})
         setPostObj(prev => {
             return {...prev, inputs: arr}
         })
+        inheritRef()
     }
 // ##########################################################################
     function changeTopMargin(loc, value){
@@ -140,7 +142,6 @@ export default function ViewPost(props){
     }
 // ##########################################################################
     const [updater, setUpdater] = useState(false);
-    const [rows, setRows] = useState(1);
     function updateInputOutput(loc, value){
         setUpdater(prev => !prev)
         const arr = postObj.inputs
@@ -148,6 +149,7 @@ export default function ViewPost(props){
         setPostObj(prev => {
             return {...prev, inputs: arr}
         })
+        inheritRef()
     }
     function handleKeyDown(e) {
         e.target.style.height = 'inherit';
@@ -155,15 +157,13 @@ export default function ViewPost(props){
         // In case you have a limitation
         // e.target.style.height = `${Math.min(e.target.scrollHeight, limit)}px`;
     }
-
     const applyTextSize = {
         height : 'inherit',
     }
-
 // ##########################################################################
     function InsertBtns(props){
         return (
-            <>{!props.inputStart &&<button className="post-input cancel-insert" onClick={()=>setShowButtons(false)}>cancel</button>}
+            <>{!props.inputStart && !props.inputEnd &&<button className="post-input cancel-insert" onClick={()=>setShowButtons(null)}>cancel</button>}
             <button disabled={inputDisabled && "+true"} className={!props.inputStart?"post-input":"edit-post-btn"} 
                 onClick={()=> addInput(props.index, "text")}>text</button>
             <button disabled={inputDisabled && "+true"} className={!props.inputStart?"post-input":"edit-post-btn"} 
@@ -173,16 +173,22 @@ export default function ViewPost(props){
         )
     }
 
-
-    const textarea = useRef();
-
-    useEffect(()=> {
-        if(postObj && textarea.current){
-            textarea.current.style.height = 'inherit';
-            textarea.current.style.height = `${textarea.current.scrollHeight}px`; 
+    const revealRefs = useRef([])
+    revealRefs.current = []
+    const addToRefs = (el) => {
+        if(el && !revealRefs.current.includes(el)){
+            revealRefs.current.push(el)
         }
-    }, [postObj])
-    
+        for(let i = 0; i < revealRefs.current.length; i++){
+            revealRefs.current[i].style.height = `${revealRefs.current[i].scrollHeight}px`
+        }
+    }
+    function inheritRef(){
+        for(let i = 0; i < revealRefs.current.length; i++){
+            revealRefs.current[i].style.height = 'inherit'
+        }
+    }
+
     const inputs = (inputs) => {
         return inputs.map((input, index) => 
             postObj.numInputs > 0 && 
@@ -190,16 +196,16 @@ export default function ViewPost(props){
             : input.deleting === true && "delete-input-animation"}`}> 
                 <div className="edit-post-btns">
                     <>
-                    {<button onClick={toggleButtons} className={showButtons === false ? "edit-post-btn post-input" 
+                    {<button onClick={() => toggleButtons(index)} className={showButtons !== index ? "edit-post-btn post-input" 
                         : "edit-post-btn post-input invisible-p"}>insert</button>}
                     </>
-                    {showButtons && <InsertBtns index={index} />}
+                    {showButtons === index && <InsertBtns index={index} />}
                 </div>
                 {input.type === "text" ?<>
                 <input name="fontSize" type="range" min=".5" max="10" step=".1" value={input.fontSize.slice(0, -3)} 
                     onChange={event => changeFontSize(index, event.target.value)}>
                 </input>
-                <input name="topMargin" type="range" min="0" max="10" step=".1" value={input.topMargin.slice(0, -3)} 
+                <input name="topMargin" type="range" min="0" max="20" step=".1" value={input.topMargin.slice(0, -3)} 
                     onChange={event => changeTopMargin(index, event.target.value)}>
                 </input>
                 {!input.deleting ? 
@@ -207,11 +213,10 @@ export default function ViewPost(props){
                     key={index}
                     placeholder="write text here"
                     onKeyDown={e => handleKeyDown(e)}
-                    ref={textarea}
-                    style={{height: "inherit", fontSize : input.fontSize, marginTop: input.topMargin, overflow:"hidden"}}
+                    style={{height:input.height, fontSize : input.fontSize, marginTop: input.topMargin, overflow:"hidden"}}
+                    ref={addToRefs}
                     name={"input"+JSON.stringify(index)}
                     className={`input-textarea insert-input`}
-                    rows={rows}
                     value={input.output}
                     onChange={event => updateInputOutput(index, event.target.value)}/>
                     :<div></div>}
@@ -275,10 +280,9 @@ export default function ViewPost(props){
                     </div>
                     {postObj && postObj.inputs.length > 0 &&
                         <div className="edit-post-btns">
-                        <button onClick={toggleButtons} className={showButtons === false ? "post-input" 
-                            : "post-input invisible-p"}>insert
-                        </button>
-                        {showButtons && <InsertBtns index={postObj.inputs.length} />}
+                        <>{<button onClick={() => toggleButtons(postObj.inputs.length)} className={showButtons !== postObj.inputs.length ? "edit-post-btn post-input" 
+                        : "edit-post-btn post-input invisible-p"}>insert</button>}</>
+                    {showButtons === postObj.inputs.length && <InsertBtns index={postObj.inputs.length} />}
                     </div>
                     }
                 </div>
