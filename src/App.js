@@ -448,6 +448,7 @@ function App() {
         setCurrentCommentId={setCurrentCommentId}
         userDataId={userData.id}
         editPost={startViewEditPost}
+        deletePost={startViewProfile}
       />}
 
       {/* VIEW EDIT POST */}

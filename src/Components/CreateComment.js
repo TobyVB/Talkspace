@@ -45,6 +45,7 @@ export default function CreateComment(props){
             chain: unique,
             unique: unique,
             createdAt: serverTimestamp(),
+            postId: props.capturedPostId,
         })
         .then(() => {
             setFormValue('');

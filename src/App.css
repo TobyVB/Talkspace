@@ -638,17 +638,20 @@ form {
   }
 }
 .input-textarea {
-  background-color: rgba(255, 255, 255, 0);
+  background-color: rgba(0, 0, 0, 0.3);
   border: none;
   color: white;
-  margin: 2em 0em 0em 0em;
-  padding: 0;
+  padding: .5em;
+  padding-bottom: 2em;
   width: 100%;
   font-family: sans-serif;
   font-weight: 400;
   letter-spacing: .025rem;
+  font-size: .7rem;
   /* then line height below is general size to remove line height for most fonts */
   /* line-height: 0.75em; */
+  box-shadow: 0 0 5px rgba(0,0,0,.5);
+  outline: none;
 }
 .create-post-title {
   background-color: rgba(0, 0, 0, .3);
@@ -699,6 +702,7 @@ form {
   background-color: rgba(255, 255, 255, .1);
   box-shadow: 0px 0px 5px black;
   border-radius: 5px;
+  margin-bottom: 3em;
 }
 .post-body p {
   font-size: .9rem;
@@ -740,12 +744,10 @@ form {
 .input-options {
   display: flex;
   justify-content: space-between;
-  margin-bottom: .5em;
 }
 .edit-post-btns {
   display: flex;
-  justify-content: left;
-  margin-bottom: .5em;
+  justify-content: space-between;
   border-top: 1px solid rgba(62,166,255);
 }
 .edit-post-btn {
@@ -753,22 +755,9 @@ form {
   border: 1px solid rgba(62,166,255);
   color: rgba(255, 255, 255, .75);
   border-radius: 5px;
-  margin: 0 1em 1em 0;
+  margin-right: 1em;
+  height: 1.75em;
 }
-
-
-.post-input{
-  background-color: rgba(62,166,255, .5);
-  border: 1px solid rgba(62,166,255);
-  color: rgba(255, 255, 255, .75);
-  margin: 0 1em 1em 0;
-  border-top: none;
-  border-top-left-radius: 0;
-  border-top-right-radius: 0;
-  border-bottom-left-radius: 5px;
-  border-bottom-right-radius: 5px;
-}
-
 .cancel-insert {
   margin-right: 5em;
   background-color: rgba(255, 101, 62, 0.5);
@@ -781,31 +770,46 @@ form {
   color: rgba(255, 255, 255, .75);
   border-radius: 5px;
   margin: 0em 0em 1em 0;
+  height: 1.75em;
 }
 .insert-input {
   max-width: 100%;
   margin: 0;
+  word-wrap: break-word;
 }
 .input-chain {
   display: flex;
   flex-direction: column;
-  gap: .2em;
-  margin: 1em 0;
+  margin:0;
 }
 .post-image {
   width: 100%;
   flex-shrink: 0;
   margin: 0;
+  min-height: 10px;
 }
 .post-video {
   height: 45vw;
   width: 100%;
   margin: 0;
+  min-height: 10px;
 }
 .post-text {
   white-space:pre-wrap;
   flex-shrink: 0;
   margin: 0;
+  word-wrap: break-word;
+  min-height: 10px;
+}
+.text-highlight {
+  min-height: 10px;
+}
+.text-highlight:hover{
+  background-color: rgba(246, 255, 0, .2);
+  
+}
+.select-input{
+  color:rgba(62,166,255, .65)
 }
 /* ############################################ */
 /* ############# H O M E P A G E  ############# */
@@ -1007,6 +1011,16 @@ textarea {
 }
 .comment-impact {
   padding: 1em 0 0 .5em;
+}
+.delete-comment {
+  border: none;
+  background: none;
+  color: rgb(62,166,255);
+  text-shadow: 0px 0px 2px black, 0px 0px 2px black, 0px 0px 2px black;
+  letter-spacing: .05em;
+  cursor: pointer;
+  font-size: .7rem;
+  font-weight: bold;
 }
 /* ############################################ */
 /* ################ R E P L Y ################# */
@@ -1212,4 +1226,74 @@ textarea {
   background-color: rgb(57, 76, 95);
   padding: 2em;
   padding-top: 10vh;
+}
+/* ################################################ */
+.modifier-section {
+  position: fixed;
+  bottom: 0;
+  background-color: rgb(77, 77, 77);
+  width: 100%;
+  left: 0;
+  z-index: 2;
+  height: 25vh;
+}
+.insert-section-btn {
+  width: 90vw;
+  height: 10px;
+  position:absolute;
+  margin-left: -18px;
+  margin-top: -5px;
+  z-index: 10;
+  transition: .3s;
+}
+.insert-section-btn:hover {
+  background-color:rgba(89, 255, 0, .5);
+}
+.select-setting-btns {
+  
+}
+.swap-highlight{
+  background-color: rgba(246, 255, 0, .2);
+}
+.edit-post-types {
+}
+.margin-sliders {
+  display: flex;
+  flex-direction: column;
+  gap: .3em;
+  margin-left: .3em;
+}
+.margin-slider {
+  display: flex;
+  flex-direction: column;
+}
+.margin-sliders input {
+  margin: 0;
+  padding: 0;
+}
+.margin-slider p { 
+  padding: 0;
+  margin: 0;
+}
+.font-size {
+  display: flex;
+  gap: 1em;
+}
+.empty-field {
+  background-color: rgba(255, 47, 0, 0.5);
+  height: 18px;
+  text-align: center;
+}
+.ProseMirror:focus {
+  outline: none;
+  margin: 0;
+  padding: 0;
+}
+.ProseMirror:first-child {
+  margin: 0;
+  padding: 0;
+}
+.ProseMirror {
+  margin: 0;
+  padding: 0;
 }

@@ -103,6 +103,7 @@ export default function Comment(props){
             defaultPic: currentUser.defaultPic,
             type: "reply",
             unique: `${props.type?props.unique:unique}`,
+            postId: props.capturedPostId
         })
         .then(() => {
             setFormValue('');
@@ -255,7 +256,7 @@ export default function Comment(props){
                             <p className="comment-name">{props.username}</p>
                         </div>
                         <Clock createdAt={props.createdAt} type={props.type}/>
-                        <p onClick={deleteComment}>delete</p>
+                        <button className='delete-comment' onClick={deleteComment}>delete</button>
                     </div>
                     <div className={`container-full-comment`}>
                         <div className={`comment-chat-text`}>

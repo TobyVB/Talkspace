@@ -3,7 +3,7 @@ import { useCollectionData } from 'react-firebase-hooks/firestore';
 import { nanoid } from 'nanoid';
 import { query, orderBy, onSnapshot, 
     collection, getFirestore, doc, 
-    updateDoc, arrayUnion, arrayRemove
+    updateDoc, arrayUnion, arrayRemove, deleteDoc
 } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import CreateComment from "./CreateComment.js";
@@ -103,6 +103,26 @@ export default function ViewPost(props){
     function editPost(){
         props.editPost();
     }
+    function deletePost(){
+        const docRef = doc(db, 'posts', props.capturedPostId)
+        deleteDoc(docRef)
+        .then(() => {
+            console.log("notification deleted")
+        })
+        .then(() => {
+            const q = query(commentsRef, orderBy('createdAt'))
+            onSnapshot(q, async (snapshot) => {
+                snapshot.docs.forEach((document) => {
+                    const docRef = doc(db, 'comments', document.id)
+                    if(document.data().postId === props.capturedPostId){
+                        deleteDoc(docRef)
+                    } 
+                })
+            })
+
+        })
+        props.deletePost();
+    }
 
     // if text includes https://youtu.be/ copy the text until the next " " and put it in a variable
     // also hide or remove text that matches the created variable
@@ -112,6 +132,7 @@ export default function ViewPost(props){
     return (
         <div className="page-body post">
             { auth.currentUser.uid === foundPost.uid && <button className="edit-post-btn" disabled={pagePause && "+true"} onClick={editPost}>edit post</button>}
+            { auth.currentUser.uid === foundPost.uid && <button className="edit-post-btn" disabled={pagePause && "+true"} onClick={deletePost}>delete post</button>}
             <div className="view-post-container">
                 <div className="post-header">
                     <p 
