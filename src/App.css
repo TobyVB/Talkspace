@@ -787,6 +787,7 @@ form {
   flex-shrink: 0;
   margin: 0;
   min-height: 10px;
+  object-fit: cover;
 }
 .post-video {
   height: 45vw;
@@ -802,11 +803,21 @@ form {
   min-height: 10px;
 }
 .text-highlight {
+  margin-left: -33px;
   min-height: 10px;
+  border-left: 33px solid rgba(246, 255, 0, .2);
+  animation-name: highlightAnimation;
+  animation-duration: 1s;
+  animation-direction: alternate;
+  animation-iteration-count: infinite;
 }
-.text-highlight:hover{
-  background-color: rgba(246, 255, 0, .2);
-  
+@keyframes highlightAnimation {
+  from {
+    border-left: 33px solid rgba(246, 255, 0, .1);
+  }
+  to {
+    border-left: 33px solid rgba(246, 255, 0, .5);
+  }
 }
 .select-input{
   color:rgba(62,166,255, .65)
@@ -1234,26 +1245,32 @@ textarea {
   background-color: rgb(77, 77, 77);
   width: 100%;
   left: 0;
-  z-index: 2;
+  z-index: 20;
   height: 25vh;
 }
 .insert-section-btn {
-  width: 90vw;
+  width: 89.5vw;
   height: 10px;
   position:absolute;
-  margin-left: -18px;
+  margin-left: -17px;
   margin-top: -5px;
   z-index: 10;
   transition: .3s;
-}
-.insert-section-btn:hover {
   background-color:rgba(89, 255, 0, .5);
+  animation-name: insertAnimation;
+  animation-duration: 1s;
+  animation-iteration-count:infinite;
+}
+@keyframes insertAnimation {
+  from {
+    opacity: 100%;
+  }
+  to {
+    opacity: 20%;
+  }
 }
 .select-setting-btns {
   
-}
-.swap-highlight{
-  background-color: rgba(246, 255, 0, .2);
 }
 .edit-post-types {
 }
@@ -1283,17 +1300,4 @@ textarea {
   background-color: rgba(255, 47, 0, 0.5);
   height: 18px;
   text-align: center;
-}
-.ProseMirror:focus {
-  outline: none;
-  margin: 0;
-  padding: 0;
-}
-.ProseMirror:first-child {
-  margin: 0;
-  padding: 0;
-}
-.ProseMirror {
-  margin: 0;
-  padding: 0;
 }
