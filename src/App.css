@@ -755,7 +755,7 @@ form {
   border: 1px solid rgba(62,166,255);
   color: rgba(255, 255, 255, .75);
   border-radius: 5px;
-  margin-right: 1em;
+  margin-right: .5em;
   height: 1.75em;
 }
 .cancel-insert {
@@ -1269,14 +1269,9 @@ textarea {
     opacity: 20%;
   }
 }
-.select-setting-btns {
-  
-}
-.edit-post-types {
-}
 .margin-sliders {
   display: flex;
-  flex-direction: column;
+  /* flex-direction: column; */
   gap: .3em;
   margin-left: .3em;
 }
@@ -1300,4 +1295,10 @@ textarea {
   background-color: rgba(255, 47, 0, 0.5);
   height: 18px;
   text-align: center;
+}
+.select-setting-btns {
+  margin-bottom: .5em;
+}
+button strong {
+  font-size: 1rem;
 }

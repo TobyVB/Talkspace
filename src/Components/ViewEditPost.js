@@ -64,8 +64,8 @@ export default function ViewPost(props){
     const [newInput, setNewInput] = useState(false)
     function addInput(loc, type){
         setNewInput(true)
-        const newInitInput = {type: type, output: "", fontSize: "1rem", topMargin: ".5rem", bottomMargin: ".5rem", leftMargin: "0rem", rightMargin: "0rem", height: "30vh", initializing: true, deleting: false}
-        const newInput = {type: type, output: "", fontSize: "1rem", topMargin: ".5rem", bottomMargin: ".5rem", leftMargin: "0rem", rightMargin: "0rem", height: "30vh", initializing: false, deleting: false}
+        const newInitInput = {type: type, output: "", fontSize: "1rem", topMargin: "0rem", bottomMargin: "0rem", leftMargin: "0rem", rightMargin: "0rem", height: "30vh", initializing: true, deleting: false}
+        const newInput = {type: type, output: "", fontSize: "1rem", topMargin: "0rem", bottomMargin: "0rem", leftMargin: "0rem", rightMargin: "0rem", height: "30vh", initializing: false, deleting: false}
         const initArr = postObj.inputs
         const completedArr = postObj.inputs
         initArr.splice(loc, 0, newInitInput)
@@ -233,7 +233,7 @@ export default function ViewPost(props){
 // ##########################################################################
     function InsertBtns(props){
         return (
-            <>{!props.inputStart && !props.inputEnd && postObj.inputs > 0&&<button className="edit-post-btn cancel-insert" onClick={()=>setInsertingMode(false)}>cancel</button>}
+            // {!props.inputStart && !props.inputEnd && postObj.inputs > 0&&<button className="edit-post-btn cancel-insert" onClick={()=>setInsertingMode(false)}>cancel</button>}
                 <div className="edit-post-types">
                 <button disabled={inputDisabled && "+true"} className={"edit-post-btn"} 
                     onClick={()=> addInput(props.index, "text")}>text</button>
@@ -241,7 +241,8 @@ export default function ViewPost(props){
                     onClick={()=> addInput(props.index, "image")}>image</button>
                 <button disabled={inputDisabled && "+true"} className={"edit-post-btn"} 
                     onClick={()=> addInput(props.index, "video")}>video</button>
-            </div> </>
+                <button className="edit-post-btn cancel-insert" onClick={()=>setInsertingMode(false)}>cancel</button>
+            </div> 
             
         )
     }
@@ -271,8 +272,8 @@ export default function ViewPost(props){
     function Shift(props){
         return (
             <div>
-                <button onClick={()=>modifyInput(props.index-1)} disabled={props.index===0&&"+true"}>prev</button>
-                <button onClick={()=>modifyInput(props.index+1)} disabled={props.index===postObj.inputs.length-1&&"+true"}>next</button>
+                <button className="edit-post-btn" onClick={()=>modifyInput(props.index-1)} disabled={props.index===0&&"+true"}>prev</button>
+                <button className="edit-post-btn" onClick={()=>modifyInput(props.index+1)} disabled={props.index===postObj.inputs.length-1&&"+true"}>next</button>
             </div>
         )
     }
@@ -280,9 +281,9 @@ export default function ViewPost(props){
         
         return (
             <div>
-                {props.index === 0 && <button onClick={()=>insertingB4zero()}>insert -</button>}
-                {props.index > 0 && <button onClick={()=>inserting(props.index-1)}>insert -</button>}
-                <button onClick={()=>inserting(props.index)}>insert +</button>
+                {props.index === 0 && <button className="edit-post-btn" onClick={()=>insertingB4zero()}>insert <strong>-</strong></button>}
+                {props.index > 0 && <button className="edit-post-btn" onClick={()=>inserting(props.index-1)}>insert <strong>-</strong></button>}
+                <button className="edit-post-btn" onClick={()=>inserting(props.index)}>insert <strong>+</strong></button>
             </div>
         )
     }
@@ -292,7 +293,7 @@ export default function ViewPost(props){
             postObj.numInputs > 0 && 
             <div className={swapStart===index?"swap-highlight": showInsertBtns===index && !insertingMode &&"text-highlight"} >
             {/* {index === 0 && <p className="insert-section-btn" onClick={()=>inserting(-2)}></p>} */}
-
+                {insertPrevZero && insertingMode&& index === showInsertBtns && <p className="insert-section-btn"></p>}
                 <div className={`insert-input ${input.initializing === true ? "insert-input-animation"
                 : input.deleting === true && "delete-input-animation"}`}>  
                 {postObj && 
@@ -310,10 +311,10 @@ export default function ViewPost(props){
                 input.type === "image" 
                 &&
                 input.output===""?<p className="empty-field" onClick={()=> modifyInput(index)} style={
-                    {height: input.height}
+                    {height: input.height, marginTop: input.topMargin, marginBottom: input.bottomMargin}
                 }>add image</p>:
                 input.output === ""?"field empty":input.output &&<img className="post-image" onClick={()=> modifyInput(index)} src={input.output} style={
-                    {height: input.height}
+                    {height: input.height, marginTop: input.topMargin, marginBottom: input.bottomMargin}
                 }></img>}
                 {/* #########################   s h o w I n s e r t B t n s  === i n d e x   ######################## */}
                     {showInsertBtns === index || showInsertBtns === -2?
@@ -327,6 +328,7 @@ export default function ViewPost(props){
                             {insertPrevZero && insertingMode && showInsertBtns === 0 && <InsertBtns index={index} />}
                             {insertingMode && showInsertBtns === -2 && <InsertBtns index={0} />}
                         </div>
+                        {!insertingMode && <SelectSetting key={index+"a"}/>}
                         {/* ####################   M O D I F I C A T I O N   G U I   ################### */}
                         {!insertingMode &&
                         // #####################################################
@@ -362,27 +364,51 @@ export default function ViewPost(props){
                         // #########################################################
                         // ###################   M A R G I N   #####################
                             :marginSettings? <div className="margin-sliders"><div className="margin-slider"><p>top margin</p>
-                        <input name="topMargin" type="range" min="0" max="20" step=".1" value={input.topMargin.slice(0, -3)} 
-                            onChange={event => changeTopMargin(index, event.target.value)}>
-                        </input></div>
+                        <select  onChange={e => changeTopMargin(index, e.target.value)}>
+                            <option selected={input.topMargin === "0rem"} value="0">none</option>
+                            <option selected={input.topMargin === ".5rem"} value=".5">.5</option>
+                            <option selected={input.topMargin === "1rem"} value="1">1</option>
+                            <option selected={input.topMargin === "2rem"} value="2">2</option>
+                            <option selected={input.topMargin === "4rem"} value="4">4</option>
+                            <option selected={input.topMargin === "8rem"} value="8">8</option>
+                        </select>
+                        </div>
                         <div className="margin-slider"><p>bottom margin</p>
-                        <input name="bottomMargin" type="range" min="0" max="20" step=".1" value={input.bottomMargin.slice(0, -3)} 
-                            onChange={event => changeBottomMargin(index, event.target.value)}>
-                        </input></div>
-                        <div className="margin-slider"><p>left margin</p>
-                        <input name="leftMargin" type="range" min="0" max="20" step=".1" value={input.leftMargin.slice(0, -3)} 
-                            onChange={event => changeLeftMargin(index, event.target.value)}>
-                        </input></div>
+                        <select  onChange={e => changeBottomMargin(index, e.target.value)}>
+                            <option selected={input.bottomMargin === "0rem"} value="0">none</option>
+                            <option selected={input.bottomMargin === ".5rem"} value=".5">.5</option>
+                            <option selected={input.bottomMargin === "1rem"} value="1">1</option>
+                            <option selected={input.bottomMargin === "2rem"} value="2">2</option>
+                            <option selected={input.bottomMargin === "4rem"} value="4">4</option>
+                            <option selected={input.bottomMargin === "8rem"} value="8">8</option>
+                        </select>
+                        </div>
+                        {input.type !== "image" &&<><div className="margin-slider"><p>left margin</p>
+                        <select  onChange={e => changeLeftMargin(index, e.target.value)}>
+                            <option selected={input.leftMargin === "0rem"} value="0">none</option>
+                            <option selected={input.leftMargin === ".5rem"} value=".5">.5</option>
+                            <option selected={input.leftMargin === "1rem"} value="1">1</option>
+                            <option selected={input.leftMargin === "2rem"} value="2">2</option>
+                            <option selected={input.leftMargin === "4rem"} value="4">4</option>
+                            <option selected={input.leftMargin === "8rem"} value="8">8</option>
+                        </select>
+                        </div>
                         <div className="margin-slider"><p>right margin</p>
-                        <input name="rightMargin" type="range" min="0" max="20" step=".1" value={input.rightMargin.slice(0, -3)} 
-                            onChange={event => changeRightMargin(index, event.target.value)}>
-                        </input></div></div>
+                        <select  onChange={e => changeRightMargin(index, e.target.value)}>
+                            <option selected={input.rightMargin === "0rem"} value="0">none</option>
+                            <option selected={input.rightMargin === ".5rem"} value=".5">.5</option>
+                            <option selected={input.rightMargin === "1rem"} value="1">1</option>
+                            <option selected={input.rightMargin === "2rem"} value="2">2</option>
+                            <option selected={input.rightMargin === "4rem"} value="4">4</option>
+                            <option selected={input.rightMargin === "8rem"} value="8">8</option>
+                        </select>
+                        </div></>}</div>
                         
                         // #####################################################
                         // ###################   T E X T   #####################
-                        : textarea &&
+                        : textarea && 
                         input.type === "text" ?<>
-                        {!input.deleting ? 
+                        {!input.deleting ? !insertingMode &&
                         <textarea
                             autoFocus="+true"
                             rows={4}
@@ -392,11 +418,10 @@ export default function ViewPost(props){
                             className={`input-textarea insert-input`}
                             value={input.output}
                             onChange={event => updateInputOutput(index, event.target.value)}/>
-                            
                             :<div></div>}
                         </>
                         : input.type === "video" ?<>
-                        {!input.deleting ?
+                        {!input.deleting ? !insertingMode &&
                         <textarea
                             autoFocus="+true"
                             name={"input"+JSON.stringify(index)}
@@ -406,7 +431,7 @@ export default function ViewPost(props){
                             onChange={event => updateInputOutput(index, event.target.value)}/>
                             :<div></div>}</>
                         : input.type === "image" &&<>
-                        {!input.deleting ?
+                        {!input.deleting ? !insertingMode &&
                         <textarea
                             autoFocus="+true" 
                             name={"input"+JSON.stringify(index)}
@@ -416,7 +441,7 @@ export default function ViewPost(props){
                             onChange={event => updateInputOutput(index, event.target.value)}/>
                             :<div></div>}</>  
                         }
-                        {!insertingMode && <SelectSetting key={index+"a"}/>}
+                        {/* {!insertingMode && <SelectSetting key={index+"a"}/>} */}
                     </div>
                     /* #########################   s h o w I n s e r t B t n s  ===  - 1   ######################## */
                     :showInsertBtns === -1 && 
@@ -427,7 +452,7 @@ export default function ViewPost(props){
                         value={postObj.title}
                         onChange={(event) => setPostObj({...postObj, title: event.target.value})}/>}
                 </div>
-                {insertingMode&& index ===  showInsertBtns && <p className="insert-section-btn"></p>}
+                {!insertPrevZero && insertingMode&& index === showInsertBtns && <p className="insert-section-btn"></p>}
             {/* <p className="insert-section-btn" onClick={()=>inserting(index)}></p> */}
             </div>
         )
@@ -447,7 +472,7 @@ export default function ViewPost(props){
                 </div>
                 <h4 className="post-title" onClick={()=> modifyInput(0)}>{postObj.title}</h4>
                 <div className="post-body">
-                    {postObj && postObj.inputs.length === 0 && insertingMode===false&&<p className="insert-section-btn" onClick={()=>inserting(0)}></p>}
+                    {postObj && postObj.inputs.length === 0 && !insertingMode&&<p className="insert-section-btn" onClick={()=>inserting(0)}></p>}
                     {postObj && postObj.inputs.length === 0 && insertingMode && <InsertBtns index={0} />}
                     <div className="input-chain">
                         {postObj && postObj.inputs.length > 0 && inputs(postObj.inputs)}
