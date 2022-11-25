@@ -7,7 +7,7 @@ body {
   margin: 0;
   font-family: sans-serif;
   letter-spacing: .025rem;
-  color: rgba(255, 255, 255, 0.684);
+  /* color: rgba(255, 255, 255, 0.684); */
   background-color: black;
 }
 .flex {
