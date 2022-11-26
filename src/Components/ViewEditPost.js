@@ -3,13 +3,8 @@ import { query, orderBy, onSnapshot, collection,
     getFirestore, doc, updateDoc
 } from "firebase/firestore";
 import { getAuth} from "firebase/auth";
-import { CKEditor, MediaEmbed } from '@ckeditor/ckeditor5-react';
-import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 import parse from 'html-react-parser';
-// import MediaEmbed from '@ckeditor/ckeditor5-media-embed/src/mediaembed';
-
-
-
+import TextEditor from "./TextEditor";
 
 export default function ViewPost(props){
     const db = getFirestore();
@@ -69,24 +64,6 @@ export default function ViewPost(props){
 // ##########################################################################
 
 
-    const [addData, setVal] = useState("");
-    const [addedData, showData] = useState(0);
-    const handleChange = (e, editor) => {
-        const data = editor.getData();
-        setVal(data)
-    }
-    // ClassicEditor
-    // .create( document.querySelector( '#editor' ), {
-    //     plugins: [ MediaEmbed ],
-    //     toolbar: [ 'mediaEmbed'],
-    //     mediaEmbed: {
-    //         previewsInData: true
-    //     }
-    // } )
-    // .then( )
-    // .catch( );
-
-    
 // ##########################################################################
     return (
         <div className="page-body post">
@@ -103,15 +80,7 @@ export default function ViewPost(props){
                 <h4 className="post-title">{postObj.title}</h4>
                 <div className="post-body">
 
-                    <div>
-                        <div>
-                            <button style={{backgroundColor:'black', color:'white'}} onClick={()=>showData(!addedData)}>{addedData ? 'Hide Data' : 'Show Data'}</button>
-                        </div>
-                        <CKEditor editor={ClassicEditor} data={addData} onChange={handleChange}/>
-                        <div>
-                            {addedData ? parse(addData) : ''}
-                        </div>
-                    </div>
+                    <TextEditor />
 
                 </div>
             </div>
