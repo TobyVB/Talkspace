@@ -37,6 +37,7 @@ export default function CreatePost(props) {
 
   function createPost(e) {
     e.preventDefault();
+    setPostObj({ ...postObj, text: capturedValue });
     addDoc(postsRef, postObj)
       // UPDATE HAS BEEN UPDATED...
       .then(() => {
@@ -58,11 +59,15 @@ export default function CreatePost(props) {
   }
 
   // ##########################################################################
-  const [text, setText] = useState("");
+  const [capturedValue, setCapturedValue] = useState("");
+  const captureValue = (val) => setCapturedValue(val);
+  useEffect(() => {
+    setPostObj({ ...postObj, text: capturedValue });
+  }, [capturedValue]);
   // ##########################################################################
 
   return (
-    <div className="create-post page-body">
+    <div className="page-body">
       <h1 className="create-post-h1">Create Post</h1>
       {auth.currentUser && (
         <div className="create-post-form" onSubmit={createPost}>
@@ -77,15 +82,10 @@ export default function CreatePost(props) {
             }
           />
           <div className="post-body">
-            <TextEditor />
+            <TextEditor createPost={true} captureValue={captureValue} />
           </div>
           <hr></hr>
-          <button
-            onClick={createPost}
-            className="create-post-btn"
-            type="submit"
-            disabled={!postObj.title}
-          >
+          <button onClick={createPost} type="submit" disabled={!postObj.title}>
             create post
           </button>
         </div>

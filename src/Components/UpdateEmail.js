@@ -30,10 +30,10 @@
 //     }
 
 //     return (
-//         <div className="page-body update-email">
+//         <div className="page-body settings">
 //             <h1>Update Email</h1>
 //             <button onClick={props.cancel}>cancel</button>
-//             <input 
+//             <input
 //                 onChange={(event) => setEmail(event.target.value)}
 //                 placeholder="enter new email"
 //                 value={email}

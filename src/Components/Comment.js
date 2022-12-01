@@ -255,13 +255,13 @@ export default function Comment(props) {
   return (
     <div
       className={`comment ${
-        props.unique === props.capturedUnique && `targetedComment`
+        props.unique === props.capturedUnique && `flashing-animation`
       }${
         props.type === "reply" ? " comment-type-reply" : " comment-type-comment"
       }`}
       onClick={props.resetUnique}
     >
-      <div className="comment-container-main flex">
+      <div className="comment-container-main">
         <div>
           <div className={`comment-full-header`}>
             <img
@@ -282,7 +282,7 @@ export default function Comment(props) {
             <div className={`comment-chat-text`}>
               <p className="comment-text">{props.comment}</p>
             </div>
-            <div className="flex comment-impact">
+            <div className="comment-impact">
               <div className="rate-chatMessage">
                 <p
                   className={`hidden-impact ${
@@ -309,17 +309,15 @@ export default function Comment(props) {
                 )}
               </div>
               {!showForm && !replyPressed && (
-                <button className="reply-btn" onClick={startShowForm}>
-                  REPLY
-                </button>
+                <button onClick={startShowForm}>REPLY</button>
               )}
             </div>
             {showForm && (
               <div
                 className={`create-reply-form ${
                   startCreateReply
-                    ? "startReplyAnimation"
-                    : endCreateReply && "endReplyAnimation"
+                    ? "gradual-open-animation"
+                    : endCreateReply && "gradual-close-animation"
                 }`}
               >
                 <textarea
@@ -346,7 +344,6 @@ export default function Comment(props) {
                     </button>
                   )}
                   <button
-                    className="sendComment-btn"
                     type="submit"
                     disabled={!formValue}
                     onClick={createComment}
@@ -372,8 +369,8 @@ export default function Comment(props) {
               <div
                 className={
                   showRepliesClass === true
-                    ? `open-reply-chain`
-                    : hideRepliesClass && `close-reply-chain`
+                    ? `gradual-open-animation`
+                    : hideRepliesClass && `gradual-close-animation`
                 }
               >
                 {sessionStorage.getItem(props.unique) === "true" &&

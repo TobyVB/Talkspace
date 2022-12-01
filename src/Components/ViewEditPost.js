@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-
 import {
   query,
   orderBy,
@@ -69,23 +68,16 @@ export default function ViewPost(props) {
     }
   }, [foundPost]);
   // ##########################################################################
-
+  const [capturedValue, setCapturedValue] = useState();
+  const captureValue = (val) => setCapturedValue(val);
   // ##########################################################################
 
   return (
-    <div className="page-body post">
-      <button
-        disabled={pagePause && "+true"}
-        className="edit-post-btn"
-        onClick={cancel}
-      >
+    <div className="page-body">
+      <button disabled={pagePause && "+true"} onClick={cancel}>
         cancel
       </button>
-      <button
-        disabled={pagePause && "+true"}
-        className="edit-post-btn"
-        onClick={save}
-      >
+      <button disabled={pagePause && "+true"} onClick={save}>
         save
       </button>
       <div className="view-post-container">
@@ -102,22 +94,16 @@ export default function ViewPost(props) {
             className="post-defaultPic"
           />
         </div>
-        <h4 className="post-title">{postObj.title}</h4>
+        <h4 className="post-title">{foundPost.title}</h4>
         <div className="post-body">
-          <TextEditor />
+          <TextEditor
+            createPost={false}
+            foundValue={foundPost.text}
+            captureValue={captureValue}
+            setPostObj={setPostObj}
+          />
         </div>
       </div>
     </div>
   );
 }
-// #############################
-// #############################
-// #############################
-// #############################
-// #############################
-// #############################
-// #############################
-// #############################
-// #############################
-// #############################
-// #############################

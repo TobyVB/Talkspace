@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
+import parse from "html-react-parser";
 import { useCollectionData } from "react-firebase-hooks/firestore";
 import { nanoid } from "nanoid";
 import {
@@ -136,27 +137,15 @@ export default function ViewPost(props) {
     props.deletePost();
   }
 
-  // if text includes https://youtu.be/ copy the text until the next " " and put it in a variable
-  // also hide or remove text that matches the created variable
-  // where the removed or hidden text was, put in an iframe
-
   return (
-    <div className="page-body post">
+    <div className="page-body">
       {auth.currentUser.uid === foundPost.uid && (
-        <button
-          className="edit-post-btn"
-          disabled={pagePause && "+true"}
-          onClick={editPost}
-        >
+        <button disabled={pagePause && "+true"} onClick={editPost}>
           edit post
         </button>
       )}
       {auth.currentUser.uid === foundPost.uid && (
-        <button
-          className="edit-post-btn"
-          disabled={pagePause && "+true"}
-          onClick={deletePost}
-        >
+        <button disabled={pagePause && "+true"} onClick={deletePost}>
           delete post
         </button>
       )}
@@ -176,37 +165,7 @@ export default function ViewPost(props) {
         </div>
         <h4 className="post-title">{foundPost.title}</h4>
         <div className="post-body">
-          <div className="input-chain">
-            {foundPost &&
-              foundPost.inputs.map((input) =>
-                foundPost && input.type === "text" ? (
-                  <p
-                    className="post-text"
-                    style={{
-                      fontSize: input.fontSize,
-                      marginTop: input.topMargin,
-                    }}
-                  >
-                    {input.output}
-                  </p>
-                ) : input.type === "video" ? (
-                  input.output && (
-                    <iframe
-                      className="post-video"
-                      src={`https://www.youtube.com/embed/${input.output.slice(
-                        17
-                      )}`}
-                      frameBorder="0"
-                      allowFullScreen
-                    ></iframe>
-                  )
-                ) : (
-                  input.type === "image" && (
-                    <img className="post-image" src={input.output}></img>
-                  )
-                )
-              )}
-          </div>
+          <p>{foundPost && parse(foundPost.text)}</p>
         </div>
         <button className="follow-post" onClick={followPost}>
           {foundPost && foundPost.follows.includes(props.userDataId)
