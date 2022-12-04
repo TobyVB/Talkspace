@@ -174,30 +174,24 @@ export default function ViewPost(props) {
         </button>
       </div>
       <CreateComment
-        capturedPostId={props.capturedPostId}
+        replyTo={props.capturedPostId}
         id={foundUser.id}
         uid={foundUser.uid}
+        type="comment"
+        capturedPostId={props.capturedPostId}
       />
-      <div className="chatMessages">
+      <div className="">
         {comments &&
           comments.map(
             (comment) =>
               comment.replyTo === props.capturedPostId && (
                 <div key={nanoid()}>
                   <Comment
-                    comment={comment.body}
-                    createdAt={comment.createdAt}
-                    approval={comment.approval}
-                    disapproval={comment.disapproval}
-                    username={comment.username}
-                    uid={comment.uid}
-                    id={comment.id}
+                    comment={comment}
                     type={"comment"}
                     sendUID={props.sendUID}
-                    defaultPic={comment.defaultPic}
                     key={nanoid()}
                     comments={comments}
-                    unique={comment.unique}
                     capturedUnique={props.capturedUnique}
                     resetUnique={
                       comment.unique === props.capturedUnique
@@ -207,7 +201,6 @@ export default function ViewPost(props) {
                     capturedPostId={props.capturedPostId}
                     currentCommentId={props.currentCommentId}
                     page={props.page}
-                    chain={comment.chain}
                   />
                   {props.capturedUnique === comment.unique && (
                     <div ref={scrollTarget}></div>

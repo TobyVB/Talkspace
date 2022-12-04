@@ -44,12 +44,14 @@ export default function CreateComment(props) {
       uid: auth.currentUser.uid,
       approval: [],
       disapproval: [],
-      type: "comment",
-      replyTo: props.capturedPostId,
+      type: props.type,
+      // replyTo: props.capturedPostId,
+      replyTo: props.replyTo,
       username: currentUser.username,
       defaultPic: currentUser.defaultPic,
-      chain: unique,
-      unique: unique,
+      // chain: unique,
+      chain: `${props.type === "comment" ? unique : props.chain}`,
+      unique: `${props.type === "comment" ? unique : props.unique}`,
       createdAt: serverTimestamp(),
       postId: props.capturedPostId,
     })
@@ -62,34 +64,69 @@ export default function CreateComment(props) {
         onSnapshot(q, async (snapshot) => {
           snapshot.docs.forEach((document) => {
             const docRef = doc(db, "comments", document.id);
-            if (document.data().unique === unique) {
-              console.log(unique);
-              updateDoc(docRef, {
-                id: document.id,
-              });
+            if (props.type === "comment") {
+              if (document.data().unique === unique) {
+                console.log(unique);
+                updateDoc(docRef, {
+                  id: document.id,
+                });
+              }
+            } else if (props.type === "reply") {
+              if (document.data().unique === props.unique) {
+                console.log(unique);
+                updateDoc(docRef, {
+                  id: document.id,
+                });
+              }
             }
           });
         });
       })
       // create notification for the replyTo
       .then(() => {
-        if (currentUser.uid !== props.uid) {
-          addDoc(notifyRef, {
-            to: props.uid,
-            from: currentUser.id,
-            type: "comment",
-            message: `${currentUser.username} commented on your post.`,
-            postId: props.capturedPostId,
-            unique: unique,
-            createdAt: serverTimestamp(),
-          })
-            // UPDATE HAS BEEN UPDATED...
-            .then(() => {
+        if (props.type === "comment") {
+          if (currentUser.uid !== props.uid) {
+            addDoc(notifyRef, {
+              to: props.uid,
+              from: currentUser.id,
+              type: "comment",
+              message: `${currentUser.username} commented on your post.`,
+              postId: props.capturedPostId,
+              unique: unique,
+              createdAt: serverTimestamp(),
+            })
+              // UPDATE HAS BEEN UPDATED...
+              .then(() => {
+                const q = query(notifyRef, orderBy("createdAt"));
+                onSnapshot(q, async (snapshot) => {
+                  snapshot.docs.forEach((document) => {
+                    const docRef = doc(db, "notifications", document.id);
+                    if (document.data().unique === unique) {
+                      console.log(unique);
+                      updateDoc(docRef, {
+                        id: document.id,
+                      });
+                    }
+                  });
+                });
+              });
+          }
+        } else if (props.type === "reply")
+          if (currentUser.uid !== props.commentUID) {
+            addDoc(notifyRef, {
+              to: props.commentUID,
+              from: currentUser.id,
+              type: "reply",
+              message: `${currentUser.username} replied to your comment.`,
+              postId: props.capturedPostId,
+              unique: props.unique,
+              createdAt: serverTimestamp(),
+            }).then(() => {
               const q = query(notifyRef, orderBy("createdAt"));
               onSnapshot(q, async (snapshot) => {
                 snapshot.docs.forEach((document) => {
                   const docRef = doc(db, "notifications", document.id);
-                  if (document.data().unique === unique) {
+                  if (document.data().unique === props.unique) {
                     console.log(unique);
                     updateDoc(docRef, {
                       id: document.id,
@@ -98,7 +135,7 @@ export default function CreateComment(props) {
                 });
               });
             });
-        }
+          }
       });
     setUnique(nanoid());
   }
