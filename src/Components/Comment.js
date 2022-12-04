@@ -1,7 +1,5 @@
 import { getAuth } from "firebase/auth";
 import {
-  arrayRemove,
-  arrayUnion,
   doc,
   getFirestore,
   updateDoc,
@@ -13,8 +11,9 @@ import {
   addDoc,
   deleteDoc,
 } from "firebase/firestore";
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import Clock from "./Utils/Clock.js";
+import Impact from "./Utils/Impact.js";
 
 import { nanoid } from "nanoid";
 
@@ -24,62 +23,6 @@ export default function Comment(props) {
   const commentsRef = collection(db, "comments");
   const notifyRef = collection(db, "notifications");
   const [formValue, setFormValue] = useState("");
-  const [approveImpactSelected, setApproveImpactSelected] = useState(false);
-  const [disapproveImpactSelected, setDisapproveImpactSelected] =
-    useState(false);
-
-  function updateApprove(e) {
-    e.preventDefault();
-    // e.stopPropagation();
-    const docRef = doc(db, "comments", props.id);
-    if (!props.approval.includes(auth.currentUser.uid)) {
-      updateDoc(docRef, {
-        approval: arrayUnion(auth.currentUser.uid),
-        disapproval: arrayRemove(auth.currentUser.uid),
-      }).then(() => {
-        setApproveImpactSelected(true);
-        setDisapproveImpactSelected(false);
-        console.log("approved");
-      });
-    } else {
-      updateDoc(docRef, {
-        approval: arrayRemove(auth.currentUser.uid),
-      }).then(() => {
-        setApproveImpactSelected(false);
-      });
-    }
-  }
-  function updateDisapprove(e) {
-    e.preventDefault();
-    // e.stopPropagation();
-    const docRef = doc(db, "comments", props.id);
-    if (!props.disapproval.includes(auth.currentUser.uid)) {
-      updateDoc(docRef, {
-        approval: arrayRemove(auth.currentUser.uid),
-        disapproval: arrayUnion(auth.currentUser.uid),
-      }).then(() => {
-        setDisapproveImpactSelected(true);
-        setApproveImpactSelected(false);
-        console.log("disapproved");
-      });
-    } else {
-      updateDoc(docRef, {
-        disapproval: arrayRemove(auth.currentUser.uid),
-      }).then(() => {
-        setDisapproveImpactSelected(false);
-      });
-    }
-  }
-
-  const approveImpactClass = approveImpactSelected
-    ? "approve-impact-selected"
-    : "";
-  const disapproveImpactClass = disapproveImpactSelected
-    ? "disapprove-impact-selected"
-    : "";
-
-  const approves = props.approval.length;
-  const disapproves = props.disapproval.length;
 
   const [unique, setUnique] = useState(nanoid());
 
@@ -185,7 +128,6 @@ export default function Comment(props) {
   }
 
   // ACCESS REPLIES
-
   const [replyDisabled, setReplyDisabled] = useState(false);
   const [showRepliesClass, setShowRepliesClass] = useState(false);
   const [hideRepliesClass, setHideRepliesClass] = useState(false);
@@ -265,7 +207,7 @@ export default function Comment(props) {
         <div>
           <div className={`comment-full-header`}>
             <img
-              className="comment-profile-pic"
+              className="mini-defaultPic"
               alt="user"
               src={props.defaultPic}
               onClick={() => props.sendUID(props.uid)}
@@ -283,31 +225,11 @@ export default function Comment(props) {
               <p className="comment-text">{props.comment}</p>
             </div>
             <div className="comment-impact">
-              <div className="rate-chatMessage">
-                <p
-                  className={`hidden-impact ${
-                    props.approval.includes(auth.currentUser.uid) &&
-                    `hidden-impact-bright`
-                  } ${approveImpactClass}`}
-                  onClick={updateApprove}
-                >
-                  👍
-                </p>
-                {approves > 0 && <span className="numImpact">{approves}</span>}
-
-                <p
-                  className={`hidden-impact ${
-                    props.disapproval.includes(auth.currentUser.uid) &&
-                    `hidden-impact-bright`
-                  } ${disapproveImpactClass}`}
-                  onClick={updateDisapprove}
-                >
-                  👎
-                </p>
-                {disapproves > 0 && (
-                  <span className="numImpact">{disapproves}</span>
-                )}
-              </div>
+              <Impact
+                approval={props.approval}
+                disapproval={props.disapproval}
+                id={props.id}
+              />
               {!showForm && !replyPressed && (
                 <button onClick={startShowForm}>REPLY</button>
               )}
@@ -370,7 +292,9 @@ export default function Comment(props) {
                 className={
                   showRepliesClass === true
                     ? `gradual-open-animation`
-                    : hideRepliesClass && `gradual-close-animation`
+                    : hideRepliesClass
+                    ? `gradual-close-animation`
+                    : ``
                 }
               >
                 {sessionStorage.getItem(props.unique) === "true" &&

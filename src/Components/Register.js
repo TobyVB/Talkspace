@@ -156,7 +156,7 @@ export default function Register(props) {
 
   return (
     <>
-      <div className="register-page page-body">
+      <div className="page-style page-body">
         <div className="form-register-email">
           <h1>SIGN UP</h1>
           <label htmlFor="email">Email</label>

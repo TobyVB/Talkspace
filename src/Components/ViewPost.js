@@ -160,12 +160,12 @@ export default function ViewPost(props) {
           <img
             alt={foundUser.username}
             src={foundUser.defaultPic}
-            className="post-defaultPic"
+            className="mini-defaultPic"
           />
         </div>
         <h4 className="post-title">{foundPost.title}</h4>
         <div className="post-body">
-          <p>{foundPost && parse(foundPost.text)}</p>
+          <div>{foundPost && parse(foundPost.text)}</div>
         </div>
         <button className="follow-post" onClick={followPost}>
           {foundPost && foundPost.follows.includes(props.userDataId)

@@ -65,13 +65,13 @@ export default function ViewProfile(props) {
   }
 
   return (
-    <div className="profile page-body">
+    <div className="page-style page-body">
       <button onClick={props.editProfile}>edit profile</button>
       <h2 className="profile-header-text">{`${currentUser.username}`}</h2>
       <div className="profile-jumbotron">
         <img
           alt="profile"
-          className="edit-profile-picture"
+          className="profile-picture"
           src={image && currentUser.defaultPic}
         />
         <div className="profile-info-section">

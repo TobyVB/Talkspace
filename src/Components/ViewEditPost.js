@@ -91,7 +91,7 @@ export default function ViewPost(props) {
           <img
             alt={foundUser.username}
             src={foundUser.defaultPic}
-            className="post-defaultPic"
+            className="mini-defaultPic"
           />
         </div>
         <h4 className="post-title">{foundPost.title}</h4>

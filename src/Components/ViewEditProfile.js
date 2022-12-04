@@ -115,7 +115,7 @@ export default function ViewEditProfile(props) {
   };
 
   return (
-    <div className="edit-profile profile">
+    <div className="page-style page-body">
       {/* ############### E D I T   P R O F I L E   P H O T O ################ */}
       {hideEditAboutMe && hideEditImage && (
         <div className="edit-profile-section">
@@ -124,7 +124,6 @@ export default function ViewEditProfile(props) {
       )}
       {!hideEditImage && (
         <div className="edit-profile-section">
-          <button onClick={cancelEditImage}>cancel</button>
           <div className="edit-defaultPic">
             <img
               alt="profile"
@@ -137,6 +136,7 @@ export default function ViewEditProfile(props) {
               accept=".jpg, .jpeg, .png"
               onChange={handleImageChange}
             />
+            <button onClick={cancelEditImage}>cancel</button>
           </div>
         </div>
       )}

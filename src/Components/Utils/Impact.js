@@ -1,76 +1,96 @@
-import {getAuth} from 'firebase/auth'
-import {arrayRemove, arrayUnion, doc,
-   getFirestore, updateDoc
-} from 'firebase/firestore'
-import React from 'react';
+import { getAuth } from "firebase/auth";
+import {
+  arrayRemove,
+  arrayUnion,
+  doc,
+  getFirestore,
+  updateDoc,
+} from "firebase/firestore";
+import React, { useState } from "react";
 
+export default function Impact(props) {
+  const auth = getAuth();
+  const db = getFirestore();
 
-export default function Impact(props){
+  const [approveImpactSelected, setApproveImpactSelected] = useState(false);
+  const [disapproveImpactSelected, setDisapproveImpactSelected] =
+    useState(false);
 
-    const auth = getAuth();
-    const db = getFirestore()
-    const { text, uid, username} = props.message;
-    const messageClass = auth.currentUser 
-      ? uid === auth.currentUser.uid 
-        ? 'sent' : 'received' 
-      : 'received';
+  const approves = props.approval.length;
+  const disapproves = props.disapproval.length;
 
-    const [approveImpactSelected, setApproveImpactSelected] = React.useState(false);
-    const [disapproveImpactSelected, setDisapproveImpactSelected] = React.useState(false);
-
-    function updateApprove(e){
-        e.stopPropagation();
-        const docRef = doc(db, 'messages', props.id)
-        updateDoc(docRef, {
-          approval: arrayUnion(auth.currentUser.uid),
-          disapproval: arrayRemove(auth.currentUser.uid)
-        })
-        .then(() => {
-          setApproveImpactSelected(true)
-          setDisapproveImpactSelected(false)
-          console.log("approved")
-        })
+  function updateApprove(e) {
+    e.preventDefault();
+    // e.stopPropagation();
+    const docRef = doc(db, "comments", props.id);
+    if (!props.approval.includes(auth.currentUser.uid)) {
+      updateDoc(docRef, {
+        approval: arrayUnion(auth.currentUser.uid),
+        disapproval: arrayRemove(auth.currentUser.uid),
+      }).then(() => {
+        setApproveImpactSelected(true);
+        setDisapproveImpactSelected(false);
+        console.log("approved");
+      });
+    } else {
+      updateDoc(docRef, {
+        approval: arrayRemove(auth.currentUser.uid),
+      }).then(() => {
+        setApproveImpactSelected(false);
+      });
     }
-    function updateDisapprove(e){
-        e.stopPropagation();
-        const docRef = doc(db, 'messages', props.id)
-        updateDoc(docRef, {
-            approval: arrayRemove(auth.currentUser.uid),
-            disapproval: arrayUnion(auth.currentUser.uid)
-        })
-        .then(() => {
-            setDisapproveImpactSelected(true)
-            setApproveImpactSelected(false)
-            console.log("disapproved")
-        })
+  }
+  function updateDisapprove(e) {
+    e.preventDefault();
+    // e.stopPropagation();
+    const docRef = doc(db, "comments", props.id);
+    if (!props.disapproval.includes(auth.currentUser.uid)) {
+      updateDoc(docRef, {
+        approval: arrayRemove(auth.currentUser.uid),
+        disapproval: arrayUnion(auth.currentUser.uid),
+      }).then(() => {
+        setDisapproveImpactSelected(true);
+        setApproveImpactSelected(false);
+        console.log("disapproved");
+      });
+    } else {
+      updateDoc(docRef, {
+        disapproval: arrayRemove(auth.currentUser.uid),
+      }).then(() => {
+        setDisapproveImpactSelected(false);
+      });
     }
-    function removeImpact(){
-        const docRef = doc(db, 'messages', props.id)
-        updateDoc(docRef, {
-            approval: arrayRemove(auth.currentUser.uid),
-            disapproval: arrayRemove(auth.currentUser.uid)
-        })
-        .then(() => {
-            setDisapproveImpactSelected(false)
-            setApproveImpactSelected(false)
-            console.log("impact removed")
-        })
-    }
-
-     // if uid in approval then add class 'voteCasted'
-     const approveImpactClass = approveImpactSelected? 'approve-impact-selected': ''
-     // if uid in disapproval then add class 'votedCasted'
-     const disapproveImpactClass = disapproveImpactSelected? 'disapprove-impact-selected': ''
-
-    return (
-        <div className="rate-chatMessage">
-            <p className={`hidden-impact ${approveImpactClass}`} 
-                onClick={updateApprove}>👍</p>
-            <p className={`hidden-impact ${disapproveImpactClass}`} 
-                onClick={updateDisapprove}>👎</p>
-            <p className="impact-metrics hidden-impact">📊</p>
-            <p className="impact-metrics hidden-impact" 
-                onClick={removeImpact}>🚫</p>
-        </div>
-    )
+  }
+  // if uid in approval then add class 'voteCasted'
+  const approveImpactClass = approveImpactSelected
+    ? "approve-impact-selected"
+    : "";
+  // if uid in disapproval then add class 'votedCasted'
+  const disapproveImpactClass = disapproveImpactSelected
+    ? "disapprove-impact-selected"
+    : "";
+  return (
+    <div className="rate-chatMessage">
+      <p
+        className={`hidden-impact ${
+          props.approval.includes(auth.currentUser.uid) &&
+          `hidden-impact-bright`
+        } ${approveImpactClass}`}
+        onClick={updateApprove}
+      >
+        👍
+      </p>
+      {approves > 0 && <span className="numImpact">{approves}</span>}
+      <p
+        className={`hidden-impact ${
+          props.disapproval.includes(auth.currentUser.uid) &&
+          `hidden-impact-bright`
+        } ${disapproveImpactClass}`}
+        onClick={updateDisapprove}
+      >
+        👎
+      </p>
+      {disapproves > 0 && <span className="numImpact">{disapproves}</span>}
+    </div>
+  );
 }
