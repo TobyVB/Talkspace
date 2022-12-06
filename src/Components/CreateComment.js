@@ -18,7 +18,6 @@ export default function CreateComment(props) {
   const db = getFirestore();
   const commentsRef = collection(db, "comments");
   const notifyRef = collection(db, "notifications");
-
   const [formValue, setFormValue] = useState("");
 
   const usersRef = collection(db, "users");
@@ -45,11 +44,9 @@ export default function CreateComment(props) {
       approval: [],
       disapproval: [],
       type: props.type,
-      // replyTo: props.capturedPostId,
       replyTo: props.replyTo,
       username: currentUser.username,
       defaultPic: currentUser.defaultPic,
-      // chain: unique,
       chain: `${props.type === "comment" ? unique : props.chain}`,
       unique: `${props.type === "comment" ? unique : props.unique}`,
       createdAt: serverTimestamp(),
@@ -142,23 +139,13 @@ export default function CreateComment(props) {
 
   // ########################################################
 
-  const [textareaCols, setTextareaCols] = useState(1);
-
-  function handleKeyPress(e) {
-    if (e.key === "Enter" && textareaCols < 3) {
-      setTextareaCols((prevTextareaCols) => (prevTextareaCols += 1));
-    }
-  }
-
   return (
     <>
       {auth.currentUser && (
         <form className="create-comment-form" onSubmit={createComment}>
           <textarea
-            onKeyPress={handleKeyPress}
             className="sendChatMessageInput"
             cols={60}
-            rows={textareaCols}
             value={formValue}
             onChange={(event) => setFormValue(event.target.value)}
             placeholder="Add a comment..."

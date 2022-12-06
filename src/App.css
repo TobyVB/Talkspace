@@ -321,8 +321,6 @@ form {
 .comment {
   border-radius: 5px;
   font-size: 0.75rem;
-}
-.comment-container-main {
   background: rgba(255, 255, 255, 0.15);
   border-radius: 5px;
   box-shadow: 0px 0px 5px black;

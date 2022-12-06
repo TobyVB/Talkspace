@@ -27,7 +27,6 @@ import ViewPost from "./Components/ViewPost.js";
 import ViewEditPost from "./Components/ViewEditPost.js";
 // settings
 import ChangeUsername from "./Components/ChangeUsername.js";
-// import UpdateEmail from './Components/UpdateEmail.js';
 import RetrievePassword from "./Components/RetrievePassword.js";
 import ChangePassword from "./Components/ChangePassword.js";
 import DeleteAccount from "./Components/DeleteAccount.js";
@@ -95,7 +94,6 @@ function App() {
   useEffect(() => {
     if (loginCompleted === true) {
       if (auth.currentUser && !auth.currentUser.emailVerified) {
-        verificationReminder();
         auth.signOut();
         setAllowLogin(true);
       }
@@ -120,10 +118,9 @@ function App() {
   const viewEditProfile = 9;
   // settings pages
   const viewChangeUsername = 10;
-  // const viewUpdateEmail = 11;
-  const viewRetrievePassword = 12;
-  const viewChangePassword = 13;
-  const viewDeleteAccount = 14;
+  const viewRetrievePassword = 11;
+  const viewChangePassword = 12;
+  const viewDeleteAccount = 13;
 
   const [page, setPage] = useState(1);
   function startViewSettings() {
@@ -160,17 +157,14 @@ function App() {
   function startViewChangeUsername() {
     setPage(10);
   }
-  function startViewUpdateEmail() {
+  function startViewRetrievePassword() {
     setPage(11);
   }
-  function startViewRetrievePassword() {
+  function startViewChangePassword() {
     setPage(12);
   }
-  function startViewChangePassword() {
-    setPage(13);
-  }
   function startViewDeleteAccount() {
-    setPage(14);
+    setPage(13);
   }
   const [startUp, setStartUp] = useState(false);
   function restartPage() {
@@ -202,18 +196,6 @@ function App() {
   const navClassNone = useNavClassNone ? "none" : "";
   const [navToggle, setNavToggle] = useState(false);
 
-  const [warning, setWarning] = useState(false);
-  const [transformWarning, setTransformWarning] = useState(false);
-  function verificationReminder() {
-    setWarning(true);
-    setTimeout(() => {
-      setWarning(false);
-      setTransformWarning(false);
-    }, 8000);
-    setTimeout(() => {
-      setTransformWarning(true);
-    }, 6000);
-  }
   function showMenu() {
     setUseNavClassNone((prev) => !prev);
     setNavToggle((prev) => !prev);
@@ -294,16 +276,6 @@ function App() {
 
   return (
     <div className="App">
-      {warning && (
-        <p
-          className={
-            transformWarning ? "warning-text transform-warning" : "warning-text"
-          }
-        >
-          user needs to be verified
-        </p>
-      )}
-      {/* When clicking off header hideMenu */}
       <header>
         <div className={`header ${navToggle && `header-toggle`}`}>
           <div className="nav-title">
@@ -439,7 +411,6 @@ function App() {
             sendPostId={sendPostId}
             goToProfile={startViewProfile}
             sendUserId={sendUID}
-            verificationReminder={verificationReminder}
           />
         )}
 
@@ -449,7 +420,6 @@ function App() {
             updateReady={updateReady}
             startViewLogin={startViewLogin}
             setAllowLogin={setAllowLogin}
-            verificationReminder={verificationReminder}
             cancelSignIn={cancelSignIn}
           />
         )}
@@ -500,14 +470,6 @@ function App() {
         {auth.currentUser && page === viewChangeUsername && (
           <ChangeUsername cancel={startViewSettings} />
         )}
-
-        {/* VIEW UPDATE EMAIL */}
-        {/* {auth.currentUser && page === viewUpdateEmail
-      && <UpdateEmail 
-        cancel={startViewSettings}     
-        userData={userData}       
-      />} */}
-
         {/* VIEW RETRIEVE PASSWORD */}
         {auth.currentUser && page === viewRetrievePassword && (
           <RetrievePassword cancel={startViewSettings} />
