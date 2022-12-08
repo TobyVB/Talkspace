@@ -8,12 +8,10 @@ import {
   doc,
   updateDoc,
 } from "firebase/firestore";
-import { getAuth } from "firebase/auth";
 import TextEditor from "./TextEditor";
 
 export default function ViewPost(props) {
   const db = getFirestore();
-  const auth = getAuth();
   const [pagePause, setPagePause] = useState(true);
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -29,7 +27,7 @@ export default function ViewPost(props) {
     const q = query(postsRef, orderBy("createdAt"));
     onSnapshot(q, async (snapshot) => {
       snapshot.docs.forEach((doc) => {
-        if (doc.data().id === props.capturedPostId) {
+        if (doc.data().id === props.captured.postId) {
           setFoundPost({ ...doc.data(), id: doc.id });
         }
       });
@@ -54,11 +52,11 @@ export default function ViewPost(props) {
     await updateDoc(docRef, postObj);
   }
   function cancel() {
-    props.cancel();
+    props.changePageTo("post");
   }
   function save() {
     updatePost();
-    props.cancel();
+    props.changePageTo("post");
   }
   // ##########################################################################
   const [postObj, setPostObj] = useState("");

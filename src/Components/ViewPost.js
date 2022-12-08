@@ -48,7 +48,7 @@ export default function ViewPost(props) {
     const q = query(postsRef, orderBy("createdAt"));
     onSnapshot(q, async (snapshot) => {
       snapshot.docs.forEach((doc) => {
-        if (doc.data().id === props.capturedPostId) {
+        if (doc.data().id === props.captured.postId) {
           setFoundPost({ ...doc.data(), id: doc.id });
         }
       });
@@ -79,25 +79,26 @@ export default function ViewPost(props) {
     });
   };
   setTimeout(() => {
-    if (props.capturedUnique !== "") {
+    if (props.captured.unique !== "") {
       scrollingTop();
     }
   }, 200);
 
   function resetUnique() {
-    props.setCapturedUnique("");
-    props.setCurrentCommentId("");
+    props.setCaptured((prev) => {
+      return { ...prev, unique: "", currentCommentId: "" };
+    });
   }
   function doNothing() {}
 
   // #####################################   F O L L O W   A N D   U N F O L L O W   P O S T   #############################################
   function followPost() {
-    if (!foundPost.follows.includes(props.userDataId)) {
+    if (!foundPost.follows.includes(props.captured.userData.id)) {
       const postRef = doc(db, "posts", foundPost.id);
       updateDoc(postRef, {
-        follows: arrayUnion(props.userDataId),
+        follows: arrayUnion(props.captured.userData.id),
       }).then(() => {
-        const userRef = doc(db, "users", props.userDataId);
+        const userRef = doc(db, "users", props.captured.userData.id);
         updateDoc(userRef, {
           following: arrayUnion(foundPost.id),
         });
@@ -105,9 +106,9 @@ export default function ViewPost(props) {
     } else {
       const postRef = doc(db, "posts", foundPost.id);
       updateDoc(postRef, {
-        follows: arrayRemove(props.userDataId),
+        follows: arrayRemove(props.captured.userData.id),
       }).then(() => {
-        const userRef = doc(db, "users", props.userDataId);
+        const userRef = doc(db, "users", props.captured.userData.id);
         updateDoc(userRef, {
           following: arrayRemove(foundPost.id),
         });
@@ -115,10 +116,10 @@ export default function ViewPost(props) {
     }
   }
   function editPost() {
-    props.editPost();
+    props.changePageTo("editPost");
   }
   function deletePost() {
-    const docRef = doc(db, "posts", props.capturedPostId);
+    const docRef = doc(db, "posts", props.captured.postId);
     deleteDoc(docRef)
       .then(() => {
         console.log("notification deleted");
@@ -128,13 +129,13 @@ export default function ViewPost(props) {
         onSnapshot(q, async (snapshot) => {
           snapshot.docs.forEach((document) => {
             const docRef = doc(db, "comments", document.id);
-            if (document.data().postId === props.capturedPostId) {
+            if (document.data().postId === props.captured.postId) {
               deleteDoc(docRef);
             }
           });
         });
       });
-    props.deletePost();
+    props.changePageTo("profile");
   }
 
   return (
@@ -153,7 +154,7 @@ export default function ViewPost(props) {
         <div className="post-header">
           <p
             className="post-author"
-            onClick={() => props.sendUID(foundUser.uid)}
+            onClick={() => props.captured.uid(foundUser.uid)}
           >
             Authored by: {foundUser.username}
           </p>
@@ -168,41 +169,41 @@ export default function ViewPost(props) {
           <div>{foundPost && parse(foundPost.text)}</div>
         </div>
         <button className="follow-post" onClick={followPost}>
-          {foundPost && foundPost.follows.includes(props.userDataId)
+          {foundPost && foundPost.follows.includes(props.captured.userData.id)
             ? "- UNFOLLOW"
             : "+ FOLLOW"}
         </button>
       </div>
       <CreateComment
-        replyTo={props.capturedPostId}
+        replyTo={props.captured.postId}
         id={foundUser.id}
         uid={foundUser.uid}
         type="comment"
-        capturedPostId={props.capturedPostId}
+        capturedPostId={props.captured.postId}
       />
       <div className="">
         {comments &&
           comments.map(
             (comment) =>
-              comment.replyTo === props.capturedPostId && (
+              comment.replyTo === props.captured.postId && (
                 <div key={nanoid()}>
                   <Comment
                     comment={comment}
                     type={"comment"}
-                    sendUID={props.sendUID}
+                    sendUID={props.captured.uid}
                     key={nanoid()}
                     comments={comments}
-                    capturedUnique={props.capturedUnique}
+                    capturedUnique={props.captured.unique}
                     resetUnique={
-                      comment.unique === props.capturedUnique
+                      comment.unique === props.captured.unique
                         ? resetUnique
                         : doNothing
                     }
-                    capturedPostId={props.capturedPostId}
-                    currentCommentId={props.currentCommentId}
+                    capturedPostId={props.captured.postId}
+                    currentCommentId={props.captured.currentCommentId}
                     page={props.page}
                   />
-                  {props.capturedUnique === comment.unique && (
+                  {props.captured.unique === comment.unique && (
                     <div ref={scrollTarget}></div>
                   )}
                 </div>

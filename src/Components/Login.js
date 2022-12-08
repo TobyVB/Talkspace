@@ -66,7 +66,7 @@ export default function Login(props) {
   }
 
   return (
-    <div className="page-style page-body">
+    <div className="page-body">
       <div className="form-login-email">
         <h1>LOG IN</h1>
         <label htmlFor="email">Enter email</label>

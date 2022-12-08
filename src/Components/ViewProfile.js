@@ -15,7 +15,6 @@ export default function ViewProfile(props) {
   const usersRef = collection(db, "users");
   const [currentUser, setCurrentUser] = useState("");
   const [image, setImage] = useState(false);
-  const [objURL, setObjURL] = useState("");
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -52,8 +51,10 @@ export default function ViewProfile(props) {
   });
 
   function viewPost(e) {
-    props.updatePage();
-    props.sendPostId(e);
+    props.changePageTo("post");
+    props.setCaptured((prev) => {
+      return { ...prev, postId: e };
+    });
   }
 
   function Post(props) {
@@ -66,13 +67,15 @@ export default function ViewProfile(props) {
 
   return (
     <div className="page-style page-body">
-      <button onClick={props.editProfile}>edit profile</button>
+      <button onClick={() => props.changePageTo("editProfile")}>
+        edit profile
+      </button>
       <h2 className="profile-header-text">{`${currentUser.username}`}</h2>
       <div className="profile-jumbotron">
         <img
           alt="profile"
           className="profile-picture"
-          src={image && currentUser.defaultPic}
+          src={image ? currentUser.defaultPic : ""}
         />
         <div className="profile-info-section">
           <div className="flex">

@@ -50,9 +50,13 @@ export default function ViewEditProfile(props) {
   async function updateUser() {
     const docRef = doc(db, "users", currentUser.id);
     await updateDoc(docRef, {
-      defaultPic: `${url === null ? props.defaultPic : url}`,
-      defPicLoc: `${url === null ? props.defPicLoc : defPicLoc}`,
-      aboutMe: `${aboutMeValue === "" ? props.aboutMe : aboutMeValue}`,
+      defaultPic: `${url === null ? props.captured.userData.defaultPic : url}`,
+      defPicLoc: `${
+        url === null ? props.captured.userData.defPicLoc : defPicLoc
+      }`,
+      aboutMe: `${
+        aboutMeValue === "" ? props.captured.userData.aboutMe : aboutMeValue
+      }`,
     });
   }
 
@@ -62,7 +66,7 @@ export default function ViewEditProfile(props) {
       image !== null && submitImage();
     }
     updateUser();
-    props.cancel();
+    props.changePageTo("profile");
   }
   const [hideEditImage, setHideEditImage] = useState(true);
   function showEditImage() {
@@ -163,7 +167,7 @@ export default function ViewEditProfile(props) {
       )}
       {/* ############### S A V E   S E T T I N G S ################ */}
       <div className="save-cancel-edit-profile">
-        <button onClick={props.cancel}>cancel</button>
+        <button onClick={() => props.changePageTo("profile")}>cancel</button>
         <button onClick={save}>save</button>
       </div>
     </div>

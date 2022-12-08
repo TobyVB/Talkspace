@@ -38,14 +38,14 @@ export default function ChangeUsername(props) {
     });
     setUsernameChanged(true);
     setTimeout(() => {
-      props.cancel();
+      props.changePageTo("settings");
     }, 2000);
   }
 
   return (
     <div className="page-body">
       <h1>Change Username</h1>
-      <button onClick={props.cancel}>cancel</button>
+      <button onClick={() => props.changePageTo("settings")}>cancel</button>
       <input
         onChange={(event) => setUsername(event.target.value)}
         placeholder="enter new username"

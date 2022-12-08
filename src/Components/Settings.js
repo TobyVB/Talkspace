@@ -5,28 +5,23 @@ export default function Settings(props) {
     window.scrollTo(0, 0);
   }, []);
 
-  // const userEmail = 'user@example.com';
-  // getAuth()
-  //     .generatePasswordResetLink(userEmail, actionCodeSettings)
-  //     .then((link) => {
-  //         // Construct password reset email template, embed the link and send
-  //         // using custom SMTP server.
-  //         return sendCustomPasswordResetEmail(userEmail, displayName, link);
-  //     })
-  //     .catch((error) => {
-  //         // Some error occurred.
-  //     });
-
   return (
     <div className="page-body">
       <h1 className="settings-title">Settings</h1>
       <hr></hr>
       <div className="settings-buttons">
-        <button onClick={props.changeUsername}>change username</button>
-        {/* <button onClick={props.updateEmail} >update email</button> */}
-        <button onClick={props.retreivePassword}>retrieve password</button>
-        <button onClick={props.changePassword}>change password</button>
-        <button onClick={props.deleteAccount}>delete account</button>
+        <button onClick={() => props.changePageTo("changeUsername")}>
+          change username
+        </button>
+        <button onClick={() => props.changePageTo("retrievePassword")}>
+          retrieve password
+        </button>
+        <button onClick={() => props.changePageTo("changePassword")}>
+          change password
+        </button>
+        <button onClick={() => props.changePageTo("deleteAccount")}>
+          delete account
+        </button>
       </div>
     </div>
   );

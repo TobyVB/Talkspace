@@ -14,6 +14,7 @@ import { useAuthState } from "react-firebase-hooks/auth";
 
 import { getStorage } from "firebase/storage";
 
+// import Navbar from "./Components/Navbar.js";
 import Notifications from "./Components/Notifications.js";
 import Settings from "./Components/Settings.js";
 import Homepage from "./Components/Homepage.js";
@@ -42,10 +43,13 @@ const firebaseConfig = {
 };
 const app = initializeApp(firebaseConfig);
 export const storage = getStorage(app);
-const auth = getAuth();
-const db = getFirestore();
 
-function App() {
+export default function App() {
+  const auth = getAuth();
+  const db = getFirestore();
+
+  const [allowLogin, setAllowLogin] = useState(true);
+  const [loginCompleted, setLoginCompleted] = useState(false);
   useAuthState(auth);
 
   function exit() {
@@ -65,10 +69,8 @@ function App() {
       )
     );
   }
-  const [userData, setuserData] = useState("");
-  const [allowLogin, setAllowLogin] = useState(true);
 
-  const [loginCompleted, setLoginCompleted] = useState(false);
+  updateAccess();
   function updateAccess() {
     if (auth.currentUser && allowLogin === true) {
       const usersRef = collection(db, "users");
@@ -80,7 +82,9 @@ function App() {
         });
         users.forEach((user) => {
           if (auth.currentUser && user.uid === auth.currentUser.uid) {
-            setuserData(user);
+            setCaptured((prev) => {
+              return { ...prev, userData: user };
+            });
           }
         });
       });
@@ -89,7 +93,6 @@ function App() {
       setLoginCompleted(true);
     }
   }
-  updateAccess();
 
   useEffect(() => {
     if (loginCompleted === true) {
@@ -106,66 +109,27 @@ function App() {
     setNotifyWindow((prevNotifyWindow) => !prevNotifyWindow);
   }
 
-  const viewSettings = 0;
-  const viewHome = 1;
-  const viewRegister = 2;
-  const viewLogin = 3;
-  const viewProfile = 4;
-  const viewOtherProfile = 5;
-  const viewCreatePost = 6;
-  const viewPost = 7;
-  const viewEditPost = 8;
-  const viewEditProfile = 9;
-  // settings pages
-  const viewChangeUsername = 10;
-  const viewRetrievePassword = 11;
-  const viewChangePassword = 12;
-  const viewDeleteAccount = 13;
+  const [page, setPage] = useState("home");
+  function changePageTo(arg) {
+    setPage(arg);
+  }
+  const pages = {
+    settings: "settings",
+    home: "home",
+    register: "register",
+    login: "login",
+    profile: "profile",
+    otherProfile: "otherProfile",
+    createPost: "createPost",
+    post: "post",
+    editPost: "editPost",
+    editProfile: "editProfile",
+    changeUsername: "changeUsername",
+    retrievePassword: "retrievePassword",
+    changePassword: "changePassword",
+    deleteAccount: "deleteAccount",
+  };
 
-  const [page, setPage] = useState(1);
-  function startViewSettings() {
-    setPage(0);
-  }
-  function startViewHome() {
-    setPage(1);
-  }
-  function startViewRegister() {
-    setPage(2);
-  }
-  function startViewLogin() {
-    setPage(3);
-  }
-  function startViewProfile() {
-    setPage(4);
-  }
-  function startViewOtherProfile() {
-    setPage(5);
-  }
-  function startViewCreatePost() {
-    setPage(6);
-  }
-  function startViewPost() {
-    setPage(7);
-  }
-  function startViewEditPost() {
-    setPage(8);
-  }
-  function startViewEditProfile() {
-    setPage(9);
-  }
-  // settings start page functions
-  function startViewChangeUsername() {
-    setPage(10);
-  }
-  function startViewRetrievePassword() {
-    setPage(11);
-  }
-  function startViewChangePassword() {
-    setPage(12);
-  }
-  function startViewDeleteAccount() {
-    setPage(13);
-  }
   const [startUp, setStartUp] = useState(false);
   function restartPage() {
     setPage(99);
@@ -179,15 +143,15 @@ function App() {
   }
   useEffect(() => {
     if (updateReadyGo === true) {
-      console.log("userData.aboutMe: " + userData.aboutMe);
-      startViewHome();
+      console.log("userData.aboutMe: " + captured.userData.aboutMe);
+      changePageTo(pages.home);
       setUpdateReadyGo(false);
     }
   }, [updateReadyGo]);
 
   useEffect(() => {
     if (startUp === true) {
-      startViewPost();
+      changePageTo(pages.post);
       setStartUp(false);
     }
   }, [startUp]);
@@ -205,30 +169,16 @@ function App() {
     setNavToggle(false);
   }
   // ############################################################
-  const [capturedUID, setCapturedUID] = useState("");
-  const sendUID = (e) => {
-    setCapturedUID(e);
-    startViewOtherProfile();
-  };
-  // ############################################################
-  const [capturedPostId, setCapturedPostId] = useState("");
-  const sendPostId = (e) => {
-    setCapturedPostId(e);
-    startViewPost();
-  };
-  // ############################################################
-  const [capturedUnique, setCapturedUnique] = useState("");
-  const sendUnique = (e) => {
-    setCapturedUnique(e);
-  };
-  // ############################################################
-  const [currentCommentId, setCurrentCommentId] = useState("");
-  const sendCurrentCommentId = (e) => {
-    setCurrentCommentId(e);
-  };
+  const [captured, setCaptured] = useState({
+    uid: "",
+    postId: "",
+    unique: "",
+    currentCommentId: "",
+    userData: "",
+  });
   // ############################################################
 
-  if (page !== 7) {
+  if (page !== "post") {
     sessionStorage.clear();
   }
 
@@ -243,36 +193,48 @@ function App() {
     message: "message",
     postId: "postId",
   });
-
-  function menuHome() {
-    startViewHome();
-    hideMenu();
-  }
-  function menuLogin() {
-    startViewLogin();
-    hideMenu();
-  }
-  function menuRegister() {
-    startViewRegister();
-    hideMenu();
-  }
-  function menuProfile() {
-    startViewProfile();
-    hideMenu();
-  }
-  function menuCreatePost() {
-    startViewCreatePost();
-    hideMenu();
-  }
-  function menuSettings() {
-    startViewSettings();
-    hideMenu();
-  }
+  // const nav = {
+  //   currentUser: auth.currentUser,
+  //   page: page,
+  //   pages: pages,
+  //   showMenu,
+  //   toggleNotifyWindow,
+  //   notifications: notifications,
+  //   navToggle: navToggle,
+  //   auth: auth,
+  //   menuSignOut,
+  // };
   function menuSignOut() {
     exit();
-    setPage(1);
+    changePageTo(pages.home);
     hideMenu();
   }
+  const menu = {
+    menuHome() {
+      changePageTo(pages.home);
+      hideMenu();
+    },
+    menuLogin() {
+      changePageTo(pages.login);
+      hideMenu();
+    },
+    menuRegister() {
+      changePageTo(pages.register);
+      hideMenu();
+    },
+    menuProfile() {
+      changePageTo(pages.profile);
+      hideMenu();
+    },
+    menuCreatePost() {
+      changePageTo(pages.createPost);
+      hideMenu();
+    },
+    menuSettings() {
+      changePageTo(pages.settings);
+      hideMenu();
+    },
+  };
 
   return (
     <div className="App">
@@ -280,7 +242,7 @@ function App() {
         <div className={`header ${navToggle && `header-toggle`}`}>
           <div className="nav-title">
             <p>The</p>
-            <h1 onClick={menuHome}>TalkSpace</h1>
+            <h1 onClick={menu.menuHome}>TalkSpace</h1>
           </div>
           <div className="menu-container">
             <div className={`login-header-buttons  ${navClassNone}`}>
@@ -288,15 +250,15 @@ function App() {
                 <>
                   <button
                     className="nav-btn"
-                    disabled={page === viewLogin ? "+true" : ""}
-                    onClick={menuLogin}
+                    disabled={page === pages.login ? "+true" : ""}
+                    onClick={menu.menuLogin}
                   >
                     Login
                   </button>
                   <button
                     className="nav-btn"
-                    disabled={page === viewRegister ? "+true" : ""}
-                    onClick={menuRegister}
+                    disabled={page === pages.register ? "+true" : ""}
+                    onClick={menu.menuRegister}
                   >
                     Register
                   </button>
@@ -306,22 +268,22 @@ function App() {
                 <>
                   <button
                     className="nav-btn"
-                    disabled={page === viewProfile ? "+true" : ""}
-                    onClick={menuProfile}
+                    disabled={page === pages.profile ? "+true" : ""}
+                    onClick={menu.menuProfile}
                   >
                     Profile
                   </button>
                   <button
                     className="nav-btn"
-                    disabled={page === viewCreatePost ? "+true" : ""}
-                    onClick={menuCreatePost}
+                    disabled={page === pages.createPost ? "+true" : ""}
+                    onClick={menu.menuCreatePost}
                   >
                     Create Post
                   </button>
                   <button
                     className="nav-btn"
-                    disabled={page === viewSettings ? "+true" : ""}
-                    onClick={menuSettings}
+                    disabled={page === pages.settings ? "+true" : ""}
+                    onClick={menu.menuSettings}
                   >
                     Settings
                   </button>
@@ -353,141 +315,73 @@ function App() {
       </header>
 
       <section onClick={hideMenu}>
-        {/* NOTIFICATIONS */}
         {notifyWindow && (
           <Notifications
             toggleNotifyWindow={toggleNotifyWindow}
             uid={auth.currentUser.uid}
-            sendPostId={sendPostId}
-            toPost={startViewPost}
+            captured={captured}
+            toPost={changePageTo(pages.post)}
             restartPage={restartPage}
-            sendUnique={sendUnique}
-            sendCurrentCommentId={sendCurrentCommentId}
             notifications={notifications}
           />
         )}
-
-        {/* SETTINGS */}
-        {auth.currentUser && page === viewSettings && (
-          <Settings
-            changeUsername={startViewChangeUsername}
-            // updateEmail={startViewUpdateEmail}
-            retreivePassword={startViewRetrievePassword}
-            changePassword={startViewChangePassword}
-            deleteAccount={startViewDeleteAccount}
-          />
+        {auth.currentUser && page === pages.settings && (
+          <Settings changePageTo={changePageTo} />
         )}
-
-        {/* PROFILE */}
-        {auth.currentUser && page === viewProfile && (
+        {auth.currentUser && page === pages.profile && (
           <ViewProfile
-            username={userData.username}
-            defaultPic={userData.defaultPic}
-            defPicLoc={userData.defPicLoc}
-            aboutMe={userData.aboutMe}
-            updatePage={startViewPost}
-            editProfile={startViewEditProfile}
-            sendPostId={sendPostId}
-            userData={userData}
-            id={userData.id}
+            changePageTo={changePageTo}
+            setCaptured={setCaptured}
             signout={exit}
           />
         )}
-
-        {/* EDIT PROFILE */}
-        {auth.currentUser && page === viewEditProfile && (
-          <ViewEditProfile
-            cancel={startViewProfile}
-            defaultPic={userData.defaultPic}
-            defPicLoc={userData.defPicLoc}
-            aboutMe={userData.aboutMe}
-          />
+        {auth.currentUser && page === pages.editProfile && (
+          <ViewEditProfile changePageTo={changePageTo} captured={captured} />
         )}
-
-        {/* HOMEPAGE */}
-        {page === viewHome && (
-          <Homepage
-            updatePage={startViewPost}
-            sendPostId={sendPostId}
-            goToProfile={startViewProfile}
-            sendUserId={sendUID}
-          />
+        {page === pages.home && (
+          <Homepage setCaptured={setCaptured} changePageTo={changePageTo} />
         )}
-
-        {/* LOGIN */}
-        {!auth.currentUser && page === viewLogin && (
+        {!auth.currentUser && page === pages.login && (
           <Login
             updateReady={updateReady}
-            startViewLogin={startViewLogin}
             setAllowLogin={setAllowLogin}
             cancelSignIn={cancelSignIn}
           />
         )}
-
-        {/* REGISTER */}
-        {!auth.currentUser && page === viewRegister && (
-          <Register updatePage={startViewLogin} exit={exit} />
+        {!auth.currentUser && page === pages.register && (
+          <Register goToLogin={changePageTo(pages.login)} exit={exit} />
         )}
-
-        {/* OTHERS PROFILE */}
-        {auth.currentUser && page === viewOtherProfile && (
+        {auth.currentUser && page === pages.otherProfile && (
           <ViewOtherProfile
-            capturedUID={capturedUID}
-            updatePage={startViewPost}
-            sendPostId={sendPostId}
+            captured={captured}
+            setCaptured={setCaptured}
+            changePageTo={changePageTo}
           />
         )}
-
-        {/* CREATE POST */}
-        {auth.currentUser && page === viewCreatePost && (
-          <CreatePost updatePage={startViewPost} sendPostId={sendPostId} />
+        {auth.currentUser && page === pages.createPost && (
+          <CreatePost changePageTo={changePageTo} setCaptured={setCaptured} />
         )}
-
-        {/* VIEW POST */}
-        {auth.currentUser && page === viewPost && (
+        {auth.currentUser && page === pages.post && (
           <ViewPost
-            capturedPostId={capturedPostId}
-            sendUID={sendUID}
-            capturedUnique={capturedUnique}
-            setCapturedUnique={setCapturedUnique}
-            currentCommentId={currentCommentId}
-            setCurrentCommentId={setCurrentCommentId}
-            userDataId={userData.id}
-            editPost={startViewEditPost}
-            deletePost={startViewProfile}
+            captured={captured}
+            setCaptured={setCaptured}
+            changePageTo={changePageTo}
           />
         )}
-
-        {/* VIEW EDIT POST */}
-        {auth.currentUser && page === viewEditPost && (
-          <ViewEditPost
-            capturedPostId={capturedPostId}
-            cancel={startViewPost}
-          />
+        {auth.currentUser && page === pages.editPost && (
+          <ViewEditPost captured={captured} changePageTo={changePageTo} />
         )}
-
-        {/* VIEW CHANGE USERNAME */}
-        {auth.currentUser && page === viewChangeUsername && (
-          <ChangeUsername cancel={startViewSettings} />
+        {auth.currentUser && page === pages.changeUsername && (
+          <ChangeUsername changePageTo={changePageTo} />
         )}
-        {/* VIEW RETRIEVE PASSWORD */}
-        {auth.currentUser && page === viewRetrievePassword && (
-          <RetrievePassword cancel={startViewSettings} />
+        {auth.currentUser && page === pages.retrievePassword && (
+          <RetrievePassword changePageTo={changePageTo} />
         )}
-
-        {/* VIEW RESET PASSWORD */}
-        {auth.currentUser && page === viewChangePassword && (
-          <ChangePassword cancel={startViewSettings} />
+        {auth.currentUser && page === pages.changePassword && (
+          <ChangePassword changePageTo={changePageTo} />
         )}
-
-        {/* VIEW DELETE ACCOUNT */}
-        {auth.currentUser && page === viewDeleteAccount && (
-          <DeleteAccount
-            cancel={startViewSettings}
-            id={userData.id}
-            username={userData.username}
-            updatePage={startViewHome}
-          />
+        {auth.currentUser && page === pages.deleteAccount && (
+          <DeleteAccount changePageTo={changePageTo} captured={captured} />
         )}
       </section>
 
@@ -497,5 +391,3 @@ function App() {
     </div>
   );
 }
-
-export default App;

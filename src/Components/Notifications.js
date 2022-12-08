@@ -23,14 +23,14 @@ export default function Notifications(props) {
                   message={notification.message}
                   type={notification.type}
                   toPost={props.toPost}
-                  sendPostId={props.sendPostId}
+                  sendPostId={props.captured.postId}
                   postId={notification.postId}
                   toggleNotifyWindow={props.toggleNotifyWindow}
                   restartPage={props.restartPage}
                   unique={notification.unique}
                   id={notification.id}
-                  sendUnique={props.sendUnique}
-                  sendCurrentCommentId={props.sendCurrentCommentId}
+                  sendUnique={props.captured.unique}
+                  sendCurrentCommentId={props.captured.currentCommentId}
                 />
               )
           )}

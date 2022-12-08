@@ -56,19 +56,19 @@ export default function Home(props) {
 
   function viewPost(e) {
     if (auth.currentUser && auth.currentUser.emailVerified) {
-      props.updatePage();
-      props.sendPostId(e);
-    } else {
-      props.verificationReminder();
+      props.changePageTo("post");
+      props.setCaptured((prev) => {
+        return { ...prev, postId: e };
+      });
     }
   }
 
   function viewProfile(e) {
     if (auth.currentUser && auth.currentUser.emailVerified) {
-      props.goToProfile();
-      props.sendUserId(e);
-    } else {
-      props.verificationReminder();
+      props.changePageTo("profile");
+      props.setCaptured((prev) => {
+        return { ...prev, uid: e };
+      });
     }
   }
   function Post(props) {

@@ -50,8 +50,10 @@ export default function CreatePost(props) {
               updateDoc(docRef, {
                 id: document.id,
               });
-              props.updatePage();
-              props.sendPostId(document.id);
+              props.changePageTo("post");
+              props.setCaptured((prev) => {
+                return { ...prev, postId: document.id };
+              });
             }
           });
         });

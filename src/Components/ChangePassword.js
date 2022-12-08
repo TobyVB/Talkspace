@@ -20,7 +20,7 @@ export default function ChangePassword(props) {
         console.log("it worked");
         setSuccess(true);
         setTimeout(() => {
-          props.cancel();
+          props.changePageTo("settings");
         }, 3000);
       })
       .catch((error) => {
@@ -46,7 +46,7 @@ export default function ChangePassword(props) {
       <button onMouseDown={noSelect} onClick={changeShowPass}>
         show password
       </button>
-      <button onClick={props.cancel}>cancel</button>
+      <button onClick={() => props.changePageTo("settings")}>cancel</button>
       {showPass && <p>{password}</p>}
       <button onClick={updatePassword}>save</button>
       {success && <p>SUCCESS!</p>}

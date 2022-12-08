@@ -7,10 +7,10 @@ export default function DeleteAccount(props) {
 
   // ########## D E L E T E   U S E R ##########
   const deleteAllUserData = async () => {
-    const docRef = doc(db, "users", props.id);
+    const docRef = doc(db, "users", props.userData.id);
     deleteDoc(docRef)
       .then(() => {
-        console.log(`${props.username} in users deleted`);
+        console.log(`${props.captured.userData.username} in users deleted`);
       })
       .then(() => {
         ("deleting from database");
@@ -30,7 +30,7 @@ export default function DeleteAccount(props) {
   return (
     <div className="page-body">
       <h1>Delete Account</h1>
-      <button onClick={props.cancel}>cancel</button>
+      <button onClick={() => props.changePageTo("settings")}>cancel</button>
       <button onClick={() => deleteAllUserData(auth.currentUser.uid)}>
         Delete User
       </button>

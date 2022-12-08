@@ -150,7 +150,7 @@ export default function Register(props) {
       })
       .then(() => {
         setLoading(false);
-        props.updatePage();
+        props.goToLogin();
       });
   }
 
