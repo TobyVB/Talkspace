@@ -1,8 +1,10 @@
+import { NavLink } from "react-router-dom";
+
 export default function Navbar(props) {
   function SignOut() {
     return (
-      props.nav.auth.currentUser && (
-        <button className="nav-btn" onClick={props.nav.menuSignOut}>
+      props.auth.currentUser && (
+        <button className="nav-btn" onClick={props.menuSignOut}>
           Sign Out
         </button>
       )
@@ -10,90 +12,90 @@ export default function Navbar(props) {
   }
   return (
     <header>
-      <div className={`header ${props.nav.navToggle && `header-toggle`}`}>
+      <div className={`header ${props.navToggle && `header-toggle`}`}>
         <div className="nav-title">
           <p>The</p>
-          <h1 onClick={props.menu.menuHome}>TalkSpace</h1>
+          <h1>
+            <NavLink style={{ color: "rgba(255,255,255,.75)" }} to="/">
+              TalkSpace
+            </NavLink>
+          </h1>
         </div>
         <div className="menu-container">
-          <div className={`login-header-buttons  ${props.nav.navClassNone}`}>
-            {!props.nav.auth.currentUser && (
+          <div className={`login-header-buttons  ${props.navClassNone}`}>
+            {!props.auth.currentUser ? (
               <>
-                <button
-                  className="nav-btn"
-                  disabled={
-                    props.nav.page === props.nav.pages.login ? "+true" : ""
+                <NavLink
+                  to="login"
+                  className={({ isActive }) =>
+                    isActive ? "link active" : "link"
                   }
-                  onClick={props.menu.menuLogin}
                 >
-                  Login
-                </button>
-                <button
-                  className="nav-btn"
-                  disabled={
-                    props.nav.page === props.nav.pages.register ? "+true" : ""
+                  {" "}
+                  Login{" "}
+                </NavLink>
+
+                <NavLink
+                  to="register"
+                  className={({ isActive }) =>
+                    isActive ? "link active" : "link"
                   }
-                  onClick={props.menu.menuRegister}
                 >
                   Register
-                </button>
+                </NavLink>
               </>
-            )}
-            {props.nav.auth.currentUser && (
+            ) : (
               <>
-                <button
-                  className="nav-btn"
-                  disabled={
-                    props.nav.page === props.nav.pages.profile ? "+true" : ""
+                <NavLink
+                  to="profile"
+                  className={({ isActive }) =>
+                    isActive ? "link active" : "link"
                   }
-                  onClick={props.menu.menuProfile}
                 >
                   Profile
-                </button>
-                <button
-                  className="nav-btn"
-                  disabled={
-                    props.nav.page === props.nav.pages.createPost ? "+true" : ""
+                </NavLink>
+
+                <NavLink
+                  to="createPost"
+                  className={({ isActive }) =>
+                    isActive ? "link active" : "link"
                   }
-                  onClick={props.menu.menuCreatePost}
                 >
                   Create Post
-                </button>
-                <button
-                  className="nav-btn"
-                  disabled={
-                    props.nav.page === props.nav.pages.settings ? "+true" : ""
+                </NavLink>
+
+                <NavLink
+                  to="settings"
+                  className={({ isActive }) =>
+                    isActive ? "link active" : "link"
                   }
-                  onClick={props.menu.menuSettings}
                 >
                   Settings
-                </button>
+                </NavLink>
+
+                <SignOut />
               </>
             )}
-            {props.nav.auth.currentUser && <SignOut />}
           </div>
-          <button className="showNav" onClick={props.nav.showMenu}>
+          <button className="showNav" onClick={props.showMenu}>
             menu
           </button>
-          {props.nav.auth.currentUser &&
-            props.nav.auth.currentUser.emailVerified && (
-              <button className="bell" onClick={props.nav.toggleNotifyWindow}>
-                🛎
-                <span className="notification-num">
-                  {" "}
-                  {props.nav.notifications &&
-                    props.nav.auth.currentUser &&
-                    props.nav.notifications.filter(
-                      (notification) =>
-                        props.nav.auth.currentUser.uid === notification.to
-                    ).length > 0 &&
-                    props.nav.notifications.filter(
-                      (notification) =>
-                        props.nav.auth.currentUser.uid === notification.to
-                    ).length}
-                </span>
-              </button>
-            )}
+          {props.auth.currentUser && props.auth.currentUser.emailVerified && (
+            <button className="bell" onClick={props.toggleNotifyWindow}>
+              🛎
+              <span className="notification-num">
+                {props.notifications &&
+                  props.notifications.filter(
+                    (notification) =>
+                      props.auth.currentUser.uid === notification.to
+                  ).length > 0 &&
+                  props.notifications.filter(
+                    (notification) =>
+                      props.auth.currentUser.uid === notification.to
+                  ).length}
+              </span>
+            </button>
+          )}
         </div>
       </div>
     </header>

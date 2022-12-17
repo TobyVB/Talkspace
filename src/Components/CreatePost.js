@@ -13,12 +13,14 @@ import {
 } from "firebase/firestore";
 import { nanoid } from "nanoid";
 import TextEditor from "./TextEditor";
+import { useNavigate } from "react-router-dom";
 
 export default function CreatePost(props) {
   const auth = getAuth();
   const db = getFirestore();
   const postsRef = collection(db, "posts");
   const [unique, setUnique] = useState(nanoid());
+  const navigate = useNavigate();
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -50,7 +52,7 @@ export default function CreatePost(props) {
               updateDoc(docRef, {
                 id: document.id,
               });
-              props.changePageTo("post");
+              navigate("/post");
               props.setCaptured((prev) => {
                 return { ...prev, postId: document.id };
               });

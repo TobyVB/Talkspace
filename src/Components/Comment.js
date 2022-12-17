@@ -35,6 +35,7 @@ export default function Comment(props) {
       onClick={props.resetUnique}
     >
       <CommentMain
+        setCaptured={props.setCaptured}
         comment={props.comment}
         startShowForm={startShowForm}
         showForm={showForm}

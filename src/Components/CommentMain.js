@@ -2,7 +2,18 @@ import DeleteComment from "./DeleteComment.js";
 import Clock from "./Utils/Clock.js";
 import Impact from "./Utils/Impact.js";
 
+import { useNavigate } from "react-router-dom";
+
 export default function CommentsMain(props) {
+  const navigate = useNavigate();
+
+  function viewProfile(e) {
+    navigate("/otherProfile");
+    props.setCaptured((prev) => {
+      return { ...prev, uid: e };
+    });
+  }
+
   return (
     <>
       <div className={`comment-full-header`}>
@@ -11,7 +22,7 @@ export default function CommentsMain(props) {
             className="mini-defaultPic"
             alt="user"
             src={props.comment.defaultPic}
-            onClick={() => props.sendUID(props.comment.uid)}
+            onClick={() => viewProfile(props.comment.uid)}
           />
           <p className="comment-name">{props.comment.username}</p>
         </div>

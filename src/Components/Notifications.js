@@ -17,12 +17,12 @@ export default function Notifications(props) {
         {props.notifications &&
           props.notifications.map(
             (notification, index) =>
-              notification.to === props.uid && (
+              notification.to === props.captured.uid && (
                 <Notification
                   key={index}
                   message={notification.message}
                   type={notification.type}
-                  toPost={props.toPost}
+                  changePageTo={props.changePageTo("post")}
                   sendPostId={props.captured.postId}
                   postId={notification.postId}
                   toggleNotifyWindow={props.toggleNotifyWindow}

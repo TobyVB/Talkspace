@@ -9,9 +9,13 @@ import {
 } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 
-export default function Home(props) {
+import { useNavigate } from "react-router-dom";
+
+export default function Homepage(props) {
   const auth = getAuth();
   const db = getFirestore();
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -56,7 +60,7 @@ export default function Home(props) {
 
   function viewPost(e) {
     if (auth.currentUser && auth.currentUser.emailVerified) {
-      props.changePageTo("post");
+      navigate("/post");
       props.setCaptured((prev) => {
         return { ...prev, postId: e };
       });
@@ -65,25 +69,11 @@ export default function Home(props) {
 
   function viewProfile(e) {
     if (auth.currentUser && auth.currentUser.emailVerified) {
-      props.changePageTo("profile");
+      navigate("/otherProfile");
       props.setCaptured((prev) => {
         return { ...prev, uid: e };
       });
     }
-  }
-  function Post(props) {
-    return (
-      <div className="homepage-post">
-        <div onClick={() => viewProfile(props.uid)} className="profile-link">
-          Posted by{" "}
-          {users &&
-            users.map((user) => user.uid === props.uid && user.username)}
-        </div>
-        <p className="post-link" onClick={() => viewPost(props.id)}>
-          {props.title}
-        </p>
-      </div>
-    );
   }
 
   return (
@@ -98,12 +88,19 @@ export default function Home(props) {
       <div className="homepage-posts">
         {posts &&
           posts.map((post) => (
-            <Post
-              id={post.id}
-              key={post.id}
-              title={post.title}
-              uid={post.uid}
-            />
+            <div className="homepage-post">
+              <div
+                onClick={() => viewProfile(post.uid)}
+                className="profile-link"
+              >
+                Posted by{" "}
+                {users &&
+                  users.map((user) => user.uid === post.uid && user.username)}
+              </div>
+              <p onClick={() => viewPost(post.id)} className="post-link">
+                {post.title}
+              </p>
+            </div>
           ))}
       </div>
     </div>

@@ -9,12 +9,16 @@ import {
 import { useCollectionData } from "react-firebase-hooks/firestore";
 import { getAuth } from "firebase/auth";
 import React, { useEffect, useState } from "react";
+
+import { useNavigate } from "react-router-dom";
+
 export default function ViewProfile(props) {
   const db = getFirestore();
   const auth = getAuth();
   const usersRef = collection(db, "users");
   const [currentUser, setCurrentUser] = useState("");
   const [image, setImage] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -51,7 +55,7 @@ export default function ViewProfile(props) {
   });
 
   function viewPost(e) {
-    props.changePageTo("post");
+    navigate("/post");
     props.setCaptured((prev) => {
       return { ...prev, postId: e };
     });
@@ -67,9 +71,7 @@ export default function ViewProfile(props) {
 
   return (
     <div className="page-style page-body">
-      <button onClick={() => props.changePageTo("editProfile")}>
-        edit profile
-      </button>
+      <button>edit profile</button>
       <h2 className="profile-header-text">{`${currentUser.username}`}</h2>
       <div className="profile-jumbotron">
         <img

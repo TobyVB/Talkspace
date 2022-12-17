@@ -18,9 +18,13 @@ import { getAuth } from "firebase/auth";
 import CreateComment from "./CreateComment.js";
 import Comment from "./Comment.js";
 
+import { useNavigate } from "react-router-dom";
+
 export default function ViewPost(props) {
   const db = getFirestore();
   const auth = getAuth();
+  const navigate = useNavigate();
+
   const commentsRef = collection(db, "comments");
   const q = query(commentsRef, orderBy("createdAt"));
   const [comments] = useCollectionData(q, {
@@ -116,7 +120,7 @@ export default function ViewPost(props) {
     }
   }
   function editPost() {
-    props.changePageTo("editPost");
+    navigate("/editPost");
   }
   function deletePost() {
     const docRef = doc(db, "posts", props.captured.postId);
@@ -135,7 +139,7 @@ export default function ViewPost(props) {
           });
         });
       });
-    props.changePageTo("profile");
+    navigate("/profile");
   }
 
   return (
@@ -201,7 +205,6 @@ export default function ViewPost(props) {
                     }
                     capturedPostId={props.captured.postId}
                     currentCommentId={props.captured.currentCommentId}
-                    page={props.page}
                   />
                   {props.captured.unique === comment.unique && (
                     <div ref={scrollTarget}></div>

@@ -9,10 +9,13 @@ import {
   updateDoc,
 } from "firebase/firestore";
 import TextEditor from "./TextEditor";
+import { useNavigate } from "react-router-dom";
 
 export default function ViewPost(props) {
   const db = getFirestore();
   const [pagePause, setPagePause] = useState(true);
+  const navigate = useNavigate();
+
   useEffect(() => {
     window.scrollTo(0, 0);
     setTimeout(() => {
@@ -52,11 +55,11 @@ export default function ViewPost(props) {
     await updateDoc(docRef, postObj);
   }
   function cancel() {
-    props.changePageTo("post");
+    navigate("/post");
   }
   function save() {
     updatePost();
-    props.changePageTo("post");
+    navigate("/post");
   }
   // ##########################################################################
   const [postObj, setPostObj] = useState("");

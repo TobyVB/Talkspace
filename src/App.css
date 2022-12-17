@@ -48,6 +48,9 @@ header {
   vertical-align: center;
   align-items: center;
 }
+.menu-container a {
+  text-decoration: none;
+}
 .footer {
   height: 10vh;
   text-align: center;
@@ -580,4 +583,11 @@ form {
     left: 30vw;
     top: 20vh;
   }
+}
+/* ################################# */
+.link {
+  color: grey;
+}
+.active {
+  color: steelblue;
 }

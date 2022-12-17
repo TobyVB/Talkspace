@@ -8,9 +8,11 @@ import {
   collection,
   getFirestore,
 } from "firebase/firestore";
+import { useNavigate } from "react-router-dom";
 
 export default function ViewOtherProfile(props) {
   const db = getFirestore();
+  const navigate = useNavigate();
 
   // FIND THE USER DOC
   const usersRef = collection(db, "users");
@@ -49,7 +51,7 @@ export default function ViewOtherProfile(props) {
   });
 
   function viewPost(e) {
-    props.changePageTo("post");
+    navigate("/post");
     props.setCaptured((prev) => {
       return { ...prev, postId: e };
     });
