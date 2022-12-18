@@ -1,5 +1,7 @@
 import React, { useEffect } from "react";
 
+import { NavLink } from "react-router-dom";
+
 export default function Settings(props) {
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -10,18 +12,10 @@ export default function Settings(props) {
       <h1 className="settings-title">Settings</h1>
       <hr></hr>
       <div className="settings-buttons">
-        <button onClick={() => props.changePageTo("changeUsername")}>
-          change username
-        </button>
-        <button onClick={() => props.changePageTo("retrievePassword")}>
-          retrieve password
-        </button>
-        <button onClick={() => props.changePageTo("changePassword")}>
-          change password
-        </button>
-        <button onClick={() => props.changePageTo("deleteAccount")}>
-          delete account
-        </button>
+        <NavLink to="changeUsername">change username</NavLink>
+        <NavLink to="retreivePassword">retrieve password</NavLink>
+        <NavLink to="changePassword">change password</NavLink>
+        <NavLink to="deleteAccount">delete account</NavLink>
       </div>
     </div>
   );

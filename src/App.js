@@ -9,11 +9,10 @@ import {
   query,
   orderBy,
 } from "firebase/firestore";
-import { useCollectionData } from "react-firebase-hooks/firestore";
+
 import { useAuthState } from "react-firebase-hooks/auth";
 import { getStorage } from "firebase/storage";
 
-// import Notifications from "./Components/Notifications.js";
 import Settings from "./Components/Settings.js";
 import Homepage from "./Components/Homepage.js";
 import ViewProfile from "./Components/ViewProfile.js";
@@ -24,7 +23,6 @@ import ViewOtherProfile from "./Components/ViewOtherProfile";
 import CreatePost from "./Components/CreatePost.js";
 import ViewPost from "./Components/ViewPost.js";
 import ViewEditPost from "./Components/ViewEditPost.js";
-// settings
 import ChangeUsername from "./Components/ChangeUsername.js";
 import RetrievePassword from "./Components/RetrievePassword.js";
 import ChangePassword from "./Components/ChangePassword.js";
@@ -44,6 +42,11 @@ const firebaseConfig = {
 };
 const app = initializeApp(firebaseConfig);
 export const storage = getStorage(app);
+// ############################################################
+
+// ############################################################
+
+// ############################################################
 
 export default function App() {
   const auth = getAuth();
@@ -60,42 +63,8 @@ export default function App() {
     currentCommentId: "",
     userData: "",
   });
-  // ############################################################
-  const notificationsRef = collection(db, "notifications");
-  const notifyQ = query(notificationsRef, orderBy("createdAt"));
-  const [notifications] = useCollectionData(notifyQ, {
-    createdAt: "createdAt",
-    unique: "unique",
-    to: "to",
-    from: "from",
-    type: "type",
-    message: "message",
-    postId: "postId",
-  });
-  // ############################################################
-  const [page, setPage] = useState("home");
-  const [notifyWindow, setNotifyWindow] = useState(false);
-  const [startUp, setStartUp] = useState(false);
-  const [updateReadyGo, setUpdateReadyGo] = useState(false);
-  const [navToggle, setNavToggle] = useState(false);
-  const [useNavClassNone, setUseNavClassNone] = useState(true);
-  const navClassNone = useNavClassNone ? "none" : "";
 
-  if (page !== "post") {
-    sessionStorage.clear();
-  }
-
-  useEffect(() => {
-    if (updateReadyGo === true) {
-      console.log("userData.aboutMe: " + captured.userData.aboutMe);
-      setUpdateReadyGo(false);
-    }
-  }, [updateReadyGo]);
-  useEffect(() => {
-    if (startUp === true) {
-      setStartUp(false);
-    }
-  }, [startUp]);
+  // ############################################################
   useEffect(() => {
     if (loginCompleted === true) {
       if (auth.currentUser && !auth.currentUser.emailVerified) {
@@ -138,57 +107,21 @@ export default function App() {
     auth.signOut();
     setAllowLogin(true);
   }
-  function toggleNotifyWindow() {
-    setNotifyWindow((prevNotifyWindow) => !prevNotifyWindow);
-  }
-  function restartPage() {
-    setPage(99);
-    setStartUp(true);
-  }
-  function updateReady() {
-    setUpdateReadyGo(true);
-    updateAccess();
-  }
-  function showMenu() {
-    setUseNavClassNone((prev) => !prev);
-    setNavToggle((prev) => !prev);
-  }
-  function hideMenu() {
-    setUseNavClassNone(true);
-    setNavToggle(false);
-  }
   // ############################################################
   function menuSignOut() {
     exit();
-    hideMenu();
   }
   // ############################################################
 
   return (
     <BrowserRouter>
       <Routes>
-        <Route
-          path="/"
-          element={
-            <SharedLayout
-              navToggle={navToggle}
-              menuSignOut={menuSignOut}
-              navClassNone={navClassNone}
-              auth={auth}
-              showMenu={showMenu}
-              hideMenu={hideMenu}
-              toggleNotifyWindow={toggleNotifyWindow}
-              notifications={notifications}
-              notifyWindow={notifyWindow}
-            />
-          }
-        >
+        <Route path="/" element={<SharedLayout menuSignOut={menuSignOut} />}>
           <Route index element={<Homepage setCaptured={setCaptured} />} />
           <Route
             path="login"
             element={
               <Login
-                updateReady={updateReady}
                 setAllowLogin={setAllowLogin}
                 cancelSignIn={cancelSignIn}
               />
@@ -214,6 +147,16 @@ export default function App() {
             element={<CreatePost setCaptured={setCaptured} />}
           />
           <Route path="settings" element={<Settings />} />
+          <Route path="settings/changeUsername" element={<ChangeUsername />} />
+          <Route
+            path="settings/retreivePassword"
+            element={<RetrievePassword />}
+          />
+          <Route path="settings/changePassword" element={<ChangePassword />} />
+          <Route
+            path="settings/deleteAccount"
+            element={<DeleteAccount menuSignOut={menuSignOut} />}
+          />
 
           <Route
             path="post"
@@ -223,19 +166,6 @@ export default function App() {
             path="editPost"
             element={<ViewEditPost captured={captured} />}
           />
-          {/* 
-          <Route
-            path="notifications"
-            element={
-              <Notifications
-                toggleNotifyWindow={toggleNotifyWindow}
-                captured={captured}
-                restartPage={restartPage}
-                notifications={notifications}
-              />
-            }
-          /> */}
-
           {/* <Route path="*" element={<Dunno />} /> */}
           {/* Make error page ^ */}
         </Route>
@@ -243,18 +173,18 @@ export default function App() {
     </BrowserRouter>
   );
 }
-
-{
-  /* {auth.currentUser && page === pages.changeUsername && (
-          <ChangeUsername changePageTo={changePageTo} />
-        )}
-        {auth.currentUser && page === pages.retrievePassword && (
-          <RetrievePassword changePageTo={changePageTo} />
-        )}
-        {auth.currentUser && page === pages.changePassword && (
-          <ChangePassword changePageTo={changePageTo} />
-        )}
-        {auth.currentUser && page === pages.deleteAccount && (
-          <DeleteAccount changePageTo={changePageTo} captured={captured} />
-        )} */
-}
+// ############################################################
+// ############################################################
+// ############################################################
+// ############################################################
+// ############################################################
+// ############################################################
+// ############################################################
+// ############################################################
+// ############################################################
+// ############################################################
+// ############################################################
+// ############################################################
+// ############################################################
+// ############################################################
+// ############################################################

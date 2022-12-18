@@ -3,22 +3,30 @@ import Navbar from "./Navbar.js";
 import Footer from "./Footer.js";
 import Notifications from "./Notifications.js";
 
+import { React, useState } from "react";
+
 const SharedLayout = (props) => {
+  const [notifyWindow, setNotifyWindow] = useState(false);
+
+  function toggleNotifyWindow() {
+    setNotifyWindow((prevNotifyWindow) => !prevNotifyWindow);
+  }
+
+  const [navOpen, setNavOpen] = useState(false);
+  function triggerNav() {
+    setNavOpen((prev) => !prev);
+  }
   return (
     <div className="App">
       <Navbar
-        navToggle={props.navToggle}
+        toggleNotifyWindow={toggleNotifyWindow}
         menuSignOut={props.menuSignOut}
-        navClassNone={props.navClassNone}
-        auth={props.auth}
-        showMenu={props.showMenu}
-        toggleNotifyWindow={props.toggleNotifyWindow}
-        notifications={props.notifications}
+        navOpen={navOpen}
       />
-      <div onClick={props.hideMenu}>
+      <div onClick={triggerNav}>
         <Outlet />
-        {props.notifyWindow && (
-          <Notifications toggleNotifyWindow={props.toggleNotifyWindow} />
+        {notifyWindow && (
+          <Notifications toggleNotifyWindow={toggleNotifyWindow} />
         )}
       </div>
 
@@ -27,3 +35,9 @@ const SharedLayout = (props) => {
   );
 };
 export default SharedLayout;
+
+// ############################################################
+// ############################################################
+// ############################################################
+// ############################################################
+// ############################################################

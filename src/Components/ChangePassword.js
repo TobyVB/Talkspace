@@ -1,6 +1,8 @@
 import { getAuth, updatePassword } from "firebase/auth";
 import React, { useState } from "react";
 
+import { NavLink } from "react-router-dom";
+
 export default function ChangePassword(props) {
   const auth = getAuth();
 
@@ -20,7 +22,7 @@ export default function ChangePassword(props) {
         console.log("it worked");
         setSuccess(true);
         setTimeout(() => {
-          props.changePageTo("settings");
+          <NavLink to="/settings" />;
         }, 3000);
       })
       .catch((error) => {
@@ -46,7 +48,7 @@ export default function ChangePassword(props) {
       <button onMouseDown={noSelect} onClick={changeShowPass}>
         show password
       </button>
-      <button onClick={() => props.changePageTo("settings")}>cancel</button>
+      <NavLink to="/settings">cancel</NavLink>
       {showPass && <p>{password}</p>}
       <button onClick={updatePassword}>save</button>
       {success && <p>SUCCESS!</p>}

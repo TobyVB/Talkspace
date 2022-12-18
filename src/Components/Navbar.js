@@ -1,41 +1,78 @@
+import { React, useEffect, useState } from "react";
+import { getFirestore, collection, query, orderBy } from "firebase/firestore";
+import { useCollectionData } from "react-firebase-hooks/firestore";
+
 import { NavLink } from "react-router-dom";
+import { getAuth } from "firebase/auth";
 
 export default function Navbar(props) {
-  function SignOut() {
-    return (
-      props.auth.currentUser && (
-        <button className="nav-btn" onClick={props.menuSignOut}>
-          Sign Out
-        </button>
-      )
-    );
+  const auth = getAuth();
+  const db = getFirestore();
+  const notificationsRef = collection(db, "notifications");
+  const notifyQ = query(notificationsRef, orderBy("createdAt"));
+  const [notifications] = useCollectionData(notifyQ, {
+    createdAt: "createdAt",
+    unique: "unique",
+    to: "to",
+    from: "from",
+    type: "type",
+    message: "message",
+    postId: "postId",
+  });
+
+  const [navToggle, setNavToggle] = useState(false);
+  const [useNavClassNone, setUseNavClassNone] = useState(true);
+  const navClassNone = useNavClassNone ? "none" : "";
+
+  function showMenu() {
+    setUseNavClassNone((prev) => !prev);
+    setNavToggle((prev) => !prev);
   }
+  useEffect(() => {
+    setUseNavClassNone(true);
+    setNavToggle(false);
+  }, [props.navOpen]);
+
+  function closeNav() {
+    setUseNavClassNone(true);
+    setNavToggle(false);
+  }
+  function signOut() {
+    closeNav();
+    props.menuSignOut();
+  }
+
   return (
     <header>
-      <div className={`header ${props.navToggle && `header-toggle`}`}>
+      <div className={`header ${navToggle && `header-toggle`}`}>
         <div className="nav-title">
           <p>The</p>
           <h1>
-            <NavLink style={{ color: "rgba(255,255,255,.75)" }} to="/">
+            <NavLink
+              onClick={closeNav}
+              style={{ color: "rgba(255,255,255,.75)" }}
+              to="/"
+            >
               TalkSpace
             </NavLink>
           </h1>
         </div>
         <div className="menu-container">
-          <div className={`login-header-buttons  ${props.navClassNone}`}>
-            {!props.auth.currentUser ? (
+          <div className={`login-header-buttons  ${navClassNone}`}>
+            {!auth.currentUser ? (
               <>
                 <NavLink
+                  onClick={closeNav}
                   to="login"
                   className={({ isActive }) =>
                     isActive ? "link active" : "link"
                   }
                 >
-                  {" "}
-                  Login{" "}
+                  Login
                 </NavLink>
 
                 <NavLink
+                  onClick={closeNav}
                   to="register"
                   className={({ isActive }) =>
                     isActive ? "link active" : "link"
@@ -47,6 +84,7 @@ export default function Navbar(props) {
             ) : (
               <>
                 <NavLink
+                  onClick={closeNav}
                   to="profile"
                   className={({ isActive }) =>
                     isActive ? "link active" : "link"
@@ -54,8 +92,8 @@ export default function Navbar(props) {
                 >
                   Profile
                 </NavLink>
-
                 <NavLink
+                  onClick={closeNav}
                   to="createPost"
                   className={({ isActive }) =>
                     isActive ? "link active" : "link"
@@ -63,8 +101,8 @@ export default function Navbar(props) {
                 >
                   Create Post
                 </NavLink>
-
                 <NavLink
+                  onClick={closeNav}
                   to="settings"
                   className={({ isActive }) =>
                     isActive ? "link active" : "link"
@@ -73,25 +111,25 @@ export default function Navbar(props) {
                   Settings
                 </NavLink>
 
-                <SignOut />
+                <NavLink to="/" onClick={signOut}>
+                  SignOut
+                </NavLink>
               </>
             )}
           </div>
-          <button className="showNav" onClick={props.showMenu}>
+          <button className="showNav" onClick={showMenu}>
             menu
           </button>
-          {props.auth.currentUser && props.auth.currentUser.emailVerified && (
+          {auth.currentUser && auth.currentUser.emailVerified && (
             <button className="bell" onClick={props.toggleNotifyWindow}>
               🛎
               <span className="notification-num">
-                {props.notifications &&
-                  props.notifications.filter(
-                    (notification) =>
-                      props.auth.currentUser.uid === notification.to
+                {notifications &&
+                  notifications.filter(
+                    (notification) => auth.currentUser.uid === notification.to
                   ).length > 0 &&
-                  props.notifications.filter(
-                    (notification) =>
-                      props.auth.currentUser.uid === notification.to
+                  notifications.filter(
+                    (notification) => auth.currentUser.uid === notification.to
                   ).length}
               </span>
             </button>

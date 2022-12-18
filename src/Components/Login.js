@@ -7,9 +7,13 @@ import {
 } from "firebase/auth";
 import { query, orderBy, collection, getFirestore } from "firebase/firestore";
 
+import { useNavigate } from "react-router-dom";
+
 export default function Login(props) {
   const auth = getAuth();
   const db = getFirestore();
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -41,7 +45,7 @@ export default function Login(props) {
       console.log("error with handleSignup function in Register.js");
     }
     setLoading(false);
-    props.updateReady();
+    navigate("../");
     window.location.reload(false);
   }
 
@@ -90,6 +94,7 @@ export default function Login(props) {
         <button disabled={loading} onClick={handleLogin}>
           login
         </button>
+
         {!forgotPassword && (
           <button onClick={forgotPasswordBtn}>forgot password?</button>
         )}

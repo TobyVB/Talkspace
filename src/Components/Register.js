@@ -17,7 +17,9 @@ import {
 import { useCollectionData } from "react-firebase-hooks/firestore";
 import { getStorage, ref, getDownloadURL } from "firebase/storage";
 import { nanoid } from "nanoid";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
+
+import { useNavigate } from "react-router-dom";
 
 export default function Register(props) {
   const db = getFirestore();
@@ -26,6 +28,8 @@ export default function Register(props) {
   const [password, setPassword] = useState("");
   const [username, setUsername] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const navigate = useNavigate();
 
   const [unique, setUnique] = useState(nanoid());
 
@@ -150,7 +154,8 @@ export default function Register(props) {
       })
       .then(() => {
         setLoading(false);
-        props.goToLogin();
+        // props.goToLogin();
+        navigate("../login");
       });
   }
 
