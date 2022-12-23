@@ -21,7 +21,7 @@ export default function ViewOtherProfile(props) {
     const q = query(usersRef, orderBy("createdAt"));
     onSnapshot(q, async (snapshot) => {
       snapshot.docs.forEach((doc) => {
-        if (doc.data().uid === props.captured.uid) {
+        if (doc.data().uid === localStorage.getItem("uid")) {
           setFoundUser({ ...doc.data(), id: doc.id });
         }
       });
@@ -52,9 +52,7 @@ export default function ViewOtherProfile(props) {
 
   function viewPost(e) {
     navigate("/post");
-    props.setCaptured((prev) => {
-      return { ...prev, postId: e };
-    });
+    localStorage.setItem("postId", e);
   }
 
   function Post(props) {

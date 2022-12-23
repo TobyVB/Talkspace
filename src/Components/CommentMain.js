@@ -9,9 +9,7 @@ export default function CommentsMain(props) {
 
   function viewProfile(e) {
     navigate("/otherProfile");
-    props.setCaptured((prev) => {
-      return { ...prev, uid: e };
-    });
+    localStorage.setItem("uid", e);
   }
 
   return (

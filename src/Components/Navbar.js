@@ -111,7 +111,7 @@ export default function Navbar(props) {
                   Settings
                 </NavLink>
 
-                <NavLink to="/" onClick={signOut}>
+                <NavLink className="link" to="/" onClick={signOut}>
                   SignOut
                 </NavLink>
               </>

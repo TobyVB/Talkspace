@@ -12,9 +12,6 @@ export default function DeleteAccount(props) {
     const docRef = doc(db, "users", props.userData.id);
     deleteDoc(docRef)
       .then(() => {
-        console.log(`${props.captured.userData.username} in users deleted`);
-      })
-      .then(() => {
         ("deleting from database");
         deleteUser(auth.currentUser)
           .then(() => {

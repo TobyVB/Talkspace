@@ -44,11 +44,11 @@ export default function CreateComment(props) {
       approval: [],
       disapproval: [],
       type: props.type,
-      replyTo: props.replyTo,
+      replyTo: props.comment.replyTo,
       username: currentUser.username,
       defaultPic: currentUser.defaultPic,
-      chain: `${props.type === "comment" ? unique : props.chain}`,
-      unique: `${props.type === "comment" ? unique : props.unique}`,
+      chain: `${props.type === "comment" ? unique : props.comment.chain}`,
+      unique: `${props.type === "comment" ? unique : props.comment.unique}`,
       createdAt: serverTimestamp(),
       postId: props.capturedPostId,
     })
@@ -69,7 +69,7 @@ export default function CreateComment(props) {
                 });
               }
             } else if (props.type === "reply") {
-              if (document.data().unique === props.unique) {
+              if (document.data().unique === props.comment.unique) {
                 console.log(unique);
                 updateDoc(docRef, {
                   id: document.id,
@@ -109,21 +109,21 @@ export default function CreateComment(props) {
               });
           }
         } else if (props.type === "reply")
-          if (currentUser.uid !== props.commentUID) {
+          if (currentUser.uid !== props.comment.uid) {
             addDoc(notifyRef, {
-              to: props.commentUID,
+              to: props.comment.uid,
               from: currentUser.id,
               type: "reply",
               message: `${currentUser.username} replied to your comment.`,
               postId: props.capturedPostId,
-              unique: props.unique,
+              unique: props.comment.unique,
               createdAt: serverTimestamp(),
             }).then(() => {
               const q = query(notifyRef, orderBy("createdAt"));
               onSnapshot(q, async (snapshot) => {
                 snapshot.docs.forEach((document) => {
                   const docRef = doc(db, "notifications", document.id);
-                  if (document.data().unique === props.unique) {
+                  if (document.data().unique === props.comment.unique) {
                     console.log(unique);
                     updateDoc(docRef, {
                       id: document.id,

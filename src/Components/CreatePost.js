@@ -26,16 +26,18 @@ export default function CreatePost(props) {
     window.scrollTo(0, 0);
   }, []);
 
-  const [postObj, setPostObj] = useState({
-    uid: auth.currentUser.uid,
-    follows: [],
-    approval: [],
-    disapproval: [],
-    createdAt: serverTimestamp(),
-    unique: unique,
-    title: "",
-    text: "",
-  });
+  const [postObj, setPostObj] = useState(
+    auth.currentUser && {
+      uid: auth.currentUser.uid,
+      follows: [],
+      approval: [],
+      disapproval: [],
+      createdAt: serverTimestamp(),
+      unique: unique,
+      title: "",
+      text: "",
+    }
+  );
 
   function createPost(e) {
     e.preventDefault();
@@ -53,9 +55,7 @@ export default function CreatePost(props) {
                 id: document.id,
               });
               navigate("/post");
-              props.setCaptured((prev) => {
-                return { ...prev, postId: document.id };
-              });
+              localStorage.setItem("postId", document.id);
             }
           });
         });

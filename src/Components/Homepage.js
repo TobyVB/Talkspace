@@ -61,18 +61,14 @@ export default function Homepage(props) {
   function viewPost(e) {
     if (auth.currentUser && auth.currentUser.emailVerified) {
       navigate("/post");
-      props.setCaptured((prev) => {
-        return { ...prev, postId: e };
-      });
+      localStorage.setItem("postId", e);
     }
   }
 
   function viewProfile(e) {
     if (auth.currentUser && auth.currentUser.emailVerified) {
       navigate("/otherProfile");
-      props.setCaptured((prev) => {
-        return { ...prev, uid: e };
-      });
+      localStorage.setItem("uid", e);
     }
   }
 
@@ -87,8 +83,8 @@ export default function Homepage(props) {
       </div>
       <div className="homepage-posts">
         {posts &&
-          posts.map((post) => (
-            <div className="homepage-post">
+          posts.map((post, index) => (
+            <div key={index} className="homepage-post">
               <div
                 onClick={() => viewProfile(post.uid)}
                 className="profile-link"

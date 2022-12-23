@@ -52,7 +52,7 @@ export default function ViewPost(props) {
     const q = query(postsRef, orderBy("createdAt"));
     onSnapshot(q, async (snapshot) => {
       snapshot.docs.forEach((doc) => {
-        if (doc.data().id === props.captured.postId) {
+        if (doc.data().id === localStorage.getItem("postId")) {
           setFoundPost({ ...doc.data(), id: doc.id });
         }
       });
@@ -73,36 +73,35 @@ export default function ViewPost(props) {
     });
   }, [foundPost]);
 
-  const scrollTarget = useRef();
-  const scrollingTop = (event) => {
-    const elmnt = scrollTarget;
-    elmnt.current.scrollIntoView({
-      behavior: "smooth",
-      block: "center",
-      inline: "start",
-    });
-  };
-  setTimeout(() => {
-    if (props.captured.unique !== "") {
-      scrollingTop();
-    }
-  }, 200);
+  // const scrollTarget = useRef();
+  // const scrollingTop = (event) => {
+  //   const elmnt = scrollTarget;
+  //   elmnt.current.scrollIntoView({
+  //     behavior: "smooth",
+  //     block: "center",
+  //     inline: "start",
+  //   });
+  // };
+  // setTimeout(() => {
+  //   if (localStorage.getItem("unique") !== "") {
+  //     scrollingTop();
+  //   }
+  // }, 200);
 
   function resetUnique() {
-    props.setCaptured((prev) => {
-      return { ...prev, unique: "", currentCommentId: "" };
-    });
+    localStorage.setItem("unique", "");
+    localStorage.setItem("currentCommentId", "");
   }
   function doNothing() {}
 
   // #####################################   F O L L O W   A N D   U N F O L L O W   P O S T   #############################################
   function followPost() {
-    if (!foundPost.follows.includes(props.captured.userData.id)) {
+    if (!foundPost.follows.includes(localStorage.getItem("userData").id)) {
       const postRef = doc(db, "posts", foundPost.id);
       updateDoc(postRef, {
-        follows: arrayUnion(props.captured.userData.id),
+        follows: arrayUnion(localStorage.getItem("userData").id),
       }).then(() => {
-        const userRef = doc(db, "users", props.captured.userData.id);
+        const userRef = doc(db, "users", localStorage.getItem("userData").id);
         updateDoc(userRef, {
           following: arrayUnion(foundPost.id),
         });
@@ -110,9 +109,9 @@ export default function ViewPost(props) {
     } else {
       const postRef = doc(db, "posts", foundPost.id);
       updateDoc(postRef, {
-        follows: arrayRemove(props.captured.userData.id),
+        follows: arrayRemove(localStorage.getItem("userData").id),
       }).then(() => {
-        const userRef = doc(db, "users", props.captured.userData.id);
+        const userRef = doc(db, "users", localStorage.getItem("userData").id);
         updateDoc(userRef, {
           following: arrayRemove(foundPost.id),
         });
@@ -123,7 +122,7 @@ export default function ViewPost(props) {
     navigate("/editPost");
   }
   function deletePost() {
-    const docRef = doc(db, "posts", props.captured.postId);
+    const docRef = doc(db, "posts", localStorage.getItem("postId"));
     deleteDoc(docRef)
       .then(() => {
         console.log("notification deleted");
@@ -133,7 +132,7 @@ export default function ViewPost(props) {
         onSnapshot(q, async (snapshot) => {
           snapshot.docs.forEach((document) => {
             const docRef = doc(db, "comments", document.id);
-            if (document.data().postId === props.captured.postId) {
+            if (document.data().postId === localStorage.getItem("postId")) {
               deleteDoc(docRef);
             }
           });
@@ -144,12 +143,12 @@ export default function ViewPost(props) {
 
   return (
     <div className="page-body">
-      {auth.currentUser.uid === foundPost.uid && (
+      {auth.currentUser && auth.currentUser.uid === foundPost.uid && (
         <button disabled={pagePause && "+true"} onClick={editPost}>
           edit post
         </button>
       )}
-      {auth.currentUser.uid === foundPost.uid && (
+      {auth.currentUser && auth.currentUser.uid === foundPost.uid && (
         <button disabled={pagePause && "+true"} onClick={deletePost}>
           delete post
         </button>
@@ -158,7 +157,7 @@ export default function ViewPost(props) {
         <div className="post-header">
           <p
             className="post-author"
-            onClick={() => props.captured.uid(foundUser.uid)}
+            onClick={() => localStorage.setItem("uid", foundUser.uid)}
           >
             Authored by: {foundUser.username}
           </p>
@@ -173,42 +172,39 @@ export default function ViewPost(props) {
           <div>{foundPost && parse(foundPost.text)}</div>
         </div>
         <button className="follow-post" onClick={followPost}>
-          {foundPost && foundPost.follows.includes(props.captured.userData.id)
+          {foundPost &&
+          foundPost.follows.includes(localStorage.getItem("userData").id)
             ? "- UNFOLLOW"
             : "+ FOLLOW"}
         </button>
       </div>
       <CreateComment
-        replyTo={props.captured.postId}
+        replyTo={localStorage.getItem("postId")}
         id={foundUser.id}
         uid={foundUser.uid}
         type="comment"
-        capturedPostId={props.captured.postId}
+        capturedPostId={localStorage.getItem("postId")}
       />
       <div className="">
         {comments &&
           comments.map(
             (comment) =>
-              comment.replyTo === props.captured.postId && (
+              comment.replyTo === localStorage.getItem("postId") && (
                 <div key={nanoid()}>
                   <Comment
                     comment={comment}
                     type={"comment"}
-                    sendUID={props.captured.uid}
                     key={nanoid()}
                     comments={comments}
-                    capturedUnique={props.captured.unique}
                     resetUnique={
-                      comment.unique === props.captured.unique
+                      comment.unique === localStorage.getItem("unique")
                         ? resetUnique
                         : doNothing
                     }
-                    capturedPostId={props.captured.postId}
-                    currentCommentId={props.captured.currentCommentId}
                   />
-                  {props.captured.unique === comment.unique && (
+                  {/* {localStorage.getItem("unique") === comment.unique && (
                     <div ref={scrollTarget}></div>
-                  )}
+                  )} */}
                 </div>
               )
           )}

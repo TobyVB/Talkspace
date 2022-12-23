@@ -9,9 +9,9 @@ import {
 } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-
 import { storage } from "../App.js";
 import React, { useEffect, useState } from "react";
+import { NavLink } from "react-router-dom";
 
 import { nanoid } from "nanoid";
 
@@ -50,12 +50,16 @@ export default function ViewEditProfile(props) {
   async function updateUser() {
     const docRef = doc(db, "users", currentUser.id);
     await updateDoc(docRef, {
-      defaultPic: `${url === null ? props.captured.userData.defaultPic : url}`,
+      defaultPic: `${
+        url === null ? localStorage.getItem("userData").defaultPic : url
+      }`,
       defPicLoc: `${
-        url === null ? props.captured.userData.defPicLoc : defPicLoc
+        url === null ? localStorage.getItem("userData").defPicLoc : defPicLoc
       }`,
       aboutMe: `${
-        aboutMeValue === "" ? props.captured.userData.aboutMe : aboutMeValue
+        aboutMeValue === ""
+          ? localStorage.getItem("userData").aboutMe
+          : aboutMeValue
       }`,
     });
   }
@@ -167,7 +171,9 @@ export default function ViewEditProfile(props) {
       )}
       {/* ############### S A V E   S E T T I N G S ################ */}
       <div className="save-cancel-edit-profile">
-        <button onClick={() => props.changePageTo("profile")}>cancel</button>
+        <NavLink className="link" to="/profile">
+          cancel
+        </NavLink>
         <button onClick={save}>save</button>
       </div>
     </div>

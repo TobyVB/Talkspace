@@ -17,20 +17,11 @@ export default function Notifications(props) {
         {props.notifications &&
           props.notifications.map(
             (notification, index) =>
-              notification.to === props.captured.uid && (
+              notification.to === localStorage.getItem("uid") && (
                 <Notification
                   key={index}
-                  message={notification.message}
-                  type={notification.type}
-                  changePageTo={props.changePageTo("post")}
-                  sendPostId={props.captured.postId}
-                  postId={notification.postId}
+                  notification={notification}
                   toggleNotifyWindow={props.toggleNotifyWindow}
-                  restartPage={props.restartPage}
-                  unique={notification.unique}
-                  id={notification.id}
-                  sendUnique={props.captured.unique}
-                  sendCurrentCommentId={props.captured.currentCommentId}
                 />
               )
           )}

@@ -30,7 +30,7 @@ export default function ViewPost(props) {
     const q = query(postsRef, orderBy("createdAt"));
     onSnapshot(q, async (snapshot) => {
       snapshot.docs.forEach((doc) => {
-        if (doc.data().id === props.captured.postId) {
+        if (doc.data().id === localStorage.getItem("postId")) {
           setFoundPost({ ...doc.data(), id: doc.id });
         }
       });

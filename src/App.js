@@ -43,9 +43,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 export const storage = getStorage(app);
 // ############################################################
-
 // ############################################################
-
 // ############################################################
 
 export default function App() {
@@ -55,14 +53,6 @@ export default function App() {
   const [allowLogin, setAllowLogin] = useState(true);
   const [loginCompleted, setLoginCompleted] = useState(false);
   useAuthState(auth);
-  // ############################################################
-  const [captured, setCaptured] = useState({
-    uid: "",
-    postId: "",
-    unique: "",
-    currentCommentId: "",
-    userData: "",
-  });
 
   // ############################################################
   useEffect(() => {
@@ -87,9 +77,7 @@ export default function App() {
         });
         users.forEach((user) => {
           if (auth.currentUser && user.uid === auth.currentUser.uid) {
-            setCaptured((prev) => {
-              return { ...prev, userData: user };
-            });
+            localStorage.setItem("userData", user);
           }
         });
       });
@@ -117,7 +105,7 @@ export default function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<SharedLayout menuSignOut={menuSignOut} />}>
-          <Route index element={<Homepage setCaptured={setCaptured} />} />
+          <Route index element={<Homepage />} />
           <Route
             path="login"
             element={
@@ -128,24 +116,10 @@ export default function App() {
             }
           />
           <Route path="register" element={<Register exit={exit} />} />
-          <Route
-            path="profile"
-            element={<ViewProfile setCaptured={setCaptured} signout={exit} />}
-          />
-          <Route
-            path="editProfile"
-            element={<ViewEditProfile captured={captured} />}
-          />
-          <Route
-            path="otherProfile"
-            element={
-              <ViewOtherProfile captured={captured} setCaptured={setCaptured} />
-            }
-          />
-          <Route
-            path="createPost"
-            element={<CreatePost setCaptured={setCaptured} />}
-          />
+          <Route path="profile" element={<ViewProfile signout={exit} />} />
+          <Route path="editProfile" element={<ViewEditProfile />} />
+          <Route path="otherProfile" element={<ViewOtherProfile />} />
+          <Route path="createPost" element={<CreatePost />} />
           <Route path="settings" element={<Settings />} />
           <Route path="settings/changeUsername" element={<ChangeUsername />} />
           <Route
@@ -158,14 +132,8 @@ export default function App() {
             element={<DeleteAccount menuSignOut={menuSignOut} />}
           />
 
-          <Route
-            path="post"
-            element={<ViewPost captured={captured} setCaptured={setCaptured} />}
-          />
-          <Route
-            path="editPost"
-            element={<ViewEditPost captured={captured} />}
-          />
+          <Route path="post" element={<ViewPost />} />
+          <Route path="editPost" element={<ViewEditPost />} />
           {/* <Route path="*" element={<Dunno />} /> */}
           {/* Make error page ^ */}
         </Route>

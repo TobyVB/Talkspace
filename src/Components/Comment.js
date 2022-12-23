@@ -30,12 +30,12 @@ export default function Comment(props) {
   return (
     <div
       className={`comment ${
-        props.comment.unique === props.capturedUnique && `flashing-animation`
+        props.comment.unique === localStorage.getItem("unique") &&
+        `flashing-animation`
       }`}
       onClick={props.resetUnique}
     >
       <CommentMain
-        setCaptured={props.setCaptured}
         comment={props.comment}
         startShowForm={startShowForm}
         showForm={showForm}
@@ -50,11 +50,8 @@ export default function Comment(props) {
           </button>
           <CreateComment
             type="reply"
-            replyTo={props.comment.id}
-            commentUID={props.comment.uid}
-            chain={props.comment.chain}
-            unique={props.comment.unique}
-            capturedPostId={props.capturedPostId}
+            capturedPostId={localStorage.getItem("postId")}
+            comment={props.comment}
           />
         </div>
       )}
@@ -86,12 +83,9 @@ export default function Comment(props) {
                     <Comment
                       comment={comment}
                       type={"reply"}
-                      sendUID={props.sendUID}
                       key={nanoid()}
                       resetUnique={props.resetUnique}
-                      unique={props.comment.unique}
-                      capturedPostId={props.capturedPostId}
-                      chain={props.comment.chain}
+                      capturedPostId={localStorage.getItem("postId")}
                     />
                   </div>
                 )

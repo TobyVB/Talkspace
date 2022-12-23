@@ -9,8 +9,7 @@ import {
 import { useCollectionData } from "react-firebase-hooks/firestore";
 import { getAuth } from "firebase/auth";
 import React, { useEffect, useState } from "react";
-
-import { useNavigate } from "react-router-dom";
+import { useNavigate, NavLink } from "react-router-dom";
 
 export default function ViewProfile(props) {
   const db = getFirestore();
@@ -34,14 +33,7 @@ export default function ViewProfile(props) {
         }
       });
     });
-    if (localStorage.getItem("prevPage") === "editProfile") {
-      setTimeout(() => {
-        setImage(true);
-        localStorage.removeItem("prevPage");
-      }, 800);
-    } else {
-      setImage(true);
-    }
+    setImage(true);
   }, []);
 
   // ########## F I N D   U S E R'S   P O S T  D O C S ##########
@@ -56,9 +48,7 @@ export default function ViewProfile(props) {
 
   function viewPost(e) {
     navigate("/post");
-    props.setCaptured((prev) => {
-      return { ...prev, postId: e };
-    });
+    localStorage.setItem("postId", e);
   }
 
   function Post(props) {
@@ -71,14 +61,17 @@ export default function ViewProfile(props) {
 
   return (
     <div className="page-style page-body">
-      <button>edit profile</button>
+      <NavLink className="link" to="/editProfile">
+        edit profile
+      </NavLink>
       <h2 className="profile-header-text">{`${currentUser.username}`}</h2>
       <div className="profile-jumbotron">
-        <img
-          alt="profile"
+        <div
           className="profile-picture"
-          src={image ? currentUser.defaultPic : ""}
-        />
+          style={{
+            backgroundImage: image ? `url(${currentUser.defaultPic})` : "",
+          }}
+        ></div>
         <div className="profile-info-section">
           <div className="flex">
             <p>user since: </p>
