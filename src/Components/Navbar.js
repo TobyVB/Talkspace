@@ -31,16 +31,27 @@ export default function Navbar(props) {
   useEffect(() => {
     setUseNavClassNone(true);
     setNavToggle(false);
+    setHidden("hidden");
   }, [props.navOpen]);
 
   function closeNav() {
     setUseNavClassNone(true);
     setNavToggle(false);
+    setHidden("hidden");
   }
   function signOut() {
     closeNav();
     props.menuSignOut();
   }
+
+  const [hidden, setHidden] = useState("hidden");
+  const toggleHidden = () => {
+    if (hidden === "hidden") {
+      setHidden("");
+    } else {
+      setHidden("hidden");
+    }
+  };
 
   return (
     <header>
@@ -58,9 +69,9 @@ export default function Navbar(props) {
           </h1>
         </div>
         <div className="menu-container">
-          <div className={`login-header-buttons  ${navClassNone}`}>
+          <div className={`header-btns-container  ${navClassNone}`}>
             {!auth.currentUser ? (
-              <>
+              <div className="login-header-btns">
                 <NavLink
                   onClick={closeNav}
                   to="login"
@@ -80,9 +91,9 @@ export default function Navbar(props) {
                 >
                   Register
                 </NavLink>
-              </>
+              </div>
             ) : (
-              <>
+              <div className="header-btns">
                 <NavLink
                   onClick={closeNav}
                   to="profile"
@@ -101,20 +112,30 @@ export default function Navbar(props) {
                 >
                   Create Post
                 </NavLink>
-                <NavLink
-                  onClick={closeNav}
-                  to="settings"
-                  className={({ isActive }) =>
-                    isActive ? "link active" : "link"
-                  }
-                >
-                  Settings
-                </NavLink>
 
+                {/* MAKE SETTINGS A DROP DOWN MENU INSTEAD */}
+
+                <div>
+                  <a onClick={toggleHidden}>Settings</a>
+                  <div className={`settings-buttons ${hidden}`}>
+                    <NavLink className={"settings-link"} to="changeUsername">
+                      change username
+                    </NavLink>
+                    <NavLink className={"settings-link"} to="retreivePassword">
+                      retrieve password
+                    </NavLink>
+                    <NavLink className={"settings-link"} to="changePassword">
+                      change password
+                    </NavLink>
+                    <NavLink className={"settings-link"} to="deleteAccount">
+                      delete account
+                    </NavLink>
+                  </div>
+                </div>
                 <NavLink className="link" to="/" onClick={signOut}>
                   SignOut
                 </NavLink>
-              </>
+              </div>
             )}
           </div>
           <button className="showNav" onClick={showMenu}>

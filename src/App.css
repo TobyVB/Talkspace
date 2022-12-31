@@ -210,8 +210,8 @@ form {
   height: 30vh;
   width: 30vh;
   margin-top: 3em;
-  object-fit: scale-down;
-  background-size: contain;
+  background-size: cover;
+  background-position: center center;
   border-radius: 0.5em;
   box-shadow: 0px 0px 5px black;
 }
@@ -449,7 +449,8 @@ form {
   display: flex;
   flex-direction: column;
   max-width: fit-content;
-  margin: 5em auto;
+  margin: 1em;
+  padding-top: 5em;
   gap: 1.25em;
 }
 /* ################################################### */
@@ -508,7 +509,7 @@ form {
   .header {
     font-size: 0.7rem;
   }
-  .login-header-buttons {
+  .header-btns-container {
     position: fixed;
     display: flex;
     flex-direction: column;
@@ -520,6 +521,16 @@ form {
     /* padding-left is so mouseleave works when passing disabled button */
     padding: 2em 0.5em;
     gap: 1.5em;
+  }
+  .login-header-btns {
+    display: flex;
+    gap: 1.5em;
+    flex-direction: column;
+  }
+  .header-btns {
+    display: flex;
+    gap: 1.5em;
+    flex-direction: column;
   }
   .showNav {
     background: none;
@@ -586,7 +597,8 @@ form {
 }
 /* ################################# */
 .link,
-button {
+button,
+.settings-link {
   color: rgba(255, 255, 255, 0.8);
   text-decoration: none;
   font-size: 0.85rem;
@@ -594,6 +606,29 @@ button {
   background: none;
   border: none;
 }
+.settings-link {
+  font-size: 1em;
+}
+.settings-buttons {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  gap: 2em;
+  background: black;
+  padding: 3em 1em 1em 1em;
+  margin-left: -1em;
+}
 .active {
   color: steelblue;
+}
+.login-header-btns {
+  display: flex;
+  gap: 1.5em;
+}
+.header-btns {
+  display: flex;
+  gap: 1.5em;
+}
+.hidden {
+  display: none;
 }

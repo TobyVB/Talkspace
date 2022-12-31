@@ -44,7 +44,11 @@ export default function CreateComment(props) {
       approval: [],
       disapproval: [],
       type: props.type,
-      replyTo: props.comment.replyTo,
+      replyTo: `${
+        props.type === "comment"
+          ? localStorage.getItem("postId")
+          : props.comment.replyTo
+      }`,
       username: currentUser.username,
       defaultPic: currentUser.defaultPic,
       chain: `${props.type === "comment" ? unique : props.comment.chain}`,

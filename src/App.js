@@ -13,7 +13,6 @@ import {
 import { useAuthState } from "react-firebase-hooks/auth";
 import { getStorage } from "firebase/storage";
 
-import Settings from "./Components/Settings.js";
 import Homepage from "./Components/Homepage.js";
 import ViewProfile from "./Components/ViewProfile.js";
 import ViewEditProfile from "./Components/ViewEditProfile.js";
@@ -120,15 +119,11 @@ export default function App() {
           <Route path="editProfile" element={<ViewEditProfile />} />
           <Route path="otherProfile" element={<ViewOtherProfile />} />
           <Route path="createPost" element={<CreatePost />} />
-          <Route path="settings" element={<Settings />} />
-          <Route path="settings/changeUsername" element={<ChangeUsername />} />
+          <Route path="changeUsername" element={<ChangeUsername />} />
+          <Route path="retreivePassword" element={<RetrievePassword />} />
+          <Route path="changePassword" element={<ChangePassword />} />
           <Route
-            path="settings/retreivePassword"
-            element={<RetrievePassword />}
-          />
-          <Route path="settings/changePassword" element={<ChangePassword />} />
-          <Route
-            path="settings/deleteAccount"
+            path="deleteAccount"
             element={<DeleteAccount menuSignOut={menuSignOut} />}
           />
 
