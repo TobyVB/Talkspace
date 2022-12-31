@@ -116,7 +116,9 @@ export default function Navbar(props) {
                 {/* MAKE SETTINGS A DROP DOWN MENU INSTEAD */}
 
                 <div>
-                  <a onClick={toggleHidden}>Settings</a>
+                  <a className="link" onClick={toggleHidden}>
+                    Settings ⬇
+                  </a>
                   <div className={`settings-buttons ${hidden}`}>
                     <NavLink className={"settings-link"} to="changeUsername">
                       change username
