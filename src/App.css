@@ -514,13 +514,15 @@ form {
     display: flex;
     flex-direction: column;
     right: 0;
-    top: 10vh;
+    top: 0vh;
     background: rgba(0, 0, 0, 0.8);
     border-bottom: 1px solid rgb(62, 166, 255);
     border-bottom-left-radius: 5px;
     /* padding-left is so mouseleave works when passing disabled button */
-    padding: 2em 0.5em;
+    padding: 15vh 0.5em 1em 0.5em;
     gap: 1.5em;
+    min-width: 180px;
+    z-index: -1;
   }
   .login-header-btns {
     display: flex;
@@ -531,6 +533,9 @@ form {
     display: flex;
     gap: 1.5em;
     flex-direction: column;
+  }
+  .header-buttons {
+    align-items: left;
   }
   .showNav {
     background: none;
@@ -573,8 +578,24 @@ form {
   .profile-picture {
     margin: auto;
   }
+  .settings-buttons {
+    position: relative;
+    margin-left: 1em;
+    padding: 1em 1em 1em 1em;
+  }
+  .link {
+    padding-left: 1em;
+  }
 }
 @media screen and (min-width: 700px) {
+  .header-btns {
+    align-items: center;
+  }
+  .settings-buttons {
+    position: absolute;
+    margin-left: -1em;
+    z-index: -1;
+  }
   .showNav {
     display: none;
   }
@@ -594,6 +615,12 @@ form {
     left: 30vw;
     top: 20vh;
   }
+  .header-buttons {
+    align-items: center;
+  }
+  .settings-buttons {
+    padding: 3em 1em 1em 1em;
+  }
 }
 /* ################################# */
 .link,
@@ -607,13 +634,10 @@ button,
   border: none;
 }
 .settings-buttons {
-  position: absolute;
   display: flex;
   flex-direction: column;
   gap: 2em;
   background: black;
-  padding: 3em 1em 1em 1em;
-  margin-left: -1em;
 }
 .active {
   color: steelblue;
@@ -625,7 +649,6 @@ button,
 .header-btns {
   display: flex;
   gap: 1.5em;
-  align-items: center;
 }
 .hidden {
   display: none;
