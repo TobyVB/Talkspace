@@ -67,7 +67,7 @@ export default function Homepage(props) {
 
   function viewProfile(e) {
     if (auth.currentUser && auth.currentUser.emailVerified) {
-      navigate("/otherProfile");
+      navigate("/profile");
       localStorage.setItem("uid", e);
     }
   }

@@ -1,17 +1,15 @@
 import { getAuth, updatePassword } from "firebase/auth";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 
 export default function ChangePassword(props) {
   const auth = getAuth();
 
+  const navigate = useNavigate();
+
   const [password, setPassword] = useState("");
-  const [showPass, setShowPass] = useState(false);
   const [success, setSuccess] = useState(false);
-  function changeShowPass() {
-    setShowPass((prevShowPass) => !prevShowPass);
-  }
 
   const user = auth.currentUser;
 
@@ -31,13 +29,11 @@ export default function ChangePassword(props) {
         // ...
       });
   }
-  function noSelect(event) {
-    event.preventDefault();
-  }
 
   return (
     <div className="page-body">
       <h1>Reset Password</h1>
+      <button onClick={() => navigate(-1)}>Back</button>
       <input
         className="reset-password-input"
         type="password"
@@ -45,12 +41,8 @@ export default function ChangePassword(props) {
         value={password}
         onChange={(event) => setPassword(event.target.value)}
       />
-      <button onMouseDown={noSelect} onClick={changeShowPass}>
-        show password
-      </button>
-      <NavLink to="/settings">cancel</NavLink>
-      {showPass && <p>{password}</p>}
-      <button onClick={updatePassword}>save</button>
+
+      <button onClick={update}>save</button>
       {success && <p>SUCCESS!</p>}
     </div>
   );

@@ -8,7 +8,7 @@ export default function CommentsMain(props) {
   const navigate = useNavigate();
 
   function viewProfile(e) {
-    navigate("/otherProfile");
+    navigate("/profile");
     localStorage.setItem("uid", e);
   }
 

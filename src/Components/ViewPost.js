@@ -141,6 +141,11 @@ export default function ViewPost(props) {
     navigate("/profile");
   }
 
+  function goToProfile() {
+    localStorage.setItem("uid", foundUser.uid);
+    navigate("/profile");
+  }
+
   return (
     <div className="page-body">
       {auth.currentUser && auth.currentUser.uid === foundPost.uid && (
@@ -155,16 +160,14 @@ export default function ViewPost(props) {
       )}
       <div className="view-post-container">
         <div className="post-header">
-          <p
-            className="post-author"
-            onClick={() => localStorage.setItem("uid", foundUser.uid)}
-          >
+          <p className="post-author" onClick={goToProfile}>
             Authored by: {foundUser.username}
           </p>
           <img
             alt={foundUser.username}
             src={foundUser.defaultPic}
             className="mini-defaultPic"
+            onClick={goToProfile}
           />
         </div>
         <h4 className="post-title">{foundPost.title}</h4>

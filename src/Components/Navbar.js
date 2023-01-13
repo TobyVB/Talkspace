@@ -2,7 +2,7 @@ import { React, useEffect, useState } from "react";
 import { getFirestore, collection, query, orderBy } from "firebase/firestore";
 import { useCollectionData } from "react-firebase-hooks/firestore";
 
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate, useLocation } from "react-router-dom";
 import { getAuth } from "firebase/auth";
 
 export default function Navbar(props) {
@@ -23,6 +23,8 @@ export default function Navbar(props) {
   const [navToggle, setNavToggle] = useState(false);
   const [useNavClassNone, setUseNavClassNone] = useState(true);
   const navClassNone = useNavClassNone ? "none" : "";
+  const navigate = useNavigate();
+  const location = useLocation();
 
   function showMenu() {
     setUseNavClassNone((prev) => !prev);
@@ -38,6 +40,16 @@ export default function Navbar(props) {
     setUseNavClassNone(true);
     setNavToggle(false);
     setHidden("hidden");
+  }
+
+  function goToProfile() {
+    setUseNavClassNone(true);
+    setNavToggle(false);
+    setHidden("hidden");
+    localStorage.setItem("uid", auth.currentUser.uid);
+    if (location.pathname === "/profile") {
+      navigate(0);
+    }
   }
   function signOut() {
     closeNav();
@@ -95,7 +107,7 @@ export default function Navbar(props) {
             ) : (
               <div className="header-btns">
                 <NavLink
-                  onClick={closeNav}
+                  onClick={goToProfile}
                   to="profile"
                   className={({ isActive }) =>
                     isActive ? "link active" : "link"

@@ -18,7 +18,6 @@ import ViewProfile from "./Components/ViewProfile.js";
 import ViewEditProfile from "./Components/ViewEditProfile.js";
 import Login from "./Components/Login.js";
 import Register from "./Components/Register.js";
-import ViewOtherProfile from "./Components/ViewOtherProfile";
 import CreatePost from "./Components/CreatePost.js";
 import ViewPost from "./Components/ViewPost.js";
 import ViewEditPost from "./Components/ViewEditPost.js";
@@ -117,7 +116,6 @@ export default function App() {
           <Route path="register" element={<Register exit={exit} />} />
           <Route path="profile" element={<ViewProfile signout={exit} />} />
           <Route path="editProfile" element={<ViewEditProfile />} />
-          <Route path="otherProfile" element={<ViewOtherProfile />} />
           <Route path="createPost" element={<CreatePost />} />
           <Route path="changeUsername" element={<ChangeUsername />} />
           <Route path="retreivePassword" element={<RetrievePassword />} />
@@ -129,7 +127,7 @@ export default function App() {
 
           <Route path="post" element={<ViewPost />} />
           <Route path="editPost" element={<ViewEditPost />} />
-          {/* <Route path="*" element={<Dunno />} /> */}
+          {/* <Route path="*" element={<page404/>} /> */}
           {/* Make error page ^ */}
         </Route>
       </Routes>

@@ -1,11 +1,13 @@
 import { doc, deleteDoc, getFirestore } from "firebase/firestore";
 import { getAuth, deleteUser } from "firebase/auth";
 
-import { NavLink } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 export default function DeleteAccount(props) {
   const db = getFirestore();
   const auth = getAuth();
+
+  const navigate = useNavigate();
 
   // ########## D E L E T E   U S E R ##########
   const deleteAllUserData = async () => {
@@ -29,7 +31,7 @@ export default function DeleteAccount(props) {
   return (
     <div className="page-body">
       <h1>Delete Account</h1>
-      <NavLink to="/settings">cancel</NavLink>
+      <button onClick={() => navigate(-1)}>Back</button>
       <button onClick={() => deleteAllUserData(auth.currentUser.uid)}>
         Delete User
       </button>

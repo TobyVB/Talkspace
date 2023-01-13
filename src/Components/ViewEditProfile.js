@@ -11,7 +11,7 @@ import { getAuth } from "firebase/auth";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { storage } from "../App.js";
 import React, { useEffect, useState } from "react";
-import { NavLink } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 import { nanoid } from "nanoid";
 
@@ -29,10 +29,11 @@ export default function ViewEditProfile(props) {
   const [url, setUrl] = useState(null);
   const [defPicLoc, setDefPicLoc] = useState(props.defPicLoc);
 
+  const navigate = useNavigate();
+
   const [objURL, setObjURL] = useState("");
 
   window.scrollTo(0, 0);
-  localStorage.setItem("prevPage", "editProfile");
 
   // ########## A C C E S S   C U R R E N T   U S E R'S   D O C ##########
   useEffect(() => {
@@ -70,7 +71,7 @@ export default function ViewEditProfile(props) {
       image !== null && submitImage();
     }
     updateUser();
-    props.changePageTo("profile");
+    navigate("/profile");
   }
   const [hideEditImage, setHideEditImage] = useState(true);
   function showEditImage() {
@@ -171,9 +172,7 @@ export default function ViewEditProfile(props) {
       )}
       {/* ############### S A V E   S E T T I N G S ################ */}
       <div className="save-cancel-edit-profile">
-        <NavLink className="link" to="/profile">
-          cancel
-        </NavLink>
+        <button onClick={() => navigate(-1)}>cancel</button>
         <button onClick={save}>save</button>
       </div>
     </div>

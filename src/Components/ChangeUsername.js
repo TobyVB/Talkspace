@@ -8,16 +8,16 @@ import {
   collection,
 } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
-
+import { useNavigate } from "react-router-dom";
 import React, { useEffect, useState } from "react";
-
-import { NavLink } from "react-router-dom";
 
 export default function ChangeUsername(props) {
   const db = getFirestore();
   const auth = getAuth();
   const usersRef = collection(db, "users");
   const [currentUser, setCurrentUser] = useState("");
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     const q = query(usersRef, orderBy("createdAt"));
@@ -39,16 +39,12 @@ export default function ChangeUsername(props) {
       username: username,
     });
     setUsernameChanged(true);
-    setTimeout(() => {
-      <NavLink to="/settings" />;
-    }, 2000);
   }
 
   return (
     <div className="page-body">
       <h1>Change Username</h1>
-      {/* <button onClick={() => props.changePageTo("settings")}>cancel</button> */}
-      <NavLink to="/settings">back</NavLink>
+      <button onClick={() => navigate(-1)}>Back</button>
       <input
         onChange={(event) => setUsername(event.target.value)}
         placeholder="enter new username"
