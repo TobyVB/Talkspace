@@ -9,7 +9,7 @@ import {
   collection,
 } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
-import { useNavigate, NavLink } from "react-router-dom";
+import { useNavigate, NavLink, useLocation } from "react-router-dom";
 
 export default function ViewProfile(props) {
   const db = getFirestore();
@@ -21,6 +21,7 @@ export default function ViewProfile(props) {
   const [image, setImage] = useState(false);
   const navigate = useNavigate();
   const [userProfile, setUserProfile] = useState(false);
+  const location = useLocation();
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -92,59 +93,88 @@ export default function ViewProfile(props) {
   }
 
   return (
-    <div className="page-style page-body">
-      {userProfile && (
-        <NavLink className="link" to="/editProfile">
-          edit profile
-        </NavLink>
-      )}
-      <h2 className="profile-header-text">{`${userData.username}`}</h2>
-      <div className="profile-jumbotron">
-        <div
-          className="profile-picture"
-          style={{
-            backgroundImage: image ? `url(${userData.defaultPic})` : "",
-          }}
-        ></div>
-        <div className="profile-info-section">
-          <div className="flex">
-            <p>user since: </p>
-            <Clock createdAt={userData.createdAt} />
-          </div>
-          <hr></hr>
-          <p>{`${userData.aboutMe !== undefined ? userData.aboutMe : ""}`}</p>
-        </div>
+    <div style={{ paddingTop: "51px" }}>
+      <div
+        style={{
+          backgroundColor: "rgba(62, 166, 255,.3)",
+          height: "100px",
+          display: "flex",
+          flexDirection: "column",
+          border: "1px solid orange",
+        }}
+      >
+        {auth.currentUser &&
+          location.pathname === "/profile" &&
+          localStorage.getItem("uid") === auth.currentUser.uid && (
+            <NavLink
+              style={{
+                border: "1px solid red",
+                display: "inline-block",
+                zIndex: "10",
+                background: "pink",
+              }}
+              className="link"
+              to="/editProfile"
+            >
+              <button
+                style={{ marginTop: "61px" }}
+                className="edit-profile-btn"
+              >
+                Edit
+              </button>
+            </NavLink>
+          )}
       </div>
-      <div className="profile-post-sections">
-        <div>
-          <h3>{`${userData.username}'s posts`}</h3>
-          <div className="foundUser-posts">
-            {posts &&
-              posts.filter((post) => post.uid === userData.uid).length < 1 &&
-              "... No posts to show"}
-            {posts &&
-              posts.map(
-                (post) =>
-                  post.uid === userData.uid && (
-                    <Post id={post.id} key={post.id} title={post.title} />
-                  )
-              )}
+      <div style={{ marginTop: 0 }} className="page-style page-body">
+        <div className="profile-jumbotron">
+          <div className="profile-info-section">
+            <h2 className="profile-header-text">{`${userData.username}`}</h2>
+            <div className="flex">
+              <p>user since: </p>
+              <Clock createdAt={userData.createdAt} />
+            </div>
+            <hr></hr>
+            <p>{`${userData.aboutMe !== undefined ? userData.aboutMe : ""}`}</p>
           </div>
+          <div
+            className="profile-picture"
+            style={{
+              backgroundImage: image ? `url(${userData.defaultPic})` : "",
+            }}
+          ></div>
         </div>
-        <div>
-          <h3>Liked Posts</h3>
-          <div className="foundUser-posts">
-            {posts &&
-              posts.filter((post) => post.follows.includes(userData.id))
-                .length < 1 &&
-              "... No posts to show"}
-            {posts &&
-              posts.map(
-                (post) =>
-                  post.follows.includes(userData.id) && (
-                    <Post id={post.id} key={post.id} title={post.title} />
-                  )
-              )}
+
+        <div className="profile-post-sections">
+          <div>
+            <h3>{`${userData.username}'s posts`}</h3>
+            <div className="foundUser-posts">
+              {posts &&
+                posts.filter((post) => post.uid === userData.uid).length < 1 &&
+                "... No posts to show"}
+              {posts &&
+                posts.map(
+                  (post) =>
+                    post.uid === userData.uid && (
+                      <Post id={post.id} key={post.id} title={post.title} />
+                    )
+                )}
+            </div>
+          </div>
+          <div>
+            <h3>Liked Posts</h3>
+            <div className="foundUser-posts">
+              {posts &&
+                posts.filter((post) => post.follows.includes(userData.id))
+                  .length < 1 &&
+                "... No posts to show"}
+              {posts &&
+                posts.map(
+                  (post) =>
+                    post.follows.includes(userData.id) && (
+                      <Post id={post.id} key={post.id} title={post.title} />
+                    )
+                )}
+            </div>
           </div>
         </div>
       </div>

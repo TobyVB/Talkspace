@@ -1,5 +1,11 @@
 import { React, useEffect, useState } from "react";
-import { getFirestore, collection, query, orderBy } from "firebase/firestore";
+import {
+  getFirestore,
+  collection,
+  query,
+  orderBy,
+  onSnapshot,
+} from "firebase/firestore";
 import { useCollectionData } from "react-firebase-hooks/firestore";
 
 import { NavLink, useNavigate, useLocation } from "react-router-dom";
@@ -65,6 +71,19 @@ export default function Navbar(props) {
     }
   };
 
+  const usersRef = collection(db, "users");
+  const [currentUser, setCurrentUser] = useState("");
+  useEffect(() => {
+    const q = query(usersRef, orderBy("createdAt"));
+    onSnapshot(q, async (snapshot) => {
+      snapshot.docs.forEach((doc) => {
+        if (doc.data().uid === auth.currentUser.uid) {
+          setCurrentUser({ ...doc.data(), id: doc.id });
+        }
+      });
+    });
+  }, []);
+
   return (
     <header>
       <div className={`header ${navToggle && `header-toggle`}`}>
@@ -80,7 +99,16 @@ export default function Navbar(props) {
             </NavLink>
           </h1>
         </div>
+
         <div className="menu-container">
+          {/* {auth.currentUser &&
+            location.pathname === "/profile" &&
+            localStorage.getItem("uid") === auth.currentUser.uid && (
+              <NavLink className="link" to="/editProfile">
+                <button className="edit-profile-btn">edit</button>
+              </NavLink>
+            )} */}
+
           <div className={`header-btns-container  ${navClassNone}`}>
             {!auth.currentUser ? (
               <div className="login-header-btns">
@@ -152,9 +180,6 @@ export default function Navbar(props) {
               </div>
             )}
           </div>
-          <button className="showNav" onClick={showMenu}>
-            menu
-          </button>
           {auth.currentUser && auth.currentUser.emailVerified && (
             <button className="bell" onClick={props.toggleNotifyWindow}>
               🛎
@@ -169,6 +194,14 @@ export default function Navbar(props) {
               </span>
             </button>
           )}
+          {/* <button className="showNav" onClick={showMenu}>
+            menu
+          </button> */}
+          <img
+            className="mini-defaultPic"
+            onClick={showMenu}
+            src={currentUser.defaultPic}
+          />
         </div>
       </div>
     </header>
