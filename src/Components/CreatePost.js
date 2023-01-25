@@ -71,7 +71,7 @@ export default function CreatePost(props) {
   // ##########################################################################
 
   return (
-    <div className="page-body">
+    <div className="page-body" style={{ paddingTop: "10em" }}>
       <h1 className="create-post-h1">Create Post</h1>
       {auth.currentUser && (
         <div className="create-post-form" onSubmit={createPost}>

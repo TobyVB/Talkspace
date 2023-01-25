@@ -97,38 +97,52 @@ export default function ViewProfile(props) {
       <div
         style={{
           backgroundColor: "rgba(62, 166, 255,.3)",
-          height: "100px",
+          height: "400px",
           display: "flex",
-          flexDirection: "column",
-          border: "1px solid orange",
+          backgroundSize: "cover",
+          backgroundPosition: "center center",
+          backgroundImage: image ? `url(${userData.coverPhoto})` : "",
         }}
-      >
-        {auth.currentUser &&
-          location.pathname === "/profile" &&
-          localStorage.getItem("uid") === auth.currentUser.uid && (
-            <NavLink
-              style={{
-                border: "1px solid red",
-                display: "inline-block",
-                zIndex: "10",
-                background: "pink",
-              }}
-              className="link"
-              to="/editProfile"
-            >
-              <button
-                style={{ marginTop: "61px" }}
-                className="edit-profile-btn"
-              >
-                Edit
-              </button>
-            </NavLink>
-          )}
-      </div>
+      ></div>
+
       <div style={{ marginTop: 0 }} className="page-style page-body">
-        <div className="profile-jumbotron">
+        <div className="profile-header">
+          <div
+            className="profile-picture"
+            style={{
+              border: "7px solid rgb(57, 76, 95)",
+              borderRadius: "100%",
+              backgroundSize: "cover",
+              backgroundPosition: "center center",
+              backgroundImage: image ? `url(${userData.defaultPic})` : "",
+            }}
+          ></div>
+          <h2 className="profile-username">{`${userData.username}`}</h2>
+          {/* create new div put create post button in there with edit button */}
+          <div className="profile-header-btns">
+            <span>
+              {auth.currentUser &&
+                location.pathname === "/profile" &&
+                localStorage.getItem("uid") === auth.currentUser.uid && (
+                  <NavLink to="/createPost">
+                    <button className="edit-profile-btn">Post</button>
+                  </NavLink>
+                )}
+            </span>
+            <span>
+              {auth.currentUser &&
+                location.pathname === "/profile" &&
+                localStorage.getItem("uid") === auth.currentUser.uid && (
+                  <NavLink to="/editProfile">
+                    <button className="edit-profile-btn">Edit</button>
+                  </NavLink>
+                )}
+            </span>
+          </div>
+        </div>
+
+        <div style={{ marginTop: "100px" }} className="profile-jumbotron">
           <div className="profile-info-section">
-            <h2 className="profile-header-text">{`${userData.username}`}</h2>
             <div className="flex">
               <p>user since: </p>
               <Clock createdAt={userData.createdAt} />
@@ -136,14 +150,7 @@ export default function ViewProfile(props) {
             <hr></hr>
             <p>{`${userData.aboutMe !== undefined ? userData.aboutMe : ""}`}</p>
           </div>
-          <div
-            className="profile-picture"
-            style={{
-              backgroundImage: image ? `url(${userData.defaultPic})` : "",
-            }}
-          ></div>
         </div>
-
         <div className="profile-post-sections">
           <div>
             <h3>{`${userData.username}'s posts`}</h3>
