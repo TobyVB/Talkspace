@@ -1,106 +1,192 @@
-import Clock from './Utils/Clock.js';
-import { getFirestore, query, orderBy, 
-    onSnapshot, collection
+import Clock from "./Utils/Clock.js";
+import React, { useEffect, useState } from "react";
+import { useCollectionData } from "react-firebase-hooks/firestore";
+import {
+  getFirestore,
+  query,
+  orderBy,
+  onSnapshot,
+  collection,
 } from "firebase/firestore";
-import { useCollectionData } from 'react-firebase-hooks/firestore';
 import { getAuth } from "firebase/auth";
-import React, {useEffect, useState} from "react";
-export default function ViewProfile(props){
-    const db = getFirestore();
-    const auth = getAuth();
-    const usersRef = collection(db, 'users');
-    const [currentUser, setCurrentUser] = useState("")
-    const [image, setImage] = useState(false);
-    const [objURL, setObjURL] = useState("")
+import { useNavigate, NavLink, useLocation } from "react-router-dom";
 
-    useEffect(() => {
-        window.scrollTo(0, 0)
-    }, [])
+export default function ViewProfile(props) {
+  const db = getFirestore();
+  const auth = getAuth();
+  const usersRef = collection(db, "users");
+  const [foundUser, setFoundUser] = useState("");
+  const [currentUser, setCurrentUser] = useState("");
+  const [userData, setUserData] = useState("");
+  const [image, setImage] = useState(false);
+  const navigate = useNavigate();
+  const [userProfile, setUserProfile] = useState(false);
+  const location = useLocation();
 
-    // ########## A C C E S S   C U R R E N T   U S E R'S   D O C ##########
-    useEffect(() => {
-        const q = query(usersRef, orderBy('createdAt'))
-        onSnapshot(q, async (snapshot) => {
-            snapshot.docs.forEach(doc => {
-                if(doc.data().uid === auth.currentUser.uid){
-                    setCurrentUser({ ...doc.data(), id: doc.id})
-                }
-            })
-        })
-        if(localStorage.getItem("prevPage") === "editProfile"){
-            setTimeout(() => {
-                setImage(true)
-                localStorage.removeItem("prevPage")
-            },800)
-        } else {
-            setImage(true);
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+  console.log("hi");
+  // ########## A C C E S S   C U R R E N T   U S E R'S   D O C ##########
+  useEffect(() => {
+    const q = query(usersRef, orderBy("createdAt"));
+    onSnapshot(q, async (snapshot) => {
+      snapshot.docs.forEach((doc) => {
+        if (doc.data().uid === auth.currentUser.uid) {
+          setCurrentUser({ ...doc.data(), id: doc.id });
         }
-    },[])
-
-    // ########## F I N D   U S E R'S   P O S T  D O C S ##########
-    const postsRef = collection(db, 'posts');
-    const qPosts = query(postsRef, orderBy('createdAt'));
-    const [posts] = useCollectionData(qPosts, { 
-      createdAt: 'createdAt', 
-      idField: 'id', 
-      title: 'title',
-      uid: `uid`
+      });
     });
+    setImage(true);
+    console.log("refind current user information");
+  }, []);
 
-    function viewPost(e){
-        props.updatePage()
-        props.sendPostId(e)
+  // ########## A C C E S S   F O U N D   U S E R'S   D O C ##########
+  useEffect(() => {
+    const q = query(usersRef, orderBy("createdAt"));
+    onSnapshot(q, async (snapshot) => {
+      snapshot.docs.forEach((doc) => {
+        if (doc.data().uid === localStorage.getItem("uid")) {
+          setFoundUser({ ...doc.data(), id: doc.id });
+        }
+      });
+    });
+  }, []);
+
+  // ########## D E T E R M I N E   I F   O N   U S E R ' S   P R O F I L E ##########
+  useEffect(() => {
+    if (foundUser !== "" && currentUser !== "") {
+      setUserData(foundUser);
     }
+  }, [foundUser, currentUser]);
 
-    function Post(props){
-        return (
-            <p 
-                className="post-link"
-                onClick={() => viewPost(props.id)}
-            >{props.title}
-            </p>
-        )
+  useEffect(() => {
+    if (foundUser.id === currentUser.id) {
+      setUserProfile(true);
+      console.log(foundUser.id);
+      console.log(currentUser.id);
+    } else {
+      setUserProfile(false);
     }
+  }, [userData]);
 
+  // ########## F I N D   U S E R'S   P O S T  D O C S ##########
+  const postsRef = collection(db, "posts");
+  const qPosts = query(postsRef, orderBy("createdAt"));
+  const [posts] = useCollectionData(qPosts, {
+    createdAt: "createdAt",
+    idField: "id",
+    title: "title",
+    uid: `uid`,
+  });
+
+  function viewPost(e) {
+    navigate("/post");
+    localStorage.setItem("postId", e);
+  }
+
+  function Post(props) {
     return (
-        <div className="profile page-body">
-            <button className="edit-user-btn" onClick={props.editProfile}>edit profile</button>
-            <h2 
-            className="profile-header-text">{`${currentUser.username}`}
-            </h2>
-            <div className="profile-jumbotron">
-                <img 
-                    alt="profile" 
-                    className="edit-profile-picture" 
-                    src={image && currentUser.defaultPic}
-                /> 
-                <div className='profile-info-section'>
-                    <div className='flex'>
-                        <p>user since: </p>
-                        <Clock createdAt={currentUser.createdAt}/>
-                    </div>     
-                    <hr></hr>
-                    <p>
-                        {`${currentUser.aboutMe !== undefined? currentUser.aboutMe: ""}`}
-                    </p>
-                </div>
-            </div>
-            <div className="profile-post-sections">
-                <div>
-                    <h3>{`${currentUser.username}'s posts`}</h3>
-                    <div className="foundUser-posts">
-                        {posts && posts.filter(post => post.uid === currentUser.uid).length < 1 && "... No posts to show"}
-                        {posts && posts.map(post => post.uid === currentUser.uid && <Post id={post.id} key={post.id} title={post.title}/>)}
-                    </div>
-                </div>
-                <div>
-                    <h3>Liked Posts</h3>
-                    <div className="foundUser-posts">
-                        {posts && posts.filter(post => post.follows.includes(currentUser.id)).length < 1 && "... No posts to show"}
-                        {posts && posts.map(post => post.follows.includes(currentUser.id)  && <Post id={post.id} key={post.id} title={post.title}/>)}
-                    </div>
-                </div>
-            </div>
+      <p className="post-link" onClick={() => viewPost(props.id)}>
+        {props.title}
+      </p>
+    );
+  }
+
+  return (
+    <div style={{ paddingTop: "51px" }}>
+      <div
+        style={{
+          backgroundColor: "rgba(62, 166, 255,.3)",
+          height: "400px",
+          display: "flex",
+          backgroundSize: "cover",
+          backgroundPosition: "center center",
+          backgroundImage: image ? `url(${foundUser.coverPic})` : "",
+        }}
+      ></div>
+
+      <div style={{ marginTop: 0 }} className="page-style page-body">
+        <div className="profile-header">
+          <div
+            className="profile-picture"
+            style={{
+              border: "7px solid rgb(57, 76, 95)",
+              backgroundColor: "rgb(57, 76, 95)",
+              borderRadius: "100%",
+              backgroundSize: "cover",
+              backgroundPosition: "center center",
+              backgroundImage: image ? `url(${foundUser.defaultPic})` : "",
+            }}
+          ></div>
+          <h2 className="profile-username">{`${userData.username}`}</h2>
+          {/* create new div put create post button in there with edit button */}
+          <div className="profile-header-btns">
+            <span>
+              {auth.currentUser &&
+                location.pathname === "/profile" &&
+                localStorage.getItem("uid") === auth.currentUser.uid && (
+                  <NavLink to="/createPost">
+                    <button className="edit-profile-btn">Post</button>
+                  </NavLink>
+                )}
+            </span>
+            <span>
+              {auth.currentUser &&
+                location.pathname === "/profile" &&
+                localStorage.getItem("uid") === auth.currentUser.uid && (
+                  <NavLink to="/editProfile">
+                    <button className="edit-profile-btn">Edit</button>
+                  </NavLink>
+                )}
+            </span>
+          </div>
         </div>
-    )
+
+        <div style={{ marginTop: "100px" }} className="profile-jumbotron">
+          <div className="profile-info-section">
+            <div className="flex">
+              <p>user since: </p>
+              <Clock createdAt={userData.createdAt} />
+            </div>
+            <hr></hr>
+            <p>{`${userData.aboutMe !== undefined ? userData.aboutMe : ""}`}</p>
+          </div>
+        </div>
+        <div className="profile-post-sections">
+          <div>
+            <h3>{`${userData.username}'s posts`}</h3>
+            <div className="foundUser-posts">
+              {posts &&
+                posts.filter((post) => post.uid === userData.uid).length < 1 &&
+                "... No posts to show"}
+              {posts &&
+                posts.map(
+                  (post) =>
+                    post.uid === userData.uid && (
+                      <Post id={post.id} key={post.id} title={post.title} />
+                    )
+                )}
+            </div>
+          </div>
+          <div>
+            <h3>Liked Posts</h3>
+            <div className="foundUser-posts">
+              {posts &&
+                posts.filter((post) => post.follows.includes(userData.id))
+                  .length < 1 &&
+                "... No posts to show"}
+              {posts &&
+                posts.map(
+                  (post) =>
+                    post.follows.includes(userData.id) && (
+                      <Post id={post.id} key={post.id} title={post.title} />
+                    )
+                )}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 }

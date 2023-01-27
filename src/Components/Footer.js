@@ -1,0 +1,18 @@
+const Footer = (props) => {
+  return (
+    <div className="footer">
+      <div className="footer-contact">
+        <p>theTalkSpace &copy;2023</p>
+        <p className="footer-email">toby.productive@gmail.com</p>
+        <p>Austin, TX & Perth, Australia</p>
+        <p>LinkedIn</p>
+      </div>
+      <div className="footer-about"></div>
+      <p>Link to about page</p>
+      <p>Link to FAQ</p>
+      <p>GitHub</p>
+    </div>
+  );
+};
+
+export default Footer;

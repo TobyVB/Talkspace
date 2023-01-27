@@ -1,37 +1,47 @@
 import React from "react";
-import {getFirestore} from "firebase/firestore";
+import { useCollectionData } from "react-firebase-hooks/firestore";
+import { getFirestore, collection, query, orderBy } from "firebase/firestore";
 import Notification from "./Notification.js";
+import { getAuth } from "firebase/auth";
 
-export default function Notifications(props){
-    const db = getFirestore();
+export default function Notifications(props) {
+  const db = getFirestore();
+  const auth = getAuth();
 
-    return (
-        <div className="notifications">
-            <button 
-                className="close-notify" 
-                onClick={props.toggleNotifyWindow}
-                >CANCEL
-            </button>
-            {props.notifications && props.notifications.length < 1 && <p>No new notifications.</p>}
-            <div>
-                {props.notifications && props.notifications.map((notification, index) => 
-                notification.to === props.uid && 
-                    <Notification 
-                        key={index} 
-                        message={notification.message}
-                        type={notification.type}
-                        toPost={props.toPost}
-                        sendPostId={props.sendPostId}
-                        postId={notification.postId}
-                        toggleNotifyWindow={props.toggleNotifyWindow}
-                        restartPage={props.restartPage}
-                        unique={notification.unique}
-                        id={notification.id}
-                        sendUnique={props.sendUnique}
-                        sendCurrentCommentId={props.sendCurrentCommentId}
-                    /> 
-                )}
-            </div>
-        </div>  
-    )
+  localStorage.setItem("uid", auth.currentUser.uid);
+  const notificationsRef = collection(db, "notifications");
+  const notifyQ = query(notificationsRef, orderBy("createdAt"));
+  const [notifications] = useCollectionData(notifyQ, {
+    createdAt: "createdAt",
+    unique: "unique",
+    to: "to",
+    from: "from",
+    type: "type",
+    message: "message",
+    postId: "postId",
+  });
+
+  return (
+    <div className="notifications">
+      <button className="close-notify" onClick={props.toggleNotifyWindow}>
+        CANCEL
+      </button>
+      {notifications && notifications.length < 1 && (
+        <p>No new notifications.</p>
+      )}
+      <div>
+        {notifications &&
+          notifications.map(
+            (notification, index) =>
+              notification.to === localStorage.getItem("uid") && (
+                <Notification
+                  key={index}
+                  notification={notification}
+                  toggleNotifyWindow={props.toggleNotifyWindow}
+                />
+              )
+          )}
+      </div>
+    </div>
+  );
 }
