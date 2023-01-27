@@ -95,7 +95,7 @@ export default function Navbar(props) {
               style={{ color: "rgba(255,255,255,.75)" }}
               to="/"
             >
-              TalkSpace
+              Talkspace
             </NavLink>
           </h1>
         </div>

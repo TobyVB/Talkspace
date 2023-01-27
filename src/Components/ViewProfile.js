@@ -26,7 +26,7 @@ export default function ViewProfile(props) {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
-
+  console.log("hi");
   // ########## A C C E S S   C U R R E N T   U S E R'S   D O C ##########
   useEffect(() => {
     const q = query(usersRef, orderBy("createdAt"));
@@ -38,6 +38,7 @@ export default function ViewProfile(props) {
       });
     });
     setImage(true);
+    console.log("refind current user information");
   }, []);
 
   // ########## A C C E S S   F O U N D   U S E R'S   D O C ##########
@@ -101,7 +102,7 @@ export default function ViewProfile(props) {
           display: "flex",
           backgroundSize: "cover",
           backgroundPosition: "center center",
-          backgroundImage: image ? `url(${userData.coverPhoto})` : "",
+          backgroundImage: image ? `url(${foundUser.coverPic})` : "",
         }}
       ></div>
 
@@ -111,10 +112,11 @@ export default function ViewProfile(props) {
             className="profile-picture"
             style={{
               border: "7px solid rgb(57, 76, 95)",
+              backgroundColor: "rgb(57, 76, 95)",
               borderRadius: "100%",
               backgroundSize: "cover",
               backgroundPosition: "center center",
-              backgroundImage: image ? `url(${userData.defaultPic})` : "",
+              backgroundImage: image ? `url(${foundUser.defaultPic})` : "",
             }}
           ></div>
           <h2 className="profile-username">{`${userData.username}`}</h2>

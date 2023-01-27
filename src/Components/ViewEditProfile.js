@@ -25,16 +25,22 @@ export default function ViewEditProfile(props) {
   const [currentUser, setCurrentUser] = useState("");
 
   const [randomNum, setRandomNum] = useState(nanoid());
+  const [coverNum, setCoverNum] = useState(nanoid());
   const [image, setImage] = useState(null);
-  // const [coverImage, setCoverImage] = useState(null);
+  const [coverImage, setCoverImage] = useState(null);
   const [url, setUrl] = useState(null);
-  // const [coverUrl, setCoverUrl] = useState(null);
-  // const [coverPicLoc, setCoverPicLoc] = useState(props.coverPicLoc);
-  const [defPicLoc, setDefPicLoc] = useState(props.defPicLoc);
+  const [coverUrl, setCoverUrl] = useState(null);
+  const [objURL, setObjURL] = useState("");
+  const [coverObjURL, setCoverObjURL] = useState("");
+  // const [defPicLoc, setDefPicLoc] = useState(
+  //   localStorage.getItem("userData").defPicLoc
+  // );
+  const [defPicLoc, setDefPicLoc] = useState(null);
+  const [coverPicLoc, setCoverPicLoc] = useState(null);
+
+  const [disableSave, setDisableSave] = useState(true);
 
   const navigate = useNavigate();
-
-  const [objURL, setObjURL] = useState("");
 
   window.scrollTo(0, 0);
 
@@ -54,39 +60,31 @@ export default function ViewEditProfile(props) {
   async function updateUser() {
     const docRef = doc(db, "users", currentUser.id);
     await updateDoc(docRef, {
-      // coverPic: `${
-      //   coverUrl === null ? localStorage.getItem("userData").coverPic : coverUrl
-      // }`,
-      // coverPicLoc: `${
-      //   coverUrl === null
-      //     ? localStorage.getItem("userData").coverPicLoc
-      //     : coverPicLoc
-      // }`,
-      defaultPic: `${
-        url === null ? localStorage.getItem("userData").defaultPic : url
+      coverPic: `${coverUrl === null ? currentUser.coverPic : coverUrl}`,
+      coverPicLoc: `${
+        coverUrl === null ? currentUser.coverPicLoc : coverPicLoc
       }`,
-      defPicLoc: `${
-        url === null ? localStorage.getItem("userData").defPicLoc : defPicLoc
-      }`,
-      aboutMe: `${
-        aboutMeValue === ""
-          ? localStorage.getItem("userData").aboutMe
-          : aboutMeValue
-      }`,
+      defaultPic: `${url === null ? currentUser.defaultPic : url}`,
+      defPicLoc: `${url === null ? currentUser.defPicLoc : defPicLoc}`,
+      aboutMe: `${aboutMeValue === "" ? currentUser.aboutMe : aboutMeValue}`,
     });
+    navigate("/profile");
+    window.location.reload(false);
   }
 
   // ########## S A V E   C H A N G E S ##########
   function save() {
     {
       image !== null && submitImage();
+      coverImage !== null && submitCoverImage();
     }
     updateUser();
-    navigate("/profile");
+    setDisableSave(true);
   }
-  const [hideEditCoverPhoto, setHideEditCoverPhoto] = useState(true);
-  function showEditCover() {
-    setHideEditCoverPhoto(false);
+
+  const [hideEditCoverImage, setHideEditCoverImage] = useState(true);
+  function showEditCoverImage() {
+    setHideEditCoverImage(false);
   }
   const [hideEditImage, setHideEditImage] = useState(true);
   function showEditImage() {
@@ -99,14 +97,14 @@ export default function ViewEditProfile(props) {
   function cancelEdit() {
     setHideEditAboutMe(true);
     setHideEditImage(true);
-    setHideEditCoverPhoto(true);
+    setHideEditCoverImage(true);
   }
   // ########## U D A T E   A B O U T   M E ##########
-  const [aboutMeValue, setAboutMeValue] = useState(props.aboutMe);
-
+  const [aboutMeValue, setAboutMeValue] = useState("");
   useEffect(() => {
-    setObjURL(image ? URL.createObjectURL(image) : null);
-  }, [image]);
+    setAboutMeValue(currentUser.aboutMe);
+  }, [currentUser]);
+
   // ########## H A N D L E   I M A G E ##########
   const handleImageChange = async (e) => {
     if (e.target.files[0]) {
@@ -117,16 +115,11 @@ export default function ViewEditProfile(props) {
     }
     await submitImage();
   };
-  // ########## H A N D L E   C O V E R   I M A G E ##########
-  // const handleCoverImageChange = async (e) => {
-  //   if (e.target.files[0]) {
-  //     const file = e.target.files[0];
-  //     imageConversion.compressAccurately(file, 100).then((res) => {
-  //       setCoverImage(res);
-  //     });
-  //   }
-  //   await submitCoverImage();
-  // };
+
+  useEffect(() => {
+    setObjURL(image ? URL.createObjectURL(image) : null);
+  }, [image]);
+
   // ########## I M A G E   S U B M I T ##########
   const submitImage = async () => {
     setDefPicLoc(randomNum);
@@ -134,55 +127,82 @@ export default function ViewEditProfile(props) {
     uploadBytes(imageRef, image)
       .then(() => {
         getDownloadURL(imageRef)
-          .then((url) => {
-            setUrl(url);
+          .then((theURL) => {
+            setUrl(theURL);
+            console.log(url);
           })
           // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
           .catch((error) => {
             console.log(error.message, "error getting image address");
+          })
+          .then(() => {
+            setTimeout(() => {
+              setDisableSave(false);
+            }, 2500);
           });
       })
       .catch((error) => {
         console.log(error.message);
       });
   };
+  function test() {
+    console.log(url);
+  }
+  // ########## H A N D L E   C O V E R   I M A G E ##########
+  const handleCoverImageChange = async (e) => {
+    if (e.target.files[0]) {
+      const file = e.target.files[0];
+      imageConversion.compressAccurately(file, 100).then((res) => {
+        setCoverImage(res);
+      });
+    }
+    await submitCoverImage();
+  };
+
+  useEffect(() => {
+    setCoverObjURL(coverImage ? URL.createObjectURL(coverImage) : null);
+  }, [coverImage]);
   // ########## C O V E R   S U B M I T ##########
-  // const submitCoverImage = async () => {
-  //   const coverNum = randomNum * 2;
-  //   setCoverPicLoc(coverNum);
-  //   const imageRef = ref(storage, coverNum);
-  //   uploadBytes(imageRef, coverImage)
-  //     .then(() => {
-  //       getDownloadURL(imageRef)
-  //         .then((url) => {
-  //           setCoverUrl(url);
-  //         })
-  //         // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  //         .catch((error) => {
-  //           console.log(error.message, "error getting image address");
-  //         });
-  //     })
-  //     .catch((error) => {
-  //       console.log(error.message);
-  //     });
-  // };
+  const submitCoverImage = async () => {
+    setCoverPicLoc(coverNum);
+    const imageRef = ref(storage, coverNum);
+    uploadBytes(imageRef, coverImage)
+      .then(() => {
+        getDownloadURL(imageRef)
+          .then((theUrl) => {
+            setCoverUrl(theUrl);
+          })
+          // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+          .catch((error) => {
+            console.log(error.message, "error getting image address");
+          })
+          .then(() => {
+            setTimeout(() => {
+              setDisableSave(false);
+            }, 2500);
+          });
+      })
+      .catch((error) => {
+        console.log(error.message);
+      });
+  };
 
   return (
     <div className="page-style page-body">
       <div className="editProfile-body">
         {/* ############### E D I T   C O V E R   P H O T O ################ */}
-        {/* {hideEditCoverPhoto && hideEditAboutMe && hideEditImage && (
+        {hideEditCoverImage && hideEditAboutMe && hideEditImage && (
           <div className="edit-profile-section">
-            <button onClick={showEditCover}>edit cover photo</button>
+            <button onClick={showEditCoverImage}>edit cover photo</button>
           </div>
         )}
-        {!hideEditCoverPhoto && (
+        {!hideEditCoverImage && (
           <div className="edit-profile-section">
             <div className="edit-defaultPic">
               <img
                 alt="profile"
-                className="profile-picture"
-                src={image !== null ? objURL : props.coverPic}
+                className="cover-picture"
+                src={coverImage !== null ? coverObjURL : currentUser.coverPic}
               />
               <input
                 className="fileTypeInput"
@@ -193,9 +213,9 @@ export default function ViewEditProfile(props) {
               <button onClick={cancelEdit}>cancel</button>
             </div>
           </div>
-        )} */}
+        )}
         {/* ############### E D I T   P R O F I L E   P H O T O ################ */}
-        {hideEditAboutMe && hideEditImage && hideEditCoverPhoto && (
+        {hideEditAboutMe && hideEditImage && hideEditCoverImage && (
           <div className="edit-profile-section">
             <button onClick={showEditImage}>edit profile photo</button>
           </div>
@@ -206,7 +226,7 @@ export default function ViewEditProfile(props) {
               <img
                 alt="profile"
                 className="profile-picture"
-                src={image !== null ? objURL : props.defaultPic}
+                src={image !== null ? objURL : currentUser.defaultPic}
               />
               <input
                 className="fileTypeInput"
@@ -215,11 +235,12 @@ export default function ViewEditProfile(props) {
                 onChange={handleImageChange}
               />
               <button onClick={cancelEdit}>cancel</button>
+              <button onClick={test}>test</button>
             </div>
           </div>
         )}
         {/* ############### E D I T   A B O U T   M E ################ */}
-        {hideEditImage && hideEditAboutMe && (
+        {hideEditImage && hideEditAboutMe && hideEditCoverImage && (
           <div className="edit-profile-section">
             <button onClick={showEditAboutMe}>edit About Me</button>
           </div>
@@ -236,14 +257,22 @@ export default function ViewEditProfile(props) {
               value={aboutMeValue}
               onChange={(event) => setAboutMeValue(event.target.value)}
             />
-            <button onClick={cancelEdit}>cancel</button>
+
+            <div className="save-cancel-edit-profile">
+              <button onClick={cancelEdit}>cancel</button>
+              <button onClick={save}>save</button>
+            </div>
           </div>
         )}
         {/* ############### S A V E   S E T T I N G S ################ */}
-        <div className="save-cancel-edit-profile">
-          <button onClick={() => navigate(-1)}>cancel</button>
-          <button onClick={save}>save</button>
-        </div>
+        {hideEditAboutMe && (
+          <div className="save-cancel-edit-profile">
+            <button onClick={() => navigate(-1)}>cancel</button>
+            <button onClick={save} disabled={disableSave ? "+true" : false}>
+              save
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
