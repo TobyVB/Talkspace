@@ -344,6 +344,7 @@ form {
   vertical-align: center;
   padding-top: 0.5em;
   justify-content: space-between;
+  overflow: hidden;
 }
 .comment-auth {
   display: flex;
@@ -380,6 +381,7 @@ form {
 .reply-btns {
   display: flex;
   justify-content: end;
+  flex-direction: column-reverse;
 }
 .cancel-reply {
   border: none;
@@ -715,4 +717,9 @@ button,
 }
 .hidden {
   display: none;
+}
+.profile-details {
+  color: white;
+  font-size: 1rem;
+  background: rgb(32, 32, 32);
 }

@@ -1,31 +1,25 @@
 import CreateComment from "./CreateComment.js";
-export default function Comment(props) {
+import Comment from "./Comment.js";
+export default function Comments(props) {
   return (
     <div>
-      <div
-        style={
-          props.color === "reply"
-            ? { background: "rgba(0,0,0,.2)" }
-            : { background: "rgba(0,0,0,.5" }
-        }
-      >
-        <div>{props.comment.body}</div>
-      </div>
       <CreateComment
         /* Include props.post so the notify knows where to send user */
-        type="reply"
-        to={props.comment.id}
+        type="comment"
+        to={props.post.id}
         post={props.post}
         user={props.user}
-        comment={props.comment}
       />
       <hr />
       <hr />
+      <hr />
+      <hr />
+      <hr />
       {props.data.comments.map((comment) => {
-        if (props.comment.id === comment.to) {
+        if (props.post.id === comment.to) {
           return (
             <Comment
-              color={"reply"}
+              color={"comment"}
               data={props.data}
               comment={comment}
               user={props.user}

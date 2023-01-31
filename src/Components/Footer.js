@@ -1,3 +1,4 @@
+import { NavLink } from "react-router-dom";
 const Footer = (props) => {
   return (
     <div className="footer">
@@ -11,6 +12,8 @@ const Footer = (props) => {
       <p>Link to about page</p>
       <p>Link to FAQ</p>
       <p>GitHub</p>
+      <NavLink to="rankings">Rankings</NavLink>
+      <NavLink to="profile">Profiles</NavLink>
     </div>
   );
 };
