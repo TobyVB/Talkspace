@@ -5,12 +5,9 @@ export default function Comments(props) {
     <div>
       <CreateComment
         /* Include props.post so the notify knows where to send user */
-        starter={true}
         type="comment"
-        to={props.post.id}
         post={props.post}
         user={props.user}
-        masterComment={""}
       />
       <hr />
       <hr />
@@ -21,13 +18,10 @@ export default function Comments(props) {
         if (props.post.id === comment.to) {
           return (
             <Comment
-              delete={"yes"}
-              type={"comment"}
               data={props.data}
               comment={comment}
               user={props.user}
               key={index}
-              masterComment={comment.id}
             />
           );
         }
