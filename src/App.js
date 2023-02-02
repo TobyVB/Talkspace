@@ -7,13 +7,7 @@ import {
   createRoutesFromElements,
   RouterProvider,
 } from "react-router-dom";
-import {
-  orderBy,
-  query,
-  collection,
-  getDocs,
-  getFirestore,
-} from "firebase/firestore";
+import { collection, getDocs, getFirestore } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 
 // P A G E S
@@ -31,7 +25,6 @@ import DeleteAccount from "./Components/DeleteAccount.js";
 import Profiles from "./Components/Profiles.js";
 import Posts from "./Components/Posts.js";
 import PostDetails from "./Components/PostDetails.js";
-// import Comments from "./Components/Comments.js";
 
 // L A Y O U T S
 import SharedLayout from "./Components/SharedLayout.js";
