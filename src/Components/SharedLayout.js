@@ -4,6 +4,7 @@ import Footer from "./Footer.js";
 import Notifications from "./Notifications.js";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { getAuth } from "firebase/auth";
+import { useLoaderData } from "react-router-dom";
 
 import { useState, useEffect } from "react";
 import {
@@ -14,7 +15,8 @@ import {
   orderBy,
 } from "firebase/firestore";
 
-const SharedLayout = (props) => {
+const SharedLayout = () => {
+  const data = useLoaderData();
   const db = getFirestore();
   const auth = getAuth();
   useAuthState(auth);
@@ -63,10 +65,6 @@ const SharedLayout = (props) => {
     auth.signOut();
     setAllowLogin(true);
   }
-  function cancelSignIn() {
-    auth.signOut();
-    setAllowLogin(true);
-  }
   function menuSignOut() {
     exit();
   }
@@ -83,7 +81,7 @@ const SharedLayout = (props) => {
           <Outlet />
         </main>
         {notifyWindow && (
-          <Notifications toggleNotifyWindow={toggleNotifyWindow} />
+          <Notifications data={data} toggleNotifyWindow={toggleNotifyWindow} />
         )}
       </div>
 
@@ -92,9 +90,3 @@ const SharedLayout = (props) => {
   );
 };
 export default SharedLayout;
-
-// ############################################################
-// ############################################################
-// ############################################################
-// ############################################################
-// ############################################################

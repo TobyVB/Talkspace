@@ -8,12 +8,12 @@ const Footer = (props) => {
         <p>Austin, TX & Perth, Australia</p>
         <p>LinkedIn</p>
       </div>
-      <div className="footer-about"></div>
-      <p>Link to about page</p>
-      <p>Link to FAQ</p>
-      <p>GitHub</p>
-      <NavLink to="rankings">Rankings</NavLink>
-      <NavLink to="profile">Profiles</NavLink>
+      <div className="footer-about">
+        <p>Link to about page</p>
+        <p>Link to FAQ</p>
+        <p>GitHub</p>
+        <NavLink to="profile">Profiles</NavLink>
+      </div>
     </div>
   );
 };

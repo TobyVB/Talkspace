@@ -7,7 +7,7 @@ import {
   createRoutesFromElements,
   RouterProvider,
 } from "react-router-dom";
-import { collection, getDocs, getFirestore } from "firebase/firestore";
+import { collection, getDocs, getFirestore, orderBy } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 
 // P A G E S
@@ -19,7 +19,6 @@ import Register from "./Components/Register.js";
 import CreatePost from "./Components/CreatePost.js";
 import ViewEditPost from "./Components/ViewEditPost.js";
 import ChangeUsername from "./Components/ChangeUsername.js";
-import RetrievePassword from "./Components/RetrievePassword.js";
 import ChangePassword from "./Components/ChangePassword.js";
 import DeleteAccount from "./Components/DeleteAccount.js";
 import Profiles from "./Components/Profiles.js";
@@ -52,41 +51,56 @@ const mainLoader = async () => {
   let user = [];
   let posts = [];
   let comments = [];
-  let replies = [];
+  let commentAlerts = [];
   profilesQuerySnapshot.forEach((doc) => {
     profiles.push(doc.data());
-    if (doc.data().uid === auth.currentUser.uid) {
+    if (auth.currentUser && doc.data().uid === auth.currentUser.uid) {
       user.push(doc.data());
     }
   });
+  let sortedProfiles = profiles.sort((p1, p2) =>
+    p1.createdAt < p2.createdAt ? 1 : p1.createdAt < p2.createdAt ? -1 : 0
+  );
+  //
   const postsQuerySnapshot = await getDocs(collection(db, "posts"));
   postsQuerySnapshot.forEach((doc) => {
     posts.push(doc.data());
   });
-
+  let sortedPosts = posts.sort((p1, p2) =>
+    p1.createdAt > p2.createdAt ? -1 : p1.createdAt > p2.createdAt ? 1 : 0
+  );
+  //
   const commentsQuerySnapshot = await getDocs(collection(db, "comments"));
   commentsQuerySnapshot.forEach((doc) => {
     comments.push(doc.data());
   });
-
-  const repliesQuerySnapshot = await getDocs(collection(db, "replies"));
-  repliesQuerySnapshot.forEach((doc) => {
-    replies.push(doc.data());
+  let sortedComments = comments.sort((p1, p2) =>
+    p1.createdAt > p2.createdAt ? -1 : p1.createdAt > p2.createdAt ? 1 : 0
+  );
+  //
+  const commentAlertQuerySnapshot = await getDocs(
+    collection(db, "commentAlerts")
+  );
+  commentAlertQuerySnapshot.forEach((doc) => {
+    commentAlerts.push(doc.data());
   });
+  let sortedCommentAlerts = commentAlerts.sort((p1, p2) =>
+    p1.createdAt > p2.createdAt ? -1 : p1.createdAt > p2.createdAt ? 1 : 0
+  );
 
   const data = {
-    profiles: profiles,
-    posts: posts,
+    profiles: sortedProfiles,
+    posts: sortedPosts,
     user: user[0],
-    comments: comments,
-    replies: replies,
+    comments: sortedComments,
+    commentAlerts: sortedCommentAlerts,
   };
   return data;
 };
 
 const router = createBrowserRouter(
   createRoutesFromElements(
-    <Route path="/" element={<SharedLayout />}>
+    <Route path="/" element={<SharedLayout />} loader={mainLoader}>
       <Route index element={<Homepage />} loader={mainLoader} />
       <Route path="login" element={<Login />} />
       <Route path="register" element={<Register />} />
@@ -97,7 +111,6 @@ const router = createBrowserRouter(
       <Route path="editProfile" element={<ViewEditProfile />} />
       <Route path="createPost" element={<CreatePost />} />
       <Route path="changeUsername" element={<ChangeUsername />} />
-      <Route path="retreivePassword" element={<RetrievePassword />} />
       <Route path="changePassword" element={<ChangePassword />} />
       <Route path="deleteAccount" element={<DeleteAccount />} />
       {/* <Route path="*" element={<page404/>} /> */}

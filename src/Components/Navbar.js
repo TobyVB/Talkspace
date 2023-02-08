@@ -62,19 +62,21 @@ export default function Navbar(props) {
   const usersRef = collection(db, "users");
   const [currentUser, setCurrentUser] = useState("");
   useEffect(() => {
-    const q = query(usersRef, orderBy("createdAt"));
-    onSnapshot(q, async (snapshot) => {
-      snapshot.docs.forEach((doc) => {
-        if (doc.data().uid === auth.currentUser.uid) {
-          setCurrentUser({ ...doc.data(), id: doc.id });
-        }
+    if (auth.currentUser) {
+      const q = query(usersRef, orderBy("createdAt"));
+      onSnapshot(q, async (snapshot) => {
+        snapshot.docs.forEach((doc) => {
+          if (doc.data().uid === auth.currentUser.uid) {
+            setCurrentUser({ ...doc.data(), id: doc.id });
+          }
+        });
       });
-    });
-  }, []);
+    }
+  }, [auth.currentUser]);
 
   return (
     <>
-      {currentUser && (
+      {
         <header>
           <div className={`header ${navToggle && `header-toggle`}`}>
             <div className="nav-title">
@@ -115,59 +117,62 @@ export default function Navbar(props) {
                     </NavLink>
                   </div>
                 ) : (
-                  <div className="header-btns">
-                    <NavLink
-                      to={"profile/" + currentUser.id.toString()}
-                      className={({ isActive }) =>
-                        isActive ? "link active" : "link"
-                      }
-                    >
-                      Profile
-                    </NavLink>
-                    <NavLink
-                      onClick={closeNav}
-                      to="createPost"
-                      className={({ isActive }) =>
-                        isActive ? "link active" : "link"
-                      }
-                    >
-                      Create Post
-                    </NavLink>
+                  currentUser !== "" && (
+                    <div className="header-btns">
+                      <NavLink
+                        onClick={closeNav}
+                        to={"profile/" + currentUser.id.toString()}
+                        className={({ isActive }) =>
+                          isActive ? "link active" : "link"
+                        }
+                      >
+                        Profile
+                      </NavLink>
+                      <NavLink
+                        onClick={closeNav}
+                        to="createPost"
+                        className={({ isActive }) =>
+                          isActive ? "link active" : "link"
+                        }
+                      >
+                        Create Post
+                      </NavLink>
 
-                    {/* S E T T I N G S   D R O P D O W N */}
+                      {/* S E T T I N G S   D R O P D O W N */}
 
-                    <div>
-                      <a className="link" onClick={toggleHidden}>
-                        Settings ⬇
-                      </a>
-                      <div className={`settings-buttons ${hidden}`}>
-                        <NavLink
-                          className={"settings-link"}
-                          to="changeUsername"
-                        >
-                          change username
-                        </NavLink>
-                        <NavLink
-                          className={"settings-link"}
-                          to="retreivePassword"
-                        >
-                          retrieve password
-                        </NavLink>
-                        <NavLink
-                          className={"settings-link"}
-                          to="changePassword"
-                        >
-                          change password
-                        </NavLink>
-                        <NavLink className={"settings-link"} to="deleteAccount">
-                          delete account
-                        </NavLink>
+                      <div>
+                        <a className="link" onClick={toggleHidden}>
+                          Settings ⬇
+                        </a>
+                        <div className={`settings-buttons ${hidden}`}>
+                          <NavLink
+                            onClick={closeNav}
+                            className={"settings-link"}
+                            to="changeUsername"
+                          >
+                            change username
+                          </NavLink>
+                          <NavLink
+                            onClick={closeNav}
+                            className={"settings-link"}
+                            to="changePassword"
+                          >
+                            change password
+                          </NavLink>
+                          <NavLink
+                            onClick={closeNav}
+                            className={"settings-link"}
+                            to="deleteAccount"
+                          >
+                            delete account
+                          </NavLink>
+                        </div>
                       </div>
+                      <NavLink className="link" to="login" onClick={signOut}>
+                        SignOut
+                      </NavLink>
                     </div>
-                    <NavLink className="link" to="/" onClick={signOut}>
-                      SignOut
-                    </NavLink>
-                  </div>
+                  )
                 )}
               </div>
               {auth.currentUser && auth.currentUser.emailVerified && (
@@ -186,15 +191,21 @@ export default function Navbar(props) {
                   </span>
                 </button>
               )}
-              <img
-                className="mini-defaultPic"
-                onClick={showMenu}
-                src={currentUser.defaultPic}
-              />
+              <div className="nav-menu">
+                {auth.currentUser ? (
+                  <img
+                    className="mini-defaultPic"
+                    onClick={showMenu}
+                    src={currentUser.defaultPic}
+                  />
+                ) : (
+                  <span onClick={showMenu}>&#8942;</span>
+                )}
+              </div>
             </div>
           </div>
         </header>
-      )}
+      }
     </>
   );
 }

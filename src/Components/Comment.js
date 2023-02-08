@@ -1,24 +1,85 @@
+import { useState } from "react";
 import DeleteComment from "./DeleteComment.js";
+import ContentHeader from "./ContentHeader.js";
+
+import Clock from "./Utils/Clock.js";
 
 export default function Comment(props) {
+  const [togglerHidden, setTogglerHidden] = useState(true);
+  const [options, setOptions] = useState(false);
+
+  function showOptions() {
+    setOptions(true);
+  }
+
   return (
-    <div style={{ display: "flex" }}>
-      <div
-        style={{
-          width: "100%",
-          background: "rgba(0,0,0,.5",
-          padding: "1rem",
-          borderRadius: "5px",
-          margin: "1rem 0",
-        }}
-      >
-        <div>{props.comment.body}</div>
-      </div>
-      {props.user.uid === props.comment.uid && (
-        <div>
-          <DeleteComment comment={props.comment} />
-        </div>
+    <div
+      className="container-comment"
+      onMouseEnter={() => setTogglerHidden(false)}
+      onMouseLeave={() => setTogglerHidden(true, setOptions(false))}
+    >
+      {options && (
+        <div
+          style={{
+            top: "0",
+            left: "0",
+            display: "block",
+            position: "fixed",
+            background: "rgba(0,0,0,0)",
+            width: "100vw",
+            height: "100vh",
+          }}
+          onClick={() => setOptions(false)}
+        ></div>
       )}
+      <div style={{ display: "flex", flexDirection: "column", width: "100%" }}>
+        <ContentHeader
+          profile={props.comment}
+          createdAt={props.comment.createdAt}
+        />
+        <div
+          style={
+            props.alertCommentId !== props.comment.id
+              ? { textDecoration: "underscore" }
+              : { background: "red" }
+          }
+          className="comment-text"
+        >
+          <div>{props.comment.body}</div>
+        </div>
+      </div>
+
+      <div style={{ margin: "auto", width: "0", display: "flex" }}>
+        {options && props.user.uid === props.comment.uid && (
+          <div
+            style={{
+              transitionDelay: ".2s",
+              background: "rgba(20, 20, 20, 1",
+              border: "1px solid white",
+              margin: "auto",
+              transform: "translateX(-80px)",
+              padding: ".5em",
+              borderRadius: "5px",
+              zIndex: "10",
+            }}
+          >
+            <div onClick={() => setOptions(false)} style={{ margin: "auto" }}>
+              <DeleteComment createdAt={props.comment.createdAt} />
+            </div>
+          </div>
+        )}
+        <span
+          style={
+            togglerHidden
+              ? { color: "rgba(0,0,0,0)" }
+              : { color: "rgba(255,255,255,.8)" }
+          }
+          className="comment-options-toggler"
+          onClick={showOptions}
+        >
+          &#8942;
+        </span>
+      </div>
     </div>
   );
 }

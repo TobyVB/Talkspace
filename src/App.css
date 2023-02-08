@@ -52,10 +52,6 @@ header {
 .menu-container a {
   text-decoration: none;
 }
-.footer {
-  /* text-align: center; */
-  padding: 2em 2em;
-}
 .footer-email {
   font-weight: 400;
 }
@@ -89,9 +85,6 @@ hr {
   border-top: 1px solid rgba(255, 255, 255, 0.198);
   width: 100%;
 }
-.invisible-p {
-  display: none;
-}
 textarea {
   background: transparent;
   color: white;
@@ -100,61 +93,28 @@ textarea {
 }
 .mini-defaultPic {
   border: 1px solid rgba(62, 166, 255, 0.9);
-  height: 35px;
-  width: 35px;
-  margin-left: 1em;
+  height: 25px;
+  width: 25px;
+  margin-top: 3px;
+  margin-bottom: 3px;
   border-radius: 5em;
   object-fit: cover;
   cursor: pointer;
 }
 /* ------------------------------------------------ */
-.numImpact {
-  margin-top: -0.3em;
-  margin-left: -0.5em;
-  text-shadow: -1px 1px 3px black;
-  color: rgba(255, 255, 255, 0.684);
-  font-size: 0.7rem;
-  z-index: 1;
-}
-.rate-chatMessage {
-  display: flex;
-  flex-direction: row;
-  border-radius: 10px;
-  padding: 0 0 0 0;
-}
-.rate-chatMessage p {
-  margin: -0.1em 0 0 0.3em;
-  z-index: 5;
-}
-.hidden-impact {
-  cursor: pointer;
-  padding: 0 0.35em;
-  color: rgba(0, 0, 0, 0.5);
-  font-size: 0.8rem;
-}
-.hidden-impact-bright {
-  cursor: pointer;
-  padding: 0 0.35em;
-  border: 1px solid rgba(0, 0, 0, 0);
-  margin: 0em 0 0 0;
-  margin-top: 0.8em;
-  color: rgba(255, 255, 255, 0.8);
-}
-.hidden-impact:hover {
-  transition: 0.4s;
-  color: white;
-}
 .time {
-  padding-left: 2em;
-  font-size: 0.65rem;
+  display: flex;
+  gap: 1em;
+  font-size: 0.85rem;
   margin-bottom: 0 auto;
   align-self: center;
   margin: 0;
+  justify-content: right;
 }
-.sendChatMessageInput {
+.create-comment {
   font-size: 0.85rem;
   padding: 0.5em;
-  border-radius: 5px;
+  border-radius: 3px;
   border: 1px solid black;
   margin-bottom: 0.5em;
 }
@@ -163,6 +123,9 @@ form {
   width: 100%;
   display: flex;
   font-size: 1.5rem;
+}
+label {
+  margin-bottom: 0.5em;
 }
 /* ########################################## */
 /* ############ R E G I S T E R ############# */
@@ -175,10 +138,10 @@ form {
   flex-direction: column;
   max-width: 300px;
 }
-.input-user-cred {
+input {
   margin-bottom: 2em;
   height: 2em;
-  border-radius: 3em;
+  border-radius: 3px;
   padding-left: 0.6em;
   border: none;
 }
@@ -197,11 +160,7 @@ form {
 /* ############# P R O F I L E  ############## */
 /* ########################################### */
 .profile-jumbotron {
-  padding-bottom: 3em;
-  justify-content: space-between;
-  margin-top: 2em;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  margin: 3em 0;
   gap: 3em;
 }
 .profile-span-edit {
@@ -225,20 +184,9 @@ form {
   align-items: center;
   flex-direction: column;
 }
-.post-link {
-  cursor: pointer;
-  background-color: rgba(255, 255, 255, 0.1);
-  padding: 1em;
-  border-radius: 5px;
-}
 .save-cancel-edit-profile {
   justify-content: center;
   display: flex;
-  gap: 3em;
-}
-.profile-post-sections {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   gap: 3em;
 }
 /* ############################################ */
@@ -259,49 +207,27 @@ form {
   font-size: 0.75rem;
   color: rgba(255, 255, 255, 0.5);
 }
-.post-title {
-  margin-left: 1em;
+.linkPost {
+  font-size: 0.8rem;
+  width: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  padding: 0.2em 1em;
+  border-radius: 3px;
+  color: rgba(255, 255, 255, 0.8);
 }
-.post-body {
-  padding: 0.5em 1em;
-  background-color: rgba(255, 255, 255, 0.1);
-  box-shadow: 0px 0px 5px black;
-  border-radius: 5px;
-  margin-bottom: 3em;
-}
+
 /* ############################################ */
 /* ############# H O M E P A G E  ############# */
 /* ############################################ */
-.homepage-header-text {
-  display: flex;
-  flex-direction: column;
-  margin: 1em 0 2.5em 0;
-  text-shadow: 1px 1px 5px black;
-  line-height: 0;
-}
-.welcome-homepage {
-  font-size: 1em;
-  align-self: center;
-  margin-bottom: 0.2em;
-}
-.the-talkspace-homepage {
-  display: flex;
-  align-self: center;
-  align-items: center;
-  text-decoration: underline;
-}
-.homepage-posts {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 1em;
-  padding: 1em;
-}
 .homepage-post {
-  padding: 0em 0.5em 0em 0.5em;
-  border-radius: 5px;
-  background-color: rgba(0, 0, 0, 0.3);
-  border: 1px solid black;
+  max-height: 150px;
+  overflow: hidden;
+  border-radius: 3px;
+  transition: 0.2s;
 }
+/* .homepage-post:hover {
+  box-shadow: inset 0 0.15em 0.2em black;
+} */
 .profile-link {
   cursor: pointer;
   display: inline-block;
@@ -310,65 +236,37 @@ form {
 }
 .post-link {
   color: rgba(255, 255, 255, 0.65);
-  box-shadow: 0px 0px 5px black;
-  margin: 0.5em 0;
+  cursor: pointer;
+  background-color: rgba(255, 255, 255, 0.1);
+  padding: 0.1em 0.5em;
+  border-radius: 3px;
+  margin: 1em 0;
 }
+
 /* ############################################ */
 /* ############## C O M M E N T ############### */
 /* ############################################ */
-.comment {
-  border-radius: 5px;
-  font-size: 0.75rem;
-  background: rgba(255, 255, 255, 0.15);
-  border-radius: 5px;
-  box-shadow: 0px 0px 5px black;
-}
-.reply .comment-profile-pic {
-  width: 5vw;
-  height: 5vw;
-}
-.comment .name {
-  align-self: flex-end;
-  margin-bottom: 0 auto;
-  margin: 0;
-  padding-right: 0;
-}
-.comment .time {
+.container-comment {
   display: flex;
-  gap: 2em;
-}
-.comment-full-header {
-  display: flex;
-  gap: 3em;
-  width: 100%;
-  vertical-align: center;
-  padding-top: 0.5em;
-  justify-content: space-between;
-  overflow: hidden;
-}
-.comment-auth {
-  display: flex;
-  gap: 1em;
-}
-.comment-text {
-  /* margin: 1.5em 0 0 0; */
-  padding: 1em;
-  border: 1px solid rgba(0, 0, 0, 0.2);
-  font-size: 0.75rem;
-  width: 80vw;
-  max-width: 100%;
-  word-wrap: break-word;
-}
-.create-comment-form {
-  display: flex;
-  flex-direction: column;
-}
-.create-reply-form {
   margin: 1em 0;
-  background-color: rgba(28, 38, 48, 0);
-  border-radius: 5px;
-  max-width: auto;
-  display: flex;
+  border-radius: 3px;
+  border: 1px solid black;
+}
+.comment-options-toggler {
+  font-size: 1.5rem;
+  margin: auto;
+  transition-delay: 0.2s;
+  cursor: pointer;
+}
+.submit {
+  background: rgba(62, 166, 255, 0.9);
+  display: block;
+  width: 100%;
+  margin: auto;
+  padding: 0.25em 0.8em;
+  border-radius: 3px;
+  letter-spacing: 0.07rem;
+  font-size: 0.8rem;
 }
 /* ############################################ */
 /* ################ R E P L Y ################# */
@@ -433,7 +331,7 @@ form {
   border: none;
   color: white;
   padding: 0.2em 0.4em;
-  border-radius: 0.2em;
+  border-radius: 0.3em;
 }
 /* ################################################### */
 /* ##############   S E T T I N G S   ################ */
@@ -449,7 +347,6 @@ form {
   flex-direction: column;
   max-width: fit-content;
   margin: 1em;
-  padding-top: 5em;
   gap: 1.25em;
 }
 /* ################################################### */
@@ -570,14 +467,6 @@ form {
   .homepage-header-text {
     font-size: 8vw;
   }
-  .comment-profile-pic {
-    min-width: 8vw;
-    min-height: 8vw;
-    max-width: 6vw;
-    max-height: 6vw;
-    width: 8vw;
-    height: 8vw;
-  }
   .profile-jumbotron {
     display: flex;
     flex-direction: column-reverse;
@@ -606,15 +495,72 @@ form {
     padding: 1em 1em 1em 1em;
   }
   .profile-picture {
-    height: 150px;
-    width: 150px;
-    margin: -120px auto 0 auto;
+    height: 125px;
+    width: 125px;
+    margin: -100px auto 0 auto;
+  }
+  .footer {
+    font-size: 0.75rem;
+    padding: 2em 0;
+    text-align: center;
+  }
+  /* ######################################################### */
+  .profile-options {
+    font-size: 0.9rem;
+    margin-bottom: 1em;
+  }
+  .post-text {
+    padding: 0.5em 1em;
+    background-color: rgba(255, 255, 255, 0.1);
+    font-size: 0.75rem;
+  }
+  .comment-text {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.2);
+    padding: 1rem;
+    font-size: 0.8rem;
+  }
+  .content-header-username {
+    font-size: 0.75rem;
+    padding: 0;
+  }
+  .post-title {
+    width: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    padding: 1em;
+    font-size: 0.8rem;
   }
 }
 @media screen and (min-width: 700px) {
+  .profile-options {
+    font-size: 0.75rem;
+    margin-bottom: 1em;
+  }
+  .post-text {
+    font-size: 0.75rem;
+    padding: 0.5em 1em;
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+  .comment-text {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.2);
+    padding: 1rem;
+    font-size: 0.8rem;
+  }
+  .content-header-username {
+    font-size: 0.75rem;
+    padding: 0;
+  }
+  .post-title {
+    width: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    padding: 1em;
+    font-size: 0.8rem;
+  }
+  /* ######################################################### */
   .page-body {
-    padding-left: 15em;
-    padding-right: 15em;
+    padding-left: 10em;
+    padding-right: 10em;
   }
   .header-btns {
     align-items: center;
@@ -631,15 +577,15 @@ form {
     font-size: 4vw;
   }
   .profile-header {
-    margin-left: 5sem;
+    margin-left: 5em;
   }
   .profile-picture {
-    height: 200px;
-    width: 200px;
+    height: 125px;
+    width: 125px;
     margin: -100px;
   }
   .profile-username {
-    margin: 0 0 1.5em 5em;
+    margin: 2em 0 1.5em 5em;
   }
   .profile-header-btns {
     display: flex;
@@ -663,13 +609,6 @@ form {
     min-width: 100vw;
     margin: -161px;
   }
-  .comment-profile-pic {
-    max-height: 4.5vw;
-    max-width: 4.5vw;
-    width: 4.5vw;
-    height: 4.5vw;
-    border: 5px solid rgba(0, 0, 0, 0.3);
-  }
   .notifications {
     height: 50vh;
     width: 40vw;
@@ -680,7 +619,13 @@ form {
     align-items: center;
   }
   .settings-buttons {
-    padding: 3em 1em 1em 1em;
+    padding: 1em 1em 1em 1em;
+  }
+  .footer {
+    font-size: 0.75rem;
+    padding: 2em 15em;
+    display: flex;
+    justify-content: space-between;
   }
 }
 /* ################################# */
@@ -689,7 +634,7 @@ button,
 .settings-link {
   color: rgba(255, 255, 255, 0.8);
   text-decoration: none;
-  font-size: 0.85rem;
+  font-size: 1rem;
   cursor: pointer;
   background: none;
   border: none;
@@ -701,7 +646,7 @@ button,
 .settings-buttons {
   display: flex;
   flex-direction: column;
-  gap: 2em;
+  gap: 1em;
   background: black;
 }
 .active {
@@ -722,4 +667,83 @@ button,
   color: white;
   font-size: 1rem;
   background: rgb(32, 32, 32);
+}
+
+/* Quill */
+.quill .ql-snow .ql-stroke,
+.ql-fill {
+  stroke: rgba(255, 255, 255, 0.8);
+}
+.ql-snow .ql-picker {
+  color: rgba(255, 255, 255, 0.8);
+}
+.ql-snow .ql-picker-label::before {
+  color: rgba(255, 255, 255, 0.8);
+}
+.ql-container.ql-snow {
+  height: 150px;
+  border-bottom-left-radius: 10px;
+  border-bottom-right-radius: 10px;
+}
+.ql-toolbar.ql-snow {
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+}
+p img {
+  max-width: 100%;
+}
+iframe {
+  max-width: 100%;
+}
+
+/* N A V B A R */
+.nav-menu span {
+  cursor: pointer;
+  font-size: 1.5rem;
+}
+
+/* CRED */
+.cred-header {
+  margin: 0 0 1em 0;
+}
+.cred-submit {
+  margin-top: 1.5em;
+}
+.error-box-container {
+  color: red;
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  position: fixed;
+  font-size: 0.7rem;
+  width: 100vw;
+  left: 0;
+}
+.error-box {
+  background: rgba(0, 0, 0, 0.8);
+  border-radius: 3px;
+  padding: 1em 2em;
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+}
+.content-header p {
+  margin: 0;
+  align-self: center;
+}
+.view-post-btn {
+  display: block;
+  margin: auto;
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.8);
+}
+.view-post-btn:hover {
+  color: white;
+}
+header .link {
+  font-size: 0.8rem;
+}
+.settings-link {
+  font-size: 0.8rem;
 }

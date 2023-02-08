@@ -5,7 +5,7 @@ export default function Profiles() {
   const profiles = data.profiles;
   return (
     <div
-      style={{ background: "bluesteele", padding: "2em" }}
+      style={{ background: "bluesteele", padding: "10em 2em 2em 2em" }}
       className="profiles"
     >
       {profiles.map((profile) => (
@@ -14,7 +14,14 @@ export default function Profiles() {
           to={profile.id.toString()}
           key={profile.id}
         >
-          <p>{profile.username}</p>
+          <div>
+            <img
+              style={{ height: "50px", width: "50px", objectFit: "cover" }}
+              src={profile.defaultPic}
+            />
+
+            <p>{profile.username}</p>
+          </div>
         </Link>
       ))}
     </div>

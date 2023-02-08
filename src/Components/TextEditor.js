@@ -1,8 +1,13 @@
 import React, { useEffect, useState } from "react";
-import ReactQuill from "react-quill";
+import ReactQuill, { Quill } from "react-quill";
 import "react-quill/dist/quill.snow.css";
+import ImageResize from "quill-image-resize-module-react";
+
+Quill.register("modules/imageResize", ImageResize);
 
 export default function TextEditor(props) {
+  const [value, setValue] = useState("");
+
   const modules = {
     toolbar: [
       ["bold", "italic", "underline", "strike"], // toggled buttons
@@ -16,12 +21,15 @@ export default function TextEditor(props) {
       [{ color: [] }, { background: [] }], // dropdown with defaults from theme
       [{ font: [] }],
       [{ align: [] }],
-
+      ["link", "image", "video"],
       ["clean"],
     ],
+    imageResize: {
+      parchment: Quill.import("parchment"),
+      modules: ["Resize", "DisplaySize"],
+    },
   };
 
-  const [value, setValue] = useState("");
   useEffect(() => {
     setValue(props.foundValue);
   }, [props.foundValue]);

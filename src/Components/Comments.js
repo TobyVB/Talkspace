@@ -8,16 +8,14 @@ export default function Comments(props) {
         type="comment"
         post={props.post}
         user={props.user}
+        postCreator={props.postCreator}
       />
-      <hr />
-      <hr />
-      <hr />
-      <hr />
-      <hr />
+      <hr style={{ margin: "1em 0", border: "none" }} />
       {props.data.comments.map((comment, index) => {
         if (props.post.id === comment.to) {
           return (
             <Comment
+              alertCommentId={props.alertCommentId}
               data={props.data}
               comment={comment}
               user={props.user}

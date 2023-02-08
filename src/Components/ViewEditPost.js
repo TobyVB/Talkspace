@@ -73,7 +73,7 @@ export default function ViewPost(props) {
               />
             </div>
             <h4 className="post-title">{post.title}</h4>
-            <div className="post-body">
+            <div className="post-text">
               <TextEditor
                 createPost={false}
                 foundValue={post.text}
