@@ -1,95 +1,78 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { getAuth } from "firebase/auth";
 import {
   collection,
   getFirestore,
-  addDoc,
   serverTimestamp,
-  onSnapshot,
-  updateDoc,
-  query,
-  orderBy,
   doc,
+  setDoc,
 } from "firebase/firestore";
-import { nanoid } from "nanoid";
 import TextEditor from "./TextEditor";
 import { useNavigate } from "react-router-dom";
 
-export default function CreatePost(props) {
+export default function CreatePost() {
   const auth = getAuth();
   const db = getFirestore();
-  const postsRef = collection(db, "posts");
-  const [unique, setUnique] = useState(nanoid());
   const navigate = useNavigate();
+
+  const [title, setTitle] = useState("");
+  const [text, setText] = useState("");
+  const [capturedValue, setCapturedValue] = useState("");
+  const captureValue = (val) => setCapturedValue(val);
+  useEffect(() => {
+    setText(capturedValue);
+  }, [capturedValue]);
 
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
 
-  const [postObj, setPostObj] = useState(
-    auth.currentUser && {
+  function createPost() {
+    const newPostRef = doc(collection(db, "posts"));
+    setDoc(newPostRef, {
       uid: auth.currentUser.uid,
       follows: [],
-      approval: [],
-      disapproval: [],
       createdAt: serverTimestamp(),
-      unique: unique,
-      title: "",
-      text: "",
-    }
-  );
-
-  function createPost(e) {
-    e.preventDefault();
-    setPostObj({ ...postObj, text: capturedValue });
-    addDoc(postsRef, postObj)
-      // UPDATE HAS BEEN UPDATED...
-      .then(() => {
-        const q = query(postsRef, orderBy("createdAt"));
-        onSnapshot(q, async (snapshot) => {
-          snapshot.docs.forEach((document) => {
-            const docRef = doc(db, "posts", document.id);
-            if (document.data().unique === unique) {
-              console.log(unique);
-              updateDoc(docRef, {
-                id: document.id,
-              });
-              navigate("/post");
-              localStorage.setItem("postId", document.id);
-            }
-          });
-        });
-      });
+      title: title,
+      text: text,
+      id: newPostRef.id,
+    }).then(() => {
+      navigate(`/posts/${newPostRef.id}`);
+    });
   }
 
-  // ##########################################################################
-  const [capturedValue, setCapturedValue] = useState("");
-  const captureValue = (val) => setCapturedValue(val);
-  useEffect(() => {
-    setPostObj({ ...postObj, text: capturedValue });
-  }, [capturedValue]);
-  // ##########################################################################
-
   return (
-    <div className="page-body" style={{ paddingTop: "10em" }}>
-      <h1 className="create-post-h1">Create Post</h1>
+    <div className="page-body" style={{ paddingTop: "6.5em" }}>
+      <h1 style={{ marginBottom: "2.5em" }}>Create a post</h1>
       {auth.currentUser && (
-        <div className="create-post-form" onSubmit={createPost}>
+        <div className="create-post-form">
+          <label>Title</label>
           <textarea
+            style={{
+              fontFamily: "sans-serif",
+              letterSpacing: ".02em",
+              margin: "0 0 2em 0",
+              padding: "0",
+              color: "rgba(255,255,255,.8",
+              border: "1px solid rgba(255, 255, 255, .8)",
+              borderRadius: "5px",
+              padding: ".5em .5em 0 .5em",
+            }}
             className="edit-post-textarea"
             cols={1}
             type="text"
             placeholder="Add post title..."
-            value={postObj.title}
-            onChange={(event) =>
-              setPostObj({ ...postObj, title: event.target.value })
-            }
+            value={title}
+            onChange={(event) => setTitle(event.target.value)}
           />
-          <div className="post-body">
-            <TextEditor createPost={true} captureValue={captureValue} />
-          </div>
-          <hr></hr>
-          <button onClick={createPost} type="submit" disabled={!postObj.title}>
+          <label>Post</label>
+          <TextEditor createPost={true} captureValue={captureValue} />
+          <button
+            style={{ marginTop: "1em" }}
+            className="submit"
+            onClick={createPost}
+            disabled={title === ""}
+          >
             create post
           </button>
         </div>

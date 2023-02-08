@@ -1,25 +1,7 @@
-import React from "react";
-import { useCollectionData } from "react-firebase-hooks/firestore";
-import { getFirestore, collection, query, orderBy } from "firebase/firestore";
 import Notification from "./Notification.js";
-import { getAuth } from "firebase/auth";
 
 export default function Notifications(props) {
-  const db = getFirestore();
-  const auth = getAuth();
-
-  localStorage.setItem("uid", auth.currentUser.uid);
-  const notificationsRef = collection(db, "notifications");
-  const notifyQ = query(notificationsRef, orderBy("createdAt"));
-  const [notifications] = useCollectionData(notifyQ, {
-    createdAt: "createdAt",
-    unique: "unique",
-    to: "to",
-    from: "from",
-    type: "type",
-    message: "message",
-    postId: "postId",
-  });
+  const notifications = props.data.commentAlerts;
 
   return (
     <div className="notifications">
@@ -33,7 +15,7 @@ export default function Notifications(props) {
         {notifications &&
           notifications.map(
             (notification, index) =>
-              notification.to === localStorage.getItem("uid") && (
+              notification.postCreator === props.data.user.id && (
                 <Notification
                   key={index}
                   notification={notification}

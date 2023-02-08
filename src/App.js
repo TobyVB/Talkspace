@@ -1,33 +1,35 @@
 import "./App.css";
-import { useEffect, useState } from "react";
 import { initializeApp } from "firebase/app";
-import { getAuth } from "firebase/auth";
-import {
-  getFirestore,
-  onSnapshot,
-  collection,
-  query,
-  orderBy,
-} from "firebase/firestore";
-
-import { useAuthState } from "react-firebase-hooks/auth";
 import { getStorage } from "firebase/storage";
+import {
+  Route,
+  createBrowserRouter,
+  createRoutesFromElements,
+  RouterProvider,
+} from "react-router-dom";
+import { collection, getDocs, getFirestore, orderBy } from "firebase/firestore";
+import { getAuth } from "firebase/auth";
 
+// P A G E S
 import Homepage from "./Components/Homepage.js";
-import ViewProfile from "./Components/ViewProfile.js";
+import ProfileDetails from "./Components/ProfileDetails.js";
 import ViewEditProfile from "./Components/ViewEditProfile.js";
 import Login from "./Components/Login.js";
 import Register from "./Components/Register.js";
 import CreatePost from "./Components/CreatePost.js";
-import ViewPost from "./Components/ViewPost.js";
 import ViewEditPost from "./Components/ViewEditPost.js";
 import ChangeUsername from "./Components/ChangeUsername.js";
-import RetrievePassword from "./Components/RetrievePassword.js";
 import ChangePassword from "./Components/ChangePassword.js";
 import DeleteAccount from "./Components/DeleteAccount.js";
+import Profiles from "./Components/Profiles.js";
+import Posts from "./Components/Posts.js";
+import PostDetails from "./Components/PostDetails.js";
 
-import { Routes, Route, BrowserRouter } from "react-router-dom";
-import SharedLayout from "./Components/SharedLayout";
+// L A Y O U T S
+import SharedLayout from "./Components/SharedLayout.js";
+import ProfileLayout from "./Components/ProfileLayout.js";
+import PostsLayout from "./Components/PostsLayout.js";
+import PostLayout from "./Components/PostLayout.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCXgrZdHQUbrEgrjTi71-Mc80WK0Ibj3zk",
@@ -40,108 +42,98 @@ const firebaseConfig = {
 };
 const app = initializeApp(firebaseConfig);
 export const storage = getStorage(app);
-// ############################################################
-// ############################################################
-// ############################################################
+
+const mainLoader = async () => {
+  const db = getFirestore();
+  const auth = getAuth();
+  const profilesQuerySnapshot = await getDocs(collection(db, "users"));
+  let profiles = [];
+  let user = [];
+  let posts = [];
+  let comments = [];
+  let commentAlerts = [];
+  profilesQuerySnapshot.forEach((doc) => {
+    profiles.push(doc.data());
+    if (auth.currentUser && doc.data().uid === auth.currentUser.uid) {
+      user.push(doc.data());
+    }
+  });
+  let sortedProfiles = profiles.sort((p1, p2) =>
+    p1.createdAt < p2.createdAt ? 1 : p1.createdAt < p2.createdAt ? -1 : 0
+  );
+  //
+  const postsQuerySnapshot = await getDocs(collection(db, "posts"));
+  postsQuerySnapshot.forEach((doc) => {
+    posts.push(doc.data());
+  });
+  let sortedPosts = posts.sort((p1, p2) =>
+    p1.createdAt > p2.createdAt ? -1 : p1.createdAt > p2.createdAt ? 1 : 0
+  );
+  //
+  const commentsQuerySnapshot = await getDocs(collection(db, "comments"));
+  commentsQuerySnapshot.forEach((doc) => {
+    comments.push(doc.data());
+  });
+  let sortedComments = comments.sort((p1, p2) =>
+    p1.createdAt > p2.createdAt ? -1 : p1.createdAt > p2.createdAt ? 1 : 0
+  );
+  //
+  const commentAlertQuerySnapshot = await getDocs(
+    collection(db, "commentAlerts")
+  );
+  commentAlertQuerySnapshot.forEach((doc) => {
+    commentAlerts.push(doc.data());
+  });
+  let sortedCommentAlerts = commentAlerts.sort((p1, p2) =>
+    p1.createdAt > p2.createdAt ? -1 : p1.createdAt > p2.createdAt ? 1 : 0
+  );
+
+  const data = {
+    profiles: sortedProfiles,
+    posts: sortedPosts,
+    user: user[0],
+    comments: sortedComments,
+    commentAlerts: sortedCommentAlerts,
+  };
+  return data;
+};
+
+const router = createBrowserRouter(
+  createRoutesFromElements(
+    <Route path="/" element={<SharedLayout />} loader={mainLoader}>
+      <Route index element={<Homepage />} loader={mainLoader} />
+      <Route path="login" element={<Login />} />
+      <Route path="register" element={<Register />} />
+      <Route path="profile" element={<ProfileLayout />}>
+        <Route index element={<Profiles />} loader={mainLoader} />
+        <Route path=":id" element={<ProfileDetails />} loader={mainLoader} />
+      </Route>
+      <Route path="editProfile" element={<ViewEditProfile />} />
+      <Route path="createPost" element={<CreatePost />} />
+      <Route path="changeUsername" element={<ChangeUsername />} />
+      <Route path="changePassword" element={<ChangePassword />} />
+      <Route path="deleteAccount" element={<DeleteAccount />} />
+      {/* <Route path="*" element={<page404/>} /> */}
+      {/* ########################### P O S T ############################ */}
+      <Route path="posts" element={<PostsLayout />}>
+        <Route index element={<Posts />} loader={mainLoader} />
+        <Route path=":id" element={<PostLayout />} loader={mainLoader}>
+          <Route index element={<PostDetails />} loader={mainLoader} />
+          <Route
+            path="editPost"
+            element={<ViewEditPost />}
+            loader={mainLoader}
+          />
+        </Route>
+      </Route>
+    </Route>
+  )
+);
 
 export default function App() {
-  const auth = getAuth();
-  const db = getFirestore();
-
-  const [allowLogin, setAllowLogin] = useState(true);
-  const [loginCompleted, setLoginCompleted] = useState(false);
-  useAuthState(auth);
-
-  // ############################################################
-  useEffect(() => {
-    if (loginCompleted === true) {
-      if (auth.currentUser && !auth.currentUser.emailVerified) {
-        auth.signOut();
-        setAllowLogin(true);
-      }
-      setLoginCompleted(false);
-    }
-  }, [loginCompleted]);
-
-  updateAccess();
-  function updateAccess() {
-    if (auth.currentUser && allowLogin === true) {
-      const usersRef = collection(db, "users");
-      const q = query(usersRef, orderBy("createdAt"));
-      onSnapshot(q, (snapshot) => {
-        let users = [];
-        snapshot.docs.forEach((doc) => {
-          users.push({ ...doc.data() });
-        });
-        users.forEach((user) => {
-          if (auth.currentUser && user.uid === auth.currentUser.uid) {
-            localStorage.setItem("userData", user);
-          }
-        });
-      });
-      console.log("user has been updated from app.js");
-      setAllowLogin(false);
-      setLoginCompleted(true);
-    }
-  }
-  // ############################################################
-  function exit() {
-    auth.signOut();
-    setAllowLogin(true);
-  }
-  function cancelSignIn() {
-    auth.signOut();
-    setAllowLogin(true);
-  }
-  // ############################################################
-  function menuSignOut() {
-    exit();
-  }
-  // ############################################################
-
-  return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<SharedLayout menuSignOut={menuSignOut} />}>
-          <Route index element={<Homepage />} />
-          <Route
-            path="login"
-            element={
-              <Login
-                setAllowLogin={setAllowLogin}
-                cancelSignIn={cancelSignIn}
-              />
-            }
-          />
-          <Route path="register" element={<Register exit={exit} />} />
-          <Route path="profile" element={<ViewProfile signout={exit} />} />
-          <Route path="editProfile" element={<ViewEditProfile />} />
-          <Route path="createPost" element={<CreatePost />} />
-          <Route path="changeUsername" element={<ChangeUsername />} />
-          <Route path="retreivePassword" element={<RetrievePassword />} />
-          <Route path="changePassword" element={<ChangePassword />} />
-          <Route
-            path="deleteAccount"
-            element={<DeleteAccount menuSignOut={menuSignOut} />}
-          />
-
-          <Route path="post" element={<ViewPost />} />
-          <Route path="editPost" element={<ViewEditPost />} />
-          {/* <Route path="*" element={<page404/>} /> */}
-          {/* Make error page ^ */}
-        </Route>
-      </Routes>
-    </BrowserRouter>
-  );
+  return <RouterProvider router={router} />;
 }
-// ############################################################
-// ############################################################
-// ############################################################
-// ############################################################
-// ############################################################
-// ############################################################
-// ############################################################
-// ############################################################
+
 // ############################################################
 // ############################################################
 // ############################################################

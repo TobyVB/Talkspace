@@ -7,36 +7,43 @@ import {
   onSnapshot,
   deleteDoc,
 } from "firebase/firestore";
+import { useLocation, NavLink } from "react-router-dom";
 
 export default function DeleteComment(props) {
-  const db = getFirestore();
-  const commentsRef = collection(db, "comments");
+  const location = useLocation();
 
   function deleteComment() {
+    const db = getFirestore();
+    const commentsRef = collection(db, "comments");
     const docRef = doc(db, "comments", props.comment.id);
-    deleteDoc(docRef)
-      .then(() => {
-        console.log("notification deleted");
-      })
-      .then(() => {
-        console.log("what's up?");
-        const q = query(commentsRef, orderBy("createdAt"));
-        onSnapshot(q, async (snapshot) => {
-          snapshot.docs.forEach((document) => {
-            const docRef = doc(db, "comments", document.id);
-            if (
-              document.data().chain === props.comment.chain &&
-              props.type == "comment"
-            ) {
-              deleteDoc(docRef);
-            }
-          });
-        });
-      });
+    const target = props.comment.id;
+    deleteDoc(docRef).then(() => {
+      console.log("notification deleted");
+    });
+    // .then(() => {
+    //   const q = query(commentsRef, orderBy("createdAt"));
+    //   onSnapshot(q, async (snapshot) => {
+    //     snapshot.docs.forEach((document, i) => {
+    //       const docRef = doc(db, "comments", document.id);
+    //       if (document.data().masterComment === target) {
+    //         console.log(i);
+    //         deleteDoc(docRef);
+    //       }
+    //     });
+    //   });
+    // });
   }
   return (
-    <button className="delete-comment" onClick={deleteComment}>
-      delete
-    </button>
+    <NavLink
+      style={{
+        fontSize: ".8rem",
+        textDecoration: "none",
+        color: "coral",
+      }}
+      onClick={() => deleteComment()}
+      to={location}
+    >
+      DELETE
+    </NavLink>
   );
 }

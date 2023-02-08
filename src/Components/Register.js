@@ -6,17 +6,14 @@ import {
 import {
   getFirestore,
   collection,
-  addDoc,
   serverTimestamp,
-  onSnapshot,
   doc,
-  updateDoc,
   query,
   orderBy,
+  setDoc,
 } from "firebase/firestore";
 import { useCollectionData } from "react-firebase-hooks/firestore";
 import { getStorage, ref, getDownloadURL } from "firebase/storage";
-import { nanoid } from "nanoid";
 import React, { useEffect, useState } from "react";
 
 import { useNavigate } from "react-router-dom";
@@ -28,19 +25,24 @@ export default function Register(props) {
 
   const navigate = useNavigate();
 
-  const [users] = useCollectionData(qUsers, {
-    username: "username",
-  });
-  const [unique, setUnique] = useState(nanoid());
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [username, setUsername] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const [noError, setNoError] = useState(true);
+  const [usernameTaken, setUsernameTaken] = useState(true);
+  const [startLetter, setStartLetter] = useState(true);
+  const [emailTaken, setEmailTaken] = useState(false);
+
   const usersRef = collection(db, "users");
   const qUsers = query(usersRef, orderBy("createdAt"));
   const [letterRef, setLetterRef] = useState("");
   const capL = username.charAt(0).toUpperCase();
   const lowL = username.charAt(0).toLowerCase();
+  const [users] = useCollectionData(qUsers, {
+    username: "username",
+  });
   const letters = [
     "a",
     "b",
@@ -93,125 +95,132 @@ export default function Register(props) {
   function signup(email, password) {
     return createUserWithEmailAndPassword(auth, email, password);
   }
+
   // ################################   H A N D L E   S I G N U P   ######################################
   async function handleSignup() {
     let defaultPic = "";
     getDownloadURL(letterRef)
-      .then((url) => {
-        defaultPic = url;
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-    localStorage.setItem("username", username);
+      .then((url) => (defaultPic = url))
+      .catch((error) => console.log(error));
     setLoading(true);
     try {
       await signup(email, password);
     } catch {
       console.log("error with handleSignup function in Register.js");
     }
-    await addDoc(usersRef, {
+    const newUserRef = doc(collection(db, "users"));
+    setDoc(newUserRef, {
       email: auth.currentUser.email,
       username: username,
       uid: auth.currentUser.uid,
       createdAt: serverTimestamp(),
-      unique: unique,
       defaultPic: defaultPic,
+      id: newUserRef.id,
     })
-      .then(() => {
-        const q = query(usersRef, orderBy("createdAt"));
-        onSnapshot(q, async (snapshot) => {
-          snapshot.docs.forEach((document) => {
-            const docRef = doc(db, "users", document.id);
-            if (document.data().unique === unique) {
-              updateDoc(docRef, {
-                id: document.id,
-              });
-            }
-          });
-        });
-      })
-      .then(() => {
-        sendEmailVerification(auth.currentUser).then(() => {});
-      })
-      .then(() => {
-        props.exit();
-      })
+      .then(() => sendEmailVerification(auth.currentUser).then(() => {}))
+      .then(() => props.exit())
       .then(() => {
         setLoading(false);
         navigate("../login");
       });
   }
-  // -/-/-/-/-/-/-/-/-/-/-/-/-/-/-   - E N D -   H A N D L E   S I G N U P   -/-/-/-/-/-/-/-/-/-/-/-/-/-/-/- //
+  // C H E C K   F O R   E R R O R S
+  useEffect(() => {
+    let usernameList = [];
+    let emailList = [];
+
+    users &&
+      users.map((user) => {
+        if (user.username.toLowerCase() === username.toLowerCase()) {
+          usernameList.push(user.username.toLowerCase());
+        } else if (user.email === email) {
+          emailList.push(user.email);
+        }
+      });
+
+    usernameList.length === 1
+      ? setUsernameTaken(true)
+      : setUsernameTaken(false);
+
+    username !== ""
+      ? !letters.includes(username.charAt(0).toLowerCase())
+        ? setStartLetter(false)
+        : setStartLetter(true)
+      : setStartLetter(true);
+
+    emailList.length === 0 && email !== "" && setEmailTaken(false);
+    email === "" && setEmailTaken(false);
+
+    emailList.length > 0 && setEmailTaken(true);
+  }, [username, email]);
+
+  useEffect(() => {
+    if (!usernameTaken && !emailTaken && startLetter) {
+      setNoError(true);
+    } else {
+      setNoError(false);
+    }
+  }, [usernameTaken, emailTaken, startLetter]);
 
   return (
     <div className="page-style page-body">
       <div className="form-register-email">
-        <h1>SIGN UP</h1>
-        <label htmlFor="email">Email</label>
-        <input
-          id="email"
-          className="input-user-cred"
-          placeholder="email"
-          name="email"
-          onChange={handleChangeEmail}
-          value={email}
-        />
-
-        {users && users.filter((user) => user.email === email).length > 0 ? (
-          <p>... email already in use</p>
-        ) : (
-          <p className="invisible-p">invisible text</p>
-        )}
-
-        <label htmlFor="password">Password</label>
+        <h1 className="cred-header">SIGN UP</h1>
+        <label>Email</label>
+        <input placeholder="email" onChange={handleChangeEmail} value={email} />
+        <label>Password</label>
         <input
           onChange={handleChangePassword}
           value={password}
-          id="password"
-          className="input-user-cred"
           placeholder="password"
           type="password"
-          name="password"
         />
-        {/* <p>... password must be between 6 and 50 characters and include letters and numbers</p> */}
-        <label htmlFor="username">Username</label>
+        <label>Username</label>
         <input
-          id="username"
-          className="input-user-cred"
           placeholder="username"
-          name="username"
           onChange={(event) => setUsername(event.target.value)}
           value={username}
         />
-
-        {
-          users &&
-          users.filter((user) => user.username === username).length > 0 ? (
-            <p>... username is already taken</p>
-          ) : (
-            <p className="invisible-p"></p>
-          )
-          // make unclickable and invisible, etc
-        }
-        {!letters.includes(lowL) ? (
-          <p>... must start with a letter</p>
-        ) : (
-          <p className="invisible-p">invisible text</p>
-        )}
-        <hr />
         {users &&
         users.filter((user) => user.username === username).length < 1 &&
         letters.includes(lowL) &&
         users &&
         users.filter((user) => user.email === email).length === 0 ? (
-          <button disabled={loading} onClick={handleSignup}>
+          <button
+            className="submit cred-submit"
+            disabled={loading}
+            onClick={handleSignup}
+          >
             register
           </button>
         ) : (
-          <button disabled="+true" onClick={handleSignup}>
+          <button
+            style={{ color: "rgba(255,255,255,.35" }}
+            className="submit cred-submit"
+            disabled="+true"
+            onClick={handleSignup}
+          >
             register
           </button>
+        )}
+        <hr style={{ margin: "1em 0", border: "none" }} />
+        {/* ################################################### */}
+        {!noError && (
+          <div className="error-box-container">
+            <div className="error-box">
+              {usernameTaken && (
+                <div style={{ margin: ".5em" }}>Username is taken</div>
+              )}
+              {!startLetter && (
+                <div style={{ margin: ".5em" }}>
+                  username must start with a letter
+                </div>
+              )}
+              {emailTaken && (
+                <div style={{ margin: ".5em" }}>Email is in use</div>
+              )}
+            </div>
+          </div>
         )}
       </div>
     </div>

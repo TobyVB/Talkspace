@@ -1,96 +1,84 @@
-import React, { useState } from "react";
-import CommentMain from "./CommentMain";
-import CreateComment from "./CreateComment.js";
-import ToggleReplies from "./ToggleReplies.js";
-import { nanoid } from "nanoid";
+import { useState } from "react";
+import DeleteComment from "./DeleteComment.js";
+import ContentHeader from "./ContentHeader.js";
+
+import Clock from "./Utils/Clock.js";
 
 export default function Comment(props) {
-  const [formValue, setFormValue] = useState("");
-  const [replyPressed, setReplyPressed] = useState(false);
-  const [showForm, setShowForm] = useState(false);
-  const [repliesBool, setRepliesBool] = useState("");
-  const [open, setOpen] = useState(false);
+  const [togglerHidden, setTogglerHidden] = useState(true);
+  const [options, setOptions] = useState(false);
 
-  function startShowForm() {
-    setShowForm(true);
-    setTimeout(() => {
-      if (showForm) {
-        setFormValue(`@${props.comment.username} `);
-      }
-    }, 500);
-    setReplyPressed((prevReplyPressed) => !prevReplyPressed);
-  }
-  function endShowForm(e) {
-    setTimeout(() => {
-      setShowForm(false);
-    }, 300);
-    setReplyPressed((prevReplyPressed) => !prevReplyPressed);
+  function showOptions() {
+    setOptions(true);
   }
 
   return (
     <div
-      className={`comment ${
-        props.comment.unique === localStorage.getItem("unique") &&
-        `flashing-animation`
-      }`}
-      onClick={props.resetUnique}
+      className="container-comment"
+      onMouseEnter={() => setTogglerHidden(false)}
+      onMouseLeave={() => setTogglerHidden(true, setOptions(false))}
     >
-      <CommentMain
-        comment={props.comment}
-        startShowForm={startShowForm}
-        showForm={showForm}
-        replyPressed={replyPressed}
-        type={props.type}
-      />
-      {/* CREATE COMMENT */}
-      {showForm && (
-        <div className="reply-btns">
-          <button className="cancel-reply" onClick={endShowForm}>
-            CANCEL
-          </button>
-          <CreateComment
-            type="reply"
-            capturedPostId={localStorage.getItem("postId")}
-            comment={props.comment}
-          />
-        </div>
+      {options && (
+        <div
+          style={{
+            top: "0",
+            left: "0",
+            display: "block",
+            position: "fixed",
+            background: "rgba(0,0,0,0)",
+            width: "100vw",
+            height: "100vh",
+          }}
+          onClick={() => setOptions(false)}
+        ></div>
       )}
-      {/* All COMMENTS || All REPLIES */}
-      <div className="comment-chain">
-        <ToggleReplies
-          comments={props.comments}
-          setRepliesBool={setRepliesBool}
-          comment={props.comment}
-          setOpen={setOpen}
+      <div style={{ display: "flex", flexDirection: "column", width: "100%" }}>
+        <ContentHeader
+          profile={props.comment}
+          createdAt={props.comment.createdAt}
         />
         <div
-          className={
-            repliesBool === true
-              ? `gradual-open-animation`
-              : repliesBool === false
-              ? `gradual-close-animation`
-              : repliesBool
+          style={
+            props.alertCommentId !== props.comment.id
+              ? { textDecoration: "underscore" }
+              : { background: "red" }
           }
+          className="comment-text"
         >
-          {/* COMMENT REPLIES */}
-          {open &&
-            props.comments &&
-            props.comments.map(
-              (comment) =>
-                comment.unique === props.comment.unique &&
-                comment.type === "reply" && (
-                  <div className="reply" key={nanoid()}>
-                    <Comment
-                      comment={comment}
-                      type={"reply"}
-                      key={nanoid()}
-                      resetUnique={props.resetUnique}
-                      capturedPostId={localStorage.getItem("postId")}
-                    />
-                  </div>
-                )
-            )}
+          <div>{props.comment.body}</div>
         </div>
+      </div>
+
+      <div style={{ margin: "auto", width: "0", display: "flex" }}>
+        {options && props.user.uid === props.comment.uid && (
+          <div
+            style={{
+              transitionDelay: ".2s",
+              background: "rgba(20, 20, 20, 1",
+              border: "1px solid white",
+              margin: "auto",
+              transform: "translateX(-80px)",
+              padding: ".5em",
+              borderRadius: "5px",
+              zIndex: "10",
+            }}
+          >
+            <div onClick={() => setOptions(false)} style={{ margin: "auto" }}>
+              <DeleteComment createdAt={props.comment.createdAt} />
+            </div>
+          </div>
+        )}
+        <span
+          style={
+            togglerHidden
+              ? { color: "rgba(0,0,0,0)" }
+              : { color: "rgba(255,255,255,.8)" }
+          }
+          className="comment-options-toggler"
+          onClick={showOptions}
+        >
+          &#8942;
+        </span>
       </div>
     </div>
   );

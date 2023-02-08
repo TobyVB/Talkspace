@@ -1,19 +1,54 @@
+import { useState } from "react";
+
 export default function Clock(props) {
+  // let day;
+  let year;
+  let month;
   let day;
+  let hour;
+  let minute;
+
   let timeOfDay;
+  const months = [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
+  ];
+
   if (props.createdAt) {
-    day = props.createdAt.toDate().toDateString();
-    timeOfDay = props.createdAt.toDate().toLocaleTimeString();
+    // day = props.createdAt.toDate().toDateString();
+    // timeOfDay = props.createdAt.toDate().toLocaleTimeString();
+
+    day = props.createdAt.toDate().getDate();
+    month = months[props.createdAt.toDate().getMonth()];
+    year = props.createdAt.toDate().getFullYear();
+    hour = props.createdAt.toDate().getHours();
+    minute = props.createdAt.toDate().getMinutes();
+    if (hour < 12) {
+      timeOfDay = "AM";
+    } else {
+      timeOfDay = "PM";
+    }
+    if (hour > 12) {
+      hour -= 12;
+    }
+    if (hour === 0) {
+      hour = 12;
+    }
   }
 
   return (
-    <div
-      className={`time ${props.messageClass} ${
-        props.type === "reply" ? " time-reply" : " time-comment"
-      }`}
-    >
-      <p>{day}</p>
-      <p>{timeOfDay}</p>
+    <div style={{ fontSize: ".65rem" }} className={`time`}>
+      <p>{`${hour}:${minute}${timeOfDay}, ${day} ${month} ${year}`}</p>
     </div>
   );
 }
