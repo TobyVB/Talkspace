@@ -44,15 +44,17 @@ export default function ChangeUsername(props) {
   return (
     <div className="page-body">
       <h1>Change Username</h1>
-      <button onClick={() => navigate(-1)}>Back</button>
       <input
         onChange={(event) => setUsername(event.target.value)}
         placeholder="enter new username"
         value={username}
       />
+      <button onClick={() => navigate(-1)}>Back</button>
       <button onClick={updateUser}>update</button>
-      {!usernameChanged && <p>Current username:</p>}
-      {!usernameChanged && <p>{currentUser.username}</p>}
+      <div>
+        {!usernameChanged && <span>Username: </span>}
+        {!usernameChanged && <span>{currentUser.username}</span>}
+      </div>
       {usernameChanged && <p>Username has been changed to: </p>}
       {usernameChanged && <p>{username}</p>}
     </div>

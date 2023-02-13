@@ -11,17 +11,22 @@ export default function ContentHeader(props) {
           className="content-header"
           style={{
             float: "right",
-            background: "rgba(0,0,0,.3)",
+            background: "rgba(0,0,0,.65)",
             padding: "0 .5em",
             display: "flex",
             justifyContent: "space-between",
             verticalAlign: "center",
+            borderTopLeftRadius: "3px",
+            borderTopRightRadius: "3px",
           }}
         >
-          <div style={{ display: "flex" }}>
+          <div
+            className="user-link-header"
+            style={{ display: "flex", cursor: "pointer" }}
+            onClick={() => navigate(`/profile/${props.profile.id}`)}
+          >
             <img
               alt={props.profile.username}
-              onClick={() => navigate(`/profile/${props.profile.id}`)}
               className="mini-defaultPic"
               src={props.profile.defaultPic}
               style={{ marginRight: ".5em" }}

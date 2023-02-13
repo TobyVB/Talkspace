@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useLoaderData } from "react-router-dom";
+import { useNavigate, useLoaderData, useLocation } from "react-router-dom";
 import Clock from "./Utils/Clock.js";
 import parse from "html-react-parser";
 import ContentHeader from "./ContentHeader.js";
@@ -9,6 +9,21 @@ export default function Homepage() {
   const data = useLoaderData();
   const profiles = data.profiles;
   const posts = data.posts;
+  const comments = data.comments;
+  const location = useLocation();
+  const [loggedIn, setLoggedIn] = useState(false);
+
+  const { state } = location;
+  useEffect(() => {
+    if (!loggedIn) {
+      if (location.state && location.state.fromLogin === true) {
+        setTimeout(() => {
+          navigate(location.path);
+          setLoggedIn(true);
+        });
+      }
+    }
+  }, []);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -28,12 +43,17 @@ export default function Homepage() {
               flexDirection: "column",
               margin: "1em 0",
               cursor: "pointer",
+              borderRadius: "3px",
             }}
             onClick={() => viewPost(props.post.id)}
           >
-            <div>
+            {/* <div>
               <Clock createdAt={props.post.createdAt} />
-            </div>
+            </div> */}
+            <ContentHeader
+              profile={props.profile}
+              createdAt={props.post.createdAt}
+            />
             <div className="linkPost" onClick={() => viewPost(props.post.id)}>
               <p>{props.post.title}</p>
             </div>
@@ -44,37 +64,47 @@ export default function Homepage() {
   }
 
   function Post(props) {
+    let commentArr = [];
+    comments.map((comment) => {
+      if (comment.to === props.post.id) {
+        commentArr.push(comment.id);
+      }
+    });
     return (
-      <div
-        className="homepage-post fade"
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          borderRadius: "3px",
-          border: "1px solid black",
-          margin: "2em 0 0 0",
-          cursor: "pointer",
-        }}
-        onClick={() => viewPost(props.post.id)}
-      >
-        <ContentHeader
-          profile={props.profile}
-          createdAt={props.post.createdAt}
-        />
-        <div className="post-title">{props.post.title}</div>
-
+      <div className="post-container">
         <div
+          className="homepage-post"
           style={{
-            borderBottomLeftRadius: "5px",
-            borderBottomRightRadius: "5px",
-            overflow: "none",
+            display: "flex",
+            flexDirection: "column",
+            cursor: "pointer",
           }}
-          className="post-text"
+          onClick={() => viewPost(props.post.id)}
         >
-          <div className="post-text">
+          <ContentHeader
+            profile={props.profile}
+            createdAt={props.post.createdAt}
+          />
+          <div className="post-title">{props.post.title}</div>
+
+          <div
+            style={{
+              overflow: "none",
+            }}
+            className="post-text"
+          >
             {props.post && parse(props.post.text)}
           </div>
         </div>
+        <button
+          onClick={() => viewPost(props.post.id, true)}
+          className="view-post-btn"
+        >
+          <span style={{ color: "black", textShadow: "0px 1px 2px black" }}>
+            💬
+          </span>{" "}
+          {commentArr.length} comments
+        </button>
       </div>
     );
   }
@@ -87,7 +117,7 @@ export default function Homepage() {
   return (
     <>
       {
-        <div className="page-body">
+        <div className="page-body homepage">
           <button
             style={{
               margin: "2em 0 2em 0",
@@ -125,12 +155,6 @@ export default function Homepage() {
                                 post={post}
                                 key={post.id}
                               />
-                              <button
-                                onClick={() => viewPost(post.id, true)}
-                                className="view-post-btn"
-                              >
-                                comments
-                              </button>
                             </>
                           )}
                         </div>

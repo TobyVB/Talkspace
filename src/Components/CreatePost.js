@@ -41,32 +41,63 @@ export default function CreatePost() {
     });
   }
 
+  function updateTitle(e) {
+    if (title.length < 100) {
+      setTitle(e);
+    } else {
+      setTitle(e);
+      setTitle((prev) => prev.substring(0, prev.length - 1));
+    }
+  }
+
   return (
-    <div className="page-body" style={{ paddingTop: "6.5em" }}>
-      <h1 style={{ marginBottom: "2.5em" }}>Create a post</h1>
+    <div className="page-body">
+      <h1>Create a post</h1>
       {auth.currentUser && (
-        <div className="create-post-form">
-          <label>Title</label>
-          <textarea
-            style={{
-              fontFamily: "sans-serif",
-              letterSpacing: ".02em",
-              margin: "0 0 2em 0",
-              padding: "0",
-              color: "rgba(255,255,255,.8",
-              border: "1px solid rgba(255, 255, 255, .8)",
-              borderRadius: "5px",
-              padding: ".5em .5em 0 .5em",
-            }}
-            className="edit-post-textarea"
-            cols={1}
-            type="text"
-            placeholder="Add post title..."
-            value={title}
-            onChange={(event) => setTitle(event.target.value)}
-          />
-          <label>Post</label>
-          <TextEditor createPost={true} captureValue={captureValue} />
+        <>
+          <div className="post-page-post-container">
+            <div className="create-post-form">
+              <label>Title</label>
+              <div
+                style={{
+                  display: "flex",
+                  padding: ".5em .5em .5em .5em",
+                  width: "100%",
+                  border: "1px solid rgba(0, 0, 0, .2)",
+                }}
+              >
+                <textarea
+                  onKeyDown={function (e) {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                    } else if (e.key === "Delete") {
+                      setTitle((prev) => prev.substring(0, prev.length - 1));
+                    }
+                  }}
+                  id="title"
+                  style={{
+                    fontFamily: "sans-serif",
+                    letterSpacing: ".02em",
+                    // border: "1px solid rgba(0, 0, 0, .2)",
+                    // borderRadius: "3px",
+                    width: "100%",
+                    margin: "0 .5em 0 0",
+                    padding: "0",
+                  }}
+                  rows={2}
+                  cols={1}
+                  type="text"
+                  placeholder="Add post title..."
+                  value={title}
+                  onChange={(event) => updateTitle(event.target.value)}
+                />
+                <div style={{ fontSize: ".8rem" }}>{title.length}/100</div>
+              </div>
+
+              <label>Post</label>
+              <TextEditor createPost={true} captureValue={captureValue} />
+            </div>
+          </div>
           <button
             style={{ marginTop: "1em" }}
             className="submit"
@@ -75,7 +106,7 @@ export default function CreatePost() {
           >
             create post
           </button>
-        </div>
+        </>
       )}
     </div>
   );

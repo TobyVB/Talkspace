@@ -17,6 +17,7 @@ export default function ProfileDetails() {
   const profiles = data.profiles;
   const posts = data.posts;
   const auth = getAuth();
+  const comments = data.comments;
 
   const navigate = useNavigate();
 
@@ -32,6 +33,8 @@ export default function ProfileDetails() {
 
   // allow to toggle list view
   function PostList(props) {
+    let poster = profiles.filter((user) => props.post.uid === user.uid);
+
     return (
       <>
         {profile && (
@@ -43,9 +46,11 @@ export default function ProfileDetails() {
             }}
             onClick={() => viewPost(props.post.id)}
           >
-            <div>
-              <Clock createdAt={props.post.createdAt} />
-            </div>
+            <ContentHeader
+              profile={poster[0]}
+              createdAt={props.post.createdAt}
+            />
+
             <div className="linkPost" onClick={() => viewPost(props.post.id)}>
               <p>{props.post.title}</p>
             </div>
@@ -56,26 +61,41 @@ export default function ProfileDetails() {
   }
 
   function Post(props) {
+    let poster = profiles.filter((user) => props.post.uid === user.uid);
+    let commentArr = [];
+    comments.map((comment) => {
+      if (comment.to === props.post.id) {
+        commentArr.push(comment.id);
+      }
+    });
     return (
-      <div
-        onClick={() => viewPost(props.post.id)}
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          margin: "3em 0 1em 0",
-          border: "1px solid black",
-          borderRadius: "3px",
-          cursor: "pointer",
-        }}
-      >
-        <ContentHeader profile={profile} createdAt={props.post.createdAt} />
-        <div className="post-title">{props.post.title}</div>
-        <div className="post-text">{props.post && parse(props.post.text)}</div>
+      <div className="post-page-post-container">
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+          }}
+        >
+          <ContentHeader profile={poster[0]} createdAt={props.post.createdAt} />
+          <div className="post-title">{props.post.title}</div>
+          <div className="post-text">
+            {props.post && parse(props.post.text)}
+          </div>
+        </div>
+        <button
+          onClick={() => viewPost(props.post.id, true)}
+          className="view-post-btn"
+        >
+          <span style={{ color: "black", textShadow: "0px 1px 2px black" }}>
+            💬
+          </span>{" "}
+          {commentArr.length} comments
+        </button>
       </div>
     );
   }
-  function viewPost(e) {
-    navigate(`/posts/${e}`);
+  function viewPost(e, bool) {
+    navigate(`/posts/${e}`, { state: { viewComments: bool } });
   }
   const [usersSelected, setUsersSelected] = useState(true);
   const [listView, setListView] = useState(false);
@@ -84,15 +104,14 @@ export default function ProfileDetails() {
   }
   return (
     <>
-      {auth.currentUser && posts && (
-        <div style={{ paddingTop: "51px" }}>
+      {posts && (
+        <div className="profile" style={{ paddingTop: "51px" }}>
           {profile !== null && (
             <div>
               <div
                 style={{
                   backgroundColor: "rgba(62, 166, 255,.3)",
                   height: "200px",
-                  display: "flex",
                   backgroundSize: "cover",
                   backgroundPosition: "center center",
                   backgroundImage: `url(${profile.coverPic})`,
@@ -104,8 +123,8 @@ export default function ProfileDetails() {
                   <div
                     className="profile-picture"
                     style={{
-                      border: "7px solid rgb(57, 76, 95)",
-                      backgroundColor: "rgb(57, 76, 95)",
+                      border: "7px solid rgb(212, 212, 212)",
+                      backgroundColor: "rgba(0, 0, 0, .5)",
                       borderRadius: "100%",
                       backgroundSize: "cover",
                       backgroundPosition: "center center",
@@ -113,29 +132,15 @@ export default function ProfileDetails() {
                     }}
                   ></div>
                   <h2 className="profile-username">{`${profile.username}`}</h2>
-                  {profile.uid === auth.currentUser.uid && (
-                    <div className="profile-header-btns">
-                      <span>
-                        <NavLink to="/createPost">
-                          <button className="edit-profile-btn">Post</button>
-                        </NavLink>
-                      </span>
-                      <span>
-                        <NavLink to="/editProfile">
-                          <button className="edit-profile-btn">Edit</button>
-                        </NavLink>
-                      </span>
-                    </div>
-                  )}
                 </div>
                 <div className="profile-jumbotron">
                   <div className="profile-info-section">
                     <p style={{ fontSize: ".8rem" }}>{profile.aboutMe}</p>
-                    <hr></hr>
                     <div
                       style={{
                         display: "flex",
-                        gap: "1em",
+                        gap: ".5em",
+                        justifyContent: "right",
                       }}
                     >
                       <p
@@ -180,7 +185,10 @@ export default function ProfileDetails() {
                           post.uid === profile.uid && listView ? (
                             <PostList post={post} key={post.id} />
                           ) : (
-                            <Post yourPost="true" post={post} key={post.id} />
+                            post.uid === profile.uid &&
+                            !listView && (
+                              <Post yourPost="true" post={post} key={post.id} />
+                            )
                           )
                         )}
                       </div>
@@ -198,11 +206,14 @@ export default function ProfileDetails() {
                             (listView ? (
                               <PostList post={post} key={post.id} />
                             ) : (
-                              <Post
-                                yourPost="false"
-                                post={post}
-                                key={post.id}
-                              />
+                              post.follows.includes(profile.id) &&
+                              !listView && (
+                                <Post
+                                  yourPost="false"
+                                  post={post}
+                                  key={post.id}
+                                />
+                              )
                             ))
                         )}
                       </div>

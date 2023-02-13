@@ -4,12 +4,16 @@ import {
   signInWithEmailAndPassword,
   sendPasswordResetEmail,
 } from "firebase/auth";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 export default function Login() {
   const auth = getAuth();
   const [passwordSent, setPasswordSent] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
+  const { state } = location;
+  const [noError, setNoError] = useState(true);
+  const [emailUnverified, setEmailUnverified] = useState(false);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -30,7 +34,21 @@ export default function Login() {
       await login(emailRef.current.value, passwordRef.current.value).then(
         () => {
           setLoading(false);
-          navigate("/");
+          if (auth.currentUser.emailVerified === false) {
+            auth.signOut().then(() => {
+              setNoError(false);
+              setEmailUnverified(true);
+              console.log("email isn't verified");
+            });
+          } else {
+            setNoError(true);
+            setEmailUnverified(false);
+            if (location.state && location.state.path) {
+              navigate(location.state.path);
+            } else {
+              navigate(`/`, { state: { fromLogin: true } });
+            }
+          }
         }
       );
     } catch {
@@ -62,7 +80,7 @@ export default function Login() {
 
   return (
     <div className="page-body">
-      <div className="form-login-email">
+      <div className="form-email">
         <h1 className="cred-header">LOG IN</h1>
         <label className="cred-label" htmlFor="email">
           Enter email
@@ -85,6 +103,16 @@ export default function Login() {
         >
           login
         </button>
+
+        {!noError && (
+          <div className="error-box-container">
+            <div className="error-box">
+              {emailUnverified && (
+                <div style={{ margin: ".5em" }}>Please verifiy your email</div>
+              )}
+            </div>
+          </div>
+        )}
 
         {!forgotPassword && (
           <button style={{ marginTop: "3em" }} onClick={forgotPasswordBtn}>

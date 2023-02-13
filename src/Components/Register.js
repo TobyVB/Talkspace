@@ -118,10 +118,11 @@ export default function Register(props) {
       id: newUserRef.id,
     })
       .then(() => sendEmailVerification(auth.currentUser).then(() => {}))
-      .then(() => props.exit())
       .then(() => {
         setLoading(false);
-        navigate("../login");
+        auth.signOut().then(() => {
+          navigate("/login");
+        });
       });
   }
   // C H E C K   F O R   E R R O R S
@@ -164,7 +165,7 @@ export default function Register(props) {
 
   return (
     <div className="page-style page-body">
-      <div className="form-register-email">
+      <div className="form-email">
         <h1 className="cred-header">SIGN UP</h1>
         <label>Email</label>
         <input placeholder="email" onChange={handleChangeEmail} value={email} />
@@ -195,7 +196,7 @@ export default function Register(props) {
           </button>
         ) : (
           <button
-            style={{ color: "rgba(255,255,255,.35" }}
+            style={{ color: "rgba(255,255,255,.5" }}
             className="submit cred-submit"
             disabled="+true"
             onClick={handleSignup}

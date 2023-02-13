@@ -13,6 +13,15 @@ export default function ViewPost(props) {
   const posts = data.posts;
   const [profile, setProfile] = useState(null);
   const [post, setPost] = useState(null);
+  const [capturedValue, setCapturedValue] = useState();
+  const captureValue = (val) => setCapturedValue(val);
+  const [newPost, setNewPost] = useState("filler");
+
+  useEffect(() => {
+    setNewPost((prev) => {
+      return { ...prev, text: capturedValue };
+    });
+  }, [capturedValue]);
 
   useEffect(() => {
     posts.map((obj) => {
@@ -36,52 +45,53 @@ export default function ViewPost(props) {
 
   async function updatePost() {
     const docRef = doc(db, "posts", post.id);
-    await updateDoc(docRef, post);
+    await updateDoc(docRef, newPost).then(() => {
+      navigate(-1);
+    });
   }
   function cancel() {
     navigate(-1);
   }
-  function save() {
-    updatePost();
-    navigate(-1);
-  }
-  const [capturedValue, setCapturedValue] = useState();
-  const captureValue = (val) => setCapturedValue(val);
 
   return (
     <>
       {post && profile && (
         <div className="page-body">
-          <button disabled={pagePause && "+true"} onClick={cancel}>
-            cancel
-          </button>
-          <button disabled={pagePause && "+true"} onClick={save}>
-            save
-          </button>
-          <div className="view-post-container">
-            <div className="post-header">
-              <p
-                className="post-author"
-                onClick={() => props.sendUID(profile.uid)}
-              >
-                Authored by: {profile.username}
-              </p>
-              <img
-                alt={profile.username}
-                src={profile.defaultPic}
-                className="mini-defaultPic"
-              />
-            </div>
-            <h4 className="post-title">{post.title}</h4>
-            <div className="post-text">
-              <TextEditor
-                createPost={false}
-                foundValue={post.text}
-                captureValue={captureValue}
-                setPostObj={() => setPost}
-              />
+          <div
+            style={{
+              paddingTop: "1.75em",
+            }}
+          >
+            <button
+              className="profile-options"
+              disabled={pagePause && "+true"}
+              onClick={cancel}
+            >
+              CANCEL
+            </button>
+          </div>
+
+          <div className="post-page-post-container">
+            <div className="view-post-container">
+              <h4 className="post-title">{post.title}</h4>
+              <div className="post-text">
+                <TextEditor
+                  createPost={false}
+                  foundValue={post.text}
+                  captureValue={captureValue}
+                  setPostObj={() => setPost}
+                />
+              </div>
             </div>
           </div>
+          <button
+            style={{ marginTop: ".6em" }}
+            className="submit"
+            disabled={pagePause && "+true"}
+            onClick={updatePost}
+          >
+            SAVE
+          </button>
         </div>
       )}
     </>

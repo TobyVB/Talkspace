@@ -32,9 +32,6 @@ export default function ViewEditProfile(props) {
   const [coverUrl, setCoverUrl] = useState(null);
   const [objURL, setObjURL] = useState("");
   const [coverObjURL, setCoverObjURL] = useState("");
-  // const [defPicLoc, setDefPicLoc] = useState(
-  //   localStorage.getItem("userData").defPicLoc
-  // );
   const [defPicLoc, setDefPicLoc] = useState(null);
   const [coverPicLoc, setCoverPicLoc] = useState(null);
 
@@ -68,18 +65,18 @@ export default function ViewEditProfile(props) {
       defPicLoc: `${url === null ? currentUser.defPicLoc : defPicLoc}`,
       aboutMe: `${aboutMeValue === "" ? currentUser.aboutMe : aboutMeValue}`,
     });
-    navigate("/profile");
-    window.location.reload(false);
+    // window.location.reload(false);
   }
 
   // ########## S A V E   C H A N G E S ##########
-  function save() {
+  async function save() {
     {
       image !== null && submitImage();
       coverImage !== null && submitCoverImage();
     }
     updateUser();
     setDisableSave(true);
+    navigate(`/profile/${currentUser.id}`);
   }
 
   const [hideEditCoverImage, setHideEditCoverImage] = useState(true);
@@ -109,7 +106,7 @@ export default function ViewEditProfile(props) {
   const handleImageChange = async (e) => {
     if (e.target.files[0]) {
       const file = e.target.files[0];
-      imageConversion.compressAccurately(file, 100).then((res) => {
+      imageConversion.compressAccurately(file, 1000).then((res) => {
         setImage(res);
       });
     }
@@ -145,14 +142,11 @@ export default function ViewEditProfile(props) {
         console.log(error.message);
       });
   };
-  function test() {
-    console.log(url);
-  }
   // ########## H A N D L E   C O V E R   I M A G E ##########
   const handleCoverImageChange = async (e) => {
     if (e.target.files[0]) {
       const file = e.target.files[0];
-      imageConversion.compressAccurately(file, 100).then((res) => {
+      imageConversion.compressAccurately(file, 1000).then((res) => {
         setCoverImage(res);
       });
     }
@@ -189,7 +183,20 @@ export default function ViewEditProfile(props) {
 
   return (
     <div className="page-style page-body">
+      <h1>Edit</h1>
       <div className="editProfile-body">
+        {/* ############### S A V E   S E T T I N G S ################ */}
+        {hideEditAboutMe && (
+          <div
+            style={{ marginBottom: "2em" }}
+            className="save-cancel-edit-profile"
+          >
+            <button onClick={() => navigate(-1)}>return</button>
+            <button onClick={save} disabled={disableSave ? "+true" : false}>
+              save
+            </button>
+          </div>
+        )}
         {/* ############### E D I T   C O V E R   P H O T O ################ */}
         {hideEditCoverImage && hideEditAboutMe && hideEditImage && (
           <div className="edit-profile-section">
@@ -199,18 +206,28 @@ export default function ViewEditProfile(props) {
         {!hideEditCoverImage && (
           <div className="edit-profile-section">
             <div className="edit-defaultPic">
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "1em",
+                }}
+              >
+                <button className="submit" onClick={cancelEdit}>
+                  cancel
+                </button>
+                <input
+                  className="fileTypeInput"
+                  type="file"
+                  accept=".jpg, .jpeg, .png"
+                  onChange={handleCoverImageChange}
+                />
+              </div>
               <img
                 alt="profile"
                 className="cover-picture"
                 src={coverImage !== null ? coverObjURL : currentUser.coverPic}
               />
-              <input
-                className="fileTypeInput"
-                type="file"
-                accept=".jpg, .jpeg, .png"
-                onChange={handleCoverImageChange}
-              />
-              <button onClick={cancelEdit}>cancel</button>
             </div>
           </div>
         )}
@@ -223,19 +240,28 @@ export default function ViewEditProfile(props) {
         {!hideEditImage && (
           <div className="edit-profile-section">
             <div className="edit-defaultPic">
-              <img
-                alt="profile"
-                className="profile-picture"
-                src={image !== null ? objURL : currentUser.defaultPic}
-              />
-              <input
-                className="fileTypeInput"
-                type="file"
-                accept=".jpg, .jpeg, .png"
-                onChange={handleImageChange}
-              />
-              <button onClick={cancelEdit}>cancel</button>
-              <button onClick={test}>test</button>
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "1em",
+                }}
+              >
+                <button className="submit" onClick={cancelEdit}>
+                  cancel
+                </button>
+                <input
+                  className="fileTypeInput"
+                  type="file"
+                  accept=".jpg, .jpeg, .png"
+                  onChange={handleImageChange}
+                />
+                <img
+                  alt="profile"
+                  className="profile-picture"
+                  src={image !== null ? objURL : currentUser.defaultPic}
+                />
+              </div>
             </div>
           </div>
         )}
@@ -247,6 +273,7 @@ export default function ViewEditProfile(props) {
         )}
         {!hideEditAboutMe && (
           <div className="edit-profile-section">
+            <label>About Me</label>
             <textarea
               className="edit-about-textarea"
               id="aboutMe"
@@ -259,18 +286,13 @@ export default function ViewEditProfile(props) {
             />
 
             <div className="save-cancel-edit-profile">
-              <button onClick={cancelEdit}>cancel</button>
-              <button onClick={save}>save</button>
+              <button className="submit" onClick={cancelEdit}>
+                cancel
+              </button>
+              <button className="submit" onClick={save}>
+                save
+              </button>
             </div>
-          </div>
-        )}
-        {/* ############### S A V E   S E T T I N G S ################ */}
-        {hideEditAboutMe && (
-          <div className="save-cancel-edit-profile">
-            <button onClick={() => navigate(-1)}>cancel</button>
-            <button onClick={save} disabled={disableSave ? "+true" : false}>
-              save
-            </button>
           </div>
         )}
       </div>

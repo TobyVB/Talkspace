@@ -6,24 +6,15 @@ import {
   orderBy,
   onSnapshot,
 } from "firebase/firestore";
-import { useCollectionData } from "react-firebase-hooks/firestore";
-import { NavLink } from "react-router-dom";
+import { useNavigate, NavLink } from "react-router-dom";
 import { getAuth } from "firebase/auth";
 
 export default function Navbar(props) {
   const auth = getAuth();
   const db = getFirestore();
-  const notificationsRef = collection(db, "notifications");
-  const notifyQ = query(notificationsRef, orderBy("createdAt"));
-  const [notifications] = useCollectionData(notifyQ, {
-    createdAt: "createdAt",
-    unique: "unique",
-    to: "to",
-    from: "from",
-    type: "type",
-    message: "message",
-    postId: "postId",
-  });
+  const notifications = props.data.commentAlerts;
+  const user = props.data.user;
+  const navigate = useNavigate();
 
   const [navToggle, setNavToggle] = useState(false);
   const [useNavClassNone, setUseNavClassNone] = useState(true);
@@ -37,25 +28,30 @@ export default function Navbar(props) {
     setUseNavClassNone(true);
     setNavToggle(false);
     setHidden("hidden");
+    setGearClicked(false);
   }, [props.navOpen]);
 
   function closeNav() {
     setUseNavClassNone(true);
     setNavToggle(false);
     setHidden("hidden");
+    setGearClicked(false);
   }
 
   function signOut() {
     closeNav();
-    props.menuSignOut();
+    auth.signOut();
   }
 
   const [hidden, setHidden] = useState("hidden");
+  const [gearClicked, setGearClicked] = useState(false);
   const toggleHidden = () => {
     if (hidden === "hidden") {
       setHidden("");
+      setGearClicked(true);
     } else {
       setHidden("hidden");
+      setGearClicked(false);
     }
   };
 
@@ -73,6 +69,13 @@ export default function Navbar(props) {
       });
     }
   }, [auth.currentUser]);
+
+  // let notesNum;
+  // useEffect(() => {
+  //   notesNum = notifications.filter(
+  //     (notification) => notification.postCreator === user.id
+  //   ).length;
+  // }, [notifications]);
 
   return (
     <>
@@ -93,115 +96,150 @@ export default function Navbar(props) {
             </div>
 
             <div className="menu-container">
-              <div className={`header-btns-container  ${navClassNone}`}>
-                {!auth.currentUser ? (
-                  <div className="login-header-btns">
-                    <NavLink
-                      onClick={closeNav}
-                      to="login"
-                      className={({ isActive }) =>
-                        isActive ? "link active" : "link"
-                      }
-                    >
-                      Login
-                    </NavLink>
+              {!auth.currentUser ||
+              (auth.currentUser && !auth.currentUser.emailVerified) ? (
+                <div className="login-header-btns">
+                  <NavLink
+                    onClick={closeNav}
+                    to="login"
+                    className={({ isActive }) =>
+                      isActive ? "link active" : "link"
+                    }
+                  >
+                    Login
+                  </NavLink>
 
-                    <NavLink
-                      onClick={closeNav}
-                      to="register"
-                      className={({ isActive }) =>
-                        isActive ? "link active" : "link"
-                      }
+                  <NavLink
+                    onClick={closeNav}
+                    to="register"
+                    className={({ isActive }) =>
+                      isActive ? "link active" : "link"
+                    }
+                  >
+                    Register
+                  </NavLink>
+                </div>
+              ) : (
+                currentUser !== "" && (
+                  <div className="header-btns">
+                    <button
+                      style={{ marginRight: "-.3em" }}
+                      className="bell"
+                      onClick={props.toggleNotifyWindow}
                     >
-                      Register
-                    </NavLink>
-                  </div>
-                ) : (
-                  currentUser !== "" && (
-                    <div className="header-btns">
+                      🛎
+                      {auth.currentUser &&
+                        user &&
+                        notifications.filter(
+                          (notification) => notification.postCreator === user.id
+                        ).length > 0 && (
+                          <span className="notification-num">
+                            {
+                              notifications.filter(
+                                (notification) =>
+                                  notification.postCreator === user.id
+                              ).length
+                            }
+                          </span>
+                        )}
+                    </button>
+
+                    <div
+                      style={{
+                        marginTop: "-.2rem",
+                      }}
+                    >
                       <NavLink
-                        onClick={closeNav}
-                        to={"profile/" + currentUser.id.toString()}
-                        className={({ isActive }) =>
-                          isActive ? "link active" : "link"
-                        }
-                      >
-                        Profile
-                      </NavLink>
-                      <NavLink
+                        style={{
+                          fontSize: "1.25rem",
+                        }}
                         onClick={closeNav}
                         to="createPost"
                         className={({ isActive }) =>
                           isActive ? "link active" : "link"
                         }
                       >
-                        Create Post
-                      </NavLink>
-
-                      {/* S E T T I N G S   D R O P D O W N */}
-
-                      <div>
-                        <a className="link" onClick={toggleHidden}>
-                          Settings ⬇
-                        </a>
-                        <div className={`settings-buttons ${hidden}`}>
-                          <NavLink
-                            onClick={closeNav}
-                            className={"settings-link"}
-                            to="changeUsername"
-                          >
-                            change username
-                          </NavLink>
-                          <NavLink
-                            onClick={closeNav}
-                            className={"settings-link"}
-                            to="changePassword"
-                          >
-                            change password
-                          </NavLink>
-                          <NavLink
-                            onClick={closeNav}
-                            className={"settings-link"}
-                            to="deleteAccount"
-                          >
-                            delete account
-                          </NavLink>
-                        </div>
-                      </div>
-                      <NavLink className="link" to="login" onClick={signOut}>
-                        SignOut
+                        +
                       </NavLink>
                     </div>
-                  )
-                )}
-              </div>
-              {auth.currentUser && auth.currentUser.emailVerified && (
-                <button className="bell" onClick={props.toggleNotifyWindow}>
-                  🛎
-                  <span className="notification-num">
-                    {notifications &&
-                      notifications.filter(
-                        (notification) =>
-                          auth.currentUser.uid === notification.to
-                      ).length > 0 &&
-                      notifications.filter(
-                        (notification) =>
-                          auth.currentUser.uid === notification.to
-                      ).length}
-                  </span>
-                </button>
+                    <NavLink
+                      onClick={closeNav}
+                      to={"profile/" + currentUser.id.toString()}
+                      className={({ isActive }) =>
+                        isActive ? "link active" : "link"
+                      }
+                    >
+                      <img
+                        className="mini-defaultPic"
+                        onClick={showMenu}
+                        src={currentUser.defaultPic}
+                      />
+                    </NavLink>
+
+                    {/* S E T T I N G S   D R O P D O W N */}
+
+                    <div>
+                      <a
+                        style={
+                          gearClicked
+                            ? {
+                                userSelect: "none",
+                                display: "inline-block",
+                                animation: "gearAnimation .35s 1",
+                                fontSize: "1.25rem",
+                                cursor: "pointer",
+                                color: "rgba(0,0,0,1)",
+                              }
+                            : {
+                                fontSize: "1.25rem",
+                                cursor: "pointer",
+                              }
+                        }
+                        onClick={toggleHidden}
+                      >
+                        ⚙️
+                      </a>
+                      <div className={`settings-buttons ${hidden}`}>
+                        <NavLink
+                          onClick={closeNav}
+                          className={"settings-link"}
+                          to="editProfile"
+                        >
+                          edit profile
+                        </NavLink>
+                        <NavLink
+                          onClick={closeNav}
+                          className={"settings-link"}
+                          to="changeUsername"
+                        >
+                          change username
+                        </NavLink>
+                        <NavLink
+                          onClick={closeNav}
+                          className={"settings-link"}
+                          to="changePassword"
+                        >
+                          change password
+                        </NavLink>
+                        <NavLink
+                          className="settings-link link"
+                          to="/"
+                          onClick={signOut}
+                        >
+                          log out
+                        </NavLink>
+                        <NavLink
+                          onClick={closeNav}
+                          className={"settings-link"}
+                          to="deleteAccount"
+                        >
+                          delete account
+                        </NavLink>
+                      </div>
+                    </div>
+                  </div>
+                )
               )}
-              <div className="nav-menu">
-                {auth.currentUser ? (
-                  <img
-                    className="mini-defaultPic"
-                    onClick={showMenu}
-                    src={currentUser.defaultPic}
-                  />
-                ) : (
-                  <span onClick={showMenu}>&#8942;</span>
-                )}
-              </div>
             </div>
           </div>
         </header>

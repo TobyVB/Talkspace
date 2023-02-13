@@ -44,6 +44,12 @@ export default function Clock(props) {
     if (hour === 0) {
       hour = 12;
     }
+    if (minute < 10 && minute !== 0) {
+      minute = "0" + minute;
+    }
+    if (minute === 0) {
+      minute = "00";
+    }
   }
 
   return (

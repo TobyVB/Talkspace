@@ -33,16 +33,16 @@ export default function ChangePassword(props) {
   return (
     <div className="page-body">
       <h1>Reset Password</h1>
-      <button onClick={() => navigate(-1)}>Back</button>
       <input
         className="reset-password-input"
+        placeholder="enter new password"
         type="password"
         name="password"
         value={password}
         onChange={(event) => setPassword(event.target.value)}
       />
-
-      <button onClick={update}>save</button>
+      <button onClick={() => navigate(-1)}>Back</button>
+      <button onClick={update}>update</button>
       {success && <p>SUCCESS!</p>}
     </div>
   );

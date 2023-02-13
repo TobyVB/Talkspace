@@ -2,8 +2,6 @@ import { useState } from "react";
 import DeleteComment from "./DeleteComment.js";
 import ContentHeader from "./ContentHeader.js";
 
-import Clock from "./Utils/Clock.js";
-
 export default function Comment(props) {
   const [togglerHidden, setTogglerHidden] = useState(true);
   const [options, setOptions] = useState(false);
@@ -11,6 +9,12 @@ export default function Comment(props) {
   function showOptions() {
     setOptions(true);
   }
+
+  const forContentHeader = {
+    username: props.comment.username,
+    defaultPic: props.comment.defaultPic,
+    id: props.comment.by,
+  };
 
   return (
     <div
@@ -34,7 +38,7 @@ export default function Comment(props) {
       )}
       <div style={{ display: "flex", flexDirection: "column", width: "100%" }}>
         <ContentHeader
-          profile={props.comment}
+          profile={forContentHeader}
           createdAt={props.comment.createdAt}
         />
         <div
@@ -64,7 +68,10 @@ export default function Comment(props) {
             }}
           >
             <div onClick={() => setOptions(false)} style={{ margin: "auto" }}>
-              <DeleteComment createdAt={props.comment.createdAt} />
+              <DeleteComment
+                createdAt={props.comment.createdAt}
+                comment={props.comment}
+              />
             </div>
           </div>
         )}

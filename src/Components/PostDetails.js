@@ -122,41 +122,41 @@ export default function ViewPost(props) {
   // ######################################
   return (
     <>
-      {post && profile && auth.currentUser && comments && (
+      {post && profile && comments && (
         <div className="page-body" style={{ paddingTop: "5em" }}>
-          <div style={{ display: "flex", justifyContent: "space-between" }}>
-            <button className="profile-options" onClick={followPost}>
-              {post.follows.includes(user.id) ? "- UNFOLLOW" : "+ FOLLOW"}
-            </button>
-            {post.uid === user.uid && (
-              <div>
-                <button className="profile-options" onClick={editPost}>
-                  EDIT
-                </button>
-                <button className="profile-options" onClick={deletePost}>
-                  DELETE
-                </button>
-              </div>
-            )}
-          </div>
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              margin: "0em 0 1em 0",
-              border: "1px solid black",
-              borderRadius: "3px",
-              boxShadow: "0px 0px 5px black",
-            }}
-          >
-            <ContentHeader profile={profile} createdAt={post.createdAt} />
-            <div className="post-title">{post.title}</div>
-            <div className="post-text">
-              <div class="post-text">{post && parse(post.text)}</div>
+          {auth.currentUser && (
+            <div style={{ display: "flex", justifyContent: "space-between" }}>
+              <button className="profile-options" onClick={followPost}>
+                {post.follows.includes(user.id) ? "- UNFOLLOW" : "+ FOLLOW"}
+              </button>
+              {post.uid === user.uid && (
+                <div>
+                  <button className="profile-options" onClick={editPost}>
+                    EDIT
+                  </button>
+                  <button className="profile-options" onClick={deletePost}>
+                    DELETE
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+          <div className="post-page-post-container">
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                borderRadius: "3px",
+              }}
+            >
+              <ContentHeader profile={profile} createdAt={post.createdAt} />
+              <div className="post-title">{post.title}</div>
+              <div className="post-text">{post && parse(post.text)}</div>
+              <div ref={myRef}></div>
             </div>
           </div>
 
-          <hr ref={myRef} style={{ margin: "1.5em 0", border: "none" }} />
+          <hr style={{ margin: "1.5em 0", border: "none" }} />
           <Comments
             alertCommentId={state && state.from}
             data={data}

@@ -6,14 +6,8 @@ import { useAuthState } from "react-firebase-hooks/auth";
 import { getAuth } from "firebase/auth";
 import { useLoaderData } from "react-router-dom";
 
-import { useState, useEffect } from "react";
-import {
-  getFirestore,
-  onSnapshot,
-  collection,
-  query,
-  orderBy,
-} from "firebase/firestore";
+import { useState } from "react";
+import { getFirestore } from "firebase/firestore";
 
 const SharedLayout = () => {
   const data = useLoaderData();
@@ -22,58 +16,26 @@ const SharedLayout = () => {
   useAuthState(auth);
   const [notifyWindow, setNotifyWindow] = useState(false);
   const [navOpen, setNavOpen] = useState(false);
-  const [allowLogin, setAllowLogin] = useState(true);
-  const [loginCompleted, setLoginCompleted] = useState(false);
 
   function toggleNotifyWindow() {
     setNotifyWindow((prevNotifyWindow) => !prevNotifyWindow);
+    if (!notifyWindow) {
+      // prevent body from scrolling
+      document.body.style.overflow = "hidden";
+    } else {
+      // allow body to scroll again
+      document.body.style.overflow = "auto";
+    }
   }
   function triggerNav() {
     setNavOpen((prev) => !prev);
-  }
-  useEffect(() => {
-    if (loginCompleted === true) {
-      if (auth.currentUser && !auth.currentUser.emailVerified) {
-        auth.signOut();
-        setAllowLogin(true);
-      }
-      setLoginCompleted(false);
-    }
-  }, [loginCompleted]);
-  updateAccess();
-  function updateAccess() {
-    if (auth.currentUser && allowLogin === true) {
-      const usersRef = collection(db, "users");
-      const q = query(usersRef, orderBy("createdAt"));
-      onSnapshot(q, (snapshot) => {
-        let users = [];
-        snapshot.docs.forEach((doc) => {
-          users.push({ ...doc.data() });
-        });
-        users.forEach((user) => {
-          if (auth.currentUser && user.uid === auth.currentUser.uid) {
-            localStorage.setItem("userData", user);
-          }
-        });
-      });
-      console.log("user has been updated from app.js");
-      setAllowLogin(false);
-      setLoginCompleted(true);
-    }
-  }
-  function exit() {
-    auth.signOut();
-    setAllowLogin(true);
-  }
-  function menuSignOut() {
-    exit();
   }
 
   return (
     <div className="App">
       <Navbar
+        data={data}
         toggleNotifyWindow={toggleNotifyWindow}
-        menuSignOut={menuSignOut}
         navOpen={navOpen}
       />
       <div onClick={triggerNav}>

@@ -7,13 +7,14 @@ import {
   doc,
   setDoc,
 } from "firebase/firestore";
-import { useLocation, NavLink } from "react-router-dom";
+import { useLocation, NavLink, useNavigate } from "react-router-dom";
 
 export default function CreateComment(props) {
   const auth = getAuth();
   const db = getFirestore();
   const [formValue, setFormValue] = useState("");
   const location = useLocation();
+  const navigate = useNavigate();
 
   function createComment() {
     const newCommentRef = doc(collection(db, "comments"));
@@ -27,23 +28,26 @@ export default function CreateComment(props) {
       defaultPic: props.user.defaultPic,
       username: props.user.username,
     });
-    const newAlertRef = doc(collection(db, "commentAlerts"));
-    setDoc(newAlertRef, {
-      body: formValue,
-      fromId: props.user.id,
-      fromUsername: props.user.username,
-      post: props.post.id,
-      postCreator: props.postCreator.id,
-      createdAt: serverTimestamp(),
-      id: newAlertRef.id,
-      commentId: newCommentRef.id,
-    });
+    if (props.post.uid !== auth.currentUser.uid) {
+      const newAlertRef = doc(collection(db, "commentAlerts"));
+      setDoc(newAlertRef, {
+        body: formValue,
+        fromId: props.user.id,
+        fromUsername: props.user.username,
+        post: props.post.id,
+        postCreator: props.postCreator.id,
+        createdAt: serverTimestamp(),
+        id: newAlertRef.id,
+        commentId: newCommentRef.id,
+      });
+    }
     setFormValue("");
   }
+  console.log(location.pathname);
 
   return (
     <>
-      {auth.currentUser && (
+      {auth.currentUser ? (
         <div>
           <textarea
             style={{ width: "100%" }}
@@ -61,12 +65,23 @@ export default function CreateComment(props) {
               textDecoration: "none",
             }}
             to={location}
-            onClick={createComment}
+            // onClick={createComment}
             disabled={!formValue}
           >
-            <button className="submit">ENTER</button>
+            <button onClick={createComment} className="submit">
+              ENTER
+            </button>
           </NavLink>
         </div>
+      ) : (
+        <button
+          className="submit"
+          onClick={() =>
+            navigate("/login", { state: { path: location.pathname } })
+          }
+        >
+          Sign in to comment
+        </button>
       )}
     </>
   );
