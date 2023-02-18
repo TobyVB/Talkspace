@@ -45,11 +45,7 @@ export default function Homepage() {
               cursor: "pointer",
               borderRadius: "3px",
             }}
-            onClick={() => viewPost(props.post.id)}
           >
-            {/* <div>
-              <Clock createdAt={props.post.createdAt} />
-            </div> */}
             <ContentHeader
               profile={props.profile}
               createdAt={props.post.createdAt}
@@ -77,19 +73,25 @@ export default function Homepage() {
           style={{
             display: "flex",
             flexDirection: "column",
-            cursor: "pointer",
           }}
-          onClick={() => viewPost(props.post.id)}
         >
           <ContentHeader
             profile={props.profile}
             createdAt={props.post.createdAt}
           />
-          <div className="post-title">{props.post.title}</div>
+          <div
+            onClick={() => viewPost(props.post.id)}
+            style={{ cursor: "pointer" }}
+            className="post-title"
+          >
+            {props.post.title}
+          </div>
 
           <div
+            onClick={() => viewPost(props.post.id)}
             style={{
               overflow: "none",
+              cursor: "pointer",
             }}
             className="post-text"
           >

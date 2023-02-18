@@ -123,7 +123,7 @@ export default function ProfileDetails() {
                   <div
                     className="profile-picture"
                     style={{
-                      border: "7px solid rgb(212, 212, 212)",
+                      border: "7px solid white",
                       backgroundColor: "rgba(0, 0, 0, .5)",
                       borderRadius: "100%",
                       backgroundSize: "cover",
