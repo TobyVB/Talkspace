@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   getFirestore,
   collection,
@@ -6,7 +6,7 @@ import {
   orderBy,
   onSnapshot,
 } from "firebase/firestore";
-import { useNavigate, NavLink } from "react-router-dom";
+import { useNavigate, NavLink, useLocation } from "react-router-dom";
 import { getAuth } from "firebase/auth";
 
 export default function Navbar(props) {
@@ -15,6 +15,7 @@ export default function Navbar(props) {
   const notifications = props.data.commentAlerts;
   const user = props.data.user;
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [navToggle, setNavToggle] = useState(false);
   const [useNavClassNone, setUseNavClassNone] = useState(true);
@@ -103,7 +104,7 @@ export default function Navbar(props) {
                     onClick={closeNav}
                     to="login"
                     className={({ isActive }) =>
-                      isActive ? "link active" : "link"
+                      isActive ? "link active logLink" : "link logLink"
                     }
                   >
                     Login
@@ -113,7 +114,7 @@ export default function Navbar(props) {
                     onClick={closeNav}
                     to="register"
                     className={({ isActive }) =>
-                      isActive ? "link active" : "link"
+                      isActive ? "link active logLink" : "link logLink"
                     }
                   >
                     Register
@@ -151,16 +152,13 @@ export default function Navbar(props) {
                       }}
                     >
                       <NavLink
-                        style={{
-                          fontSize: "1.25rem",
-                        }}
                         onClick={closeNav}
                         to="createPost"
                         className={({ isActive }) =>
                           isActive ? "link active" : "link"
                         }
                       >
-                        +
+                        <span className="plus">+</span>
                       </NavLink>
                     </div>
                     <NavLink
@@ -171,7 +169,7 @@ export default function Navbar(props) {
                       }
                     >
                       <img
-                        className="mini-defaultPic"
+                        className="mini-defaultPic m-dp-size"
                         onClick={showMenu}
                         src={currentUser.defaultPic}
                       />
@@ -187,7 +185,6 @@ export default function Navbar(props) {
                                 userSelect: "none",
                                 display: "inline-block",
                                 animation: "gearAnimation .35s 1",
-                                fontSize: "1.25rem",
                                 cursor: "pointer",
                                 color: "rgba(0,0,0,1)",
                               }
@@ -198,7 +195,7 @@ export default function Navbar(props) {
                         }
                         onClick={toggleHidden}
                       >
-                        ⚙️
+                        <span className="gear">⚙️</span>
                       </a>
                       <div className={`settings-buttons ${hidden}`}>
                         <NavLink

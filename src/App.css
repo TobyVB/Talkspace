@@ -9,13 +9,17 @@ body {
   letter-spacing: 0.025rem;
   color: rgba(255, 255, 255, 0.684);
   background-color: black;
+  font-size: 16px;
+}
+input {
+  font-size: 16px;
 }
 .page-body {
   color: rgba(0, 0, 0, 0.7);
   /* background-color: rgb(212, 212, 212); */
   background-color: white;
   max-width: 100vw;
-  padding-top: 51px;
+  padding-top: 76px;
   padding-bottom: 5em;
   min-height: 90vh;
   animation-name: pageAnimation;
@@ -44,7 +48,7 @@ header {
   border-bottom: 1px solid rgb(62, 166, 255);
   padding: 0 1em;
   justify-content: space-between;
-  height: 50px;
+  height: 75px;
 }
 .menu-container {
   display: flex;
@@ -88,6 +92,7 @@ hr {
   width: 100%;
 }
 textarea {
+  font-size: 16px;
   background: transparent;
   font-family: sans-serif;
   letter-spacing: 0.03em;
@@ -104,18 +109,20 @@ textarea {
   object-fit: cover;
   cursor: pointer;
 }
+.m-dp-size {
+  height: 35px;
+  width: 35px;
+}
 /* ------------------------------------------------ */
 .time {
   display: flex;
   gap: 1em;
-  font-size: 0.85rem;
   margin-bottom: 0 auto;
   align-self: center;
   margin: 0;
   justify-content: right;
 }
 .create-comment {
-  font-size: 0.85rem;
   padding: 0.5em;
   border-radius: 3px;
   border: 1px solid black;
@@ -213,11 +220,9 @@ input {
 .post-author {
   margin-left: 1.5em;
   cursor: pointer;
-  font-size: 0.75rem;
   color: rgba(255, 255, 255, 0.5);
 }
 .linkPost {
-  font-size: 0.8rem;
   width: 100%;
   background: rgba(0, 0, 0, 0.5);
   padding: 0.2em 1em;
@@ -231,14 +236,12 @@ input {
 /* ############# H O M E P A G E  ############# */
 /* ############################################ */
 .homepage-post {
-  max-height: 150px;
   overflow: hidden;
   transition: 0.2s;
 }
 .profile-link {
   cursor: pointer;
   display: inline-block;
-  font-size: 0.7rem;
   color: rgba(255, 255, 255, 0.6);
 }
 .post-link {
@@ -271,10 +274,9 @@ input {
   display: block;
   width: 100%;
   margin: auto;
-  padding: 0.25em 0.8em;
+  padding: 0.5em 0.8em;
   border-radius: 3px;
   letter-spacing: 0.07rem;
-  font-size: 0.8rem;
 }
 /* ############################################ */
 /* ################ R E P L Y ################# */
@@ -286,7 +288,7 @@ input {
 }
 .reply-btns {
   display: flex;
-  justify-content: end;
+  justify-content: flex-end;
   flex-direction: column-reverse;
 }
 .cancel-reply {
@@ -373,7 +375,7 @@ input {
 .settings-buttons {
   display: flex;
   flex-direction: column;
-  top: 65px;
+  top: 90px;
   right: 15px;
   margin: 0;
   border-radius: 3px;
@@ -446,9 +448,28 @@ input {
 }
 /* ################## M E D I A   Q U E R I E S ################## */
 @media screen and (max-width: 700px) {
+  .homepage-post {
+    max-height: 250px;
+  }
+  .mini-defaultPic {
+    height: 50px;
+    width: 50px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+  }
+  .plus {
+    font-size: 2.5rem;
+  }
+  .bell {
+    font-size: 1.75rem;
+    padding-right: 0.25em;
+  }
+  .gear {
+    font-size: 2rem;
+  }
   .page-body {
-    padding-left: 10%;
-    padding-right: 10%;
+    padding-left: 3%;
+    padding-right: 3%;
   }
   .profile-header {
     display: "flex";
@@ -487,13 +508,13 @@ input {
   }
   .notifications {
     height: 50vh;
-    width: 60vw;
-    left: 20vw;
-    top: 20vh;
+    width: 80vw;
+    left: 10vw;
+    top: 10vh;
   }
   .notification {
-    width: 66vw;
-    left: 17vw;
+    width: 80vw;
+    left: 10vw;
   }
   .profile-picture {
     height: 125px;
@@ -512,7 +533,6 @@ input {
   }
   .post-text {
     padding: 0.5em 1em;
-    font-size: 0.75rem;
   }
   .comment-text {
     width: 100%;
@@ -528,7 +548,7 @@ input {
     color: rgba(0, 0, 0, 0.8);
     width: 100%;
     padding: 1em 1em 0em 0.8em;
-    font-size: 0.9rem;
+    font-size: 1.25rem;
     font-weight: bold;
   }
   .hide-small-view {
@@ -536,6 +556,15 @@ input {
   }
 }
 @media screen and (min-width: 700px) {
+  .homepage-post {
+    max-height: 150px;
+  }
+  .plus {
+    font-size: 1.25rem;
+  }
+  .gear {
+    font-size: 1.5rem;
+  }
   .hide-big-view {
     display: none;
   }
@@ -652,6 +681,9 @@ button,
   color: rgba(0, 0, 0, 1);
   transition: 0.1s;
 }
+.logLink {
+  color: rgba(255, 255, 255, 0.8);
+}
 button {
   color: rgba(0, 0, 0, 0.8);
 }
@@ -668,7 +700,7 @@ button {
 }
 .header-btns {
   display: flex;
-  gap: 1.25em;
+  gap: 2em;
   align-items: center;
 }
 .hidden {
@@ -755,10 +787,10 @@ iframe {
   color: black;
 }
 header .link {
-  font-size: 0.8rem;
+  /* font-size: 0.8rem; */
 }
 .settings-link {
-  font-size: 0.8rem;
+  /* font-size: 0.8rem; */
 }
 .homepage-post .post-text {
   background-image: -webkit-linear-gradient(
@@ -785,4 +817,7 @@ header .link {
     padding-left: 30%;
     padding-right: 30%;
   }
+}
+.ql-editor {
+  font-size: 16px;
 }

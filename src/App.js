@@ -7,7 +7,13 @@ import {
   createRoutesFromElements,
   RouterProvider,
 } from "react-router-dom";
-import { collection, getDocs, getFirestore, orderBy } from "firebase/firestore";
+import {
+  collection,
+  getDocs,
+  getFirestore,
+  orderBy,
+  onSnapshot,
+} from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 
 // P A G E S
