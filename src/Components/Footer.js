@@ -11,8 +11,17 @@ const Footer = (props) => {
       <div className="footer-about">
         <p>Link to about page</p>
         <p>Link to FAQ</p>
-        <p>GitHub</p>
-        <NavLink to="profile">Profiles</NavLink>
+        <p>
+          <a
+            style={{ color: "rgba(255,255,255,.7)", textDecoration: "none" }}
+            href="https://github.com/TobyVB/Talkspace"
+          >
+            GitHub
+          </a>
+        </p>
+        <NavLink to="profile">
+          <p style={{ color: "rgba(255,255,255,.7)" }}>Profiles</p>
+        </NavLink>
       </div>
     </div>
   );
