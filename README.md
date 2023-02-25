@@ -1,5 +1,5 @@
 <h1>The TalkSpace</h1>
-See it here 👉 <a href="https://fir-practice-cace4.web.app/">The TalkSpace</a>
+<p>See it here 👉 <a href="https://fir-practice-cace4.web.app/">The TalkSpace</a></p>
 <p>This is an ongoing project I am working on. It is a social media site inspired by Reddit, Facebook, and Myspace.</p>
 
 Features I plan to add:
