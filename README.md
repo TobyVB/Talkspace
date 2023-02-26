@@ -1,6 +1,8 @@
 <h1>The TalkSpace</h1>
 <p>See it here 👉 <a href="https://fir-practice-cace4.web.app/">The TalkSpace</a></p>
-<p>This is an ongoing project I am working on. It is a social media site inspired by Reddit, Facebook, and Myspace.</p>
+<p>This is an ongoing project I am working on. It is a social media site inspired by Reddit, Facebook, Myspace, Quora and Github</p>
+<h2>Why make this?</h2>
+<p>To apply and practice knowledge of React, NOSQL(Firebase) database data flow, and routing</p>
 
 <h2>🔧  Tools used:</h2>
 
