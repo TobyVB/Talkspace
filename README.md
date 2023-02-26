@@ -4,6 +4,18 @@
 <h2>Why make this?</h2>
 <p>To apply and practice knowledge of React, NOSQL(Firebase) database data flow, and routing</p>
 
+<h2>How does it work in it's current stage?</h2>
+<ul>
+    <li>Navigate to the register page and make an account</li>
+    <li>Verify account by checking email</li>
+    <li>Login in to account</li>
+    <li>Click on a post on the homepage to view it</li>
+    <li>Comment on the post</li>
+    <li>Click on authors name or picture to see their profile</li>
+    <li>Click the plus icon in the navbar to create a post</li>
+    <li>Click the bell icon in the navbar to quickly see if users have commented on your post</li>
+</ul>
+
 <h2>🔧  Tools used:</h2>
 
 <ul>
