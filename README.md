@@ -2,16 +2,24 @@
 <p>See it here 👉 <a href="https://fir-practice-cace4.web.app/">The TalkSpace</a></p>
 <p>This is an ongoing project I am working on. It is a social media site inspired by Reddit, Facebook, and Myspace.</p>
 
-Features I plan to add:
+<h2>🔧  Tools used:</h2>
 
 <ul>
-  <li>Load up to ~ 10-20 posts on any given page, then load in more as user scrolls</li>
-  <li>Improved security</li>
+  <li>HTML5, CSS3, JavaScript</li>
+  <li>⚛️ React, React Router</li>
+  <li>🔥 Firebase</li>
+  </ul>
+
+<h2>✨ Planned Features:</h2>
+
+<ul>
   <li>Instant messaging chat</li>
   <li>Reddit style nested comments</li>
   <li>User can can add another user’s or their own post to folders they create</li>
   <li>User can be friends with another user</li>
-  <li>User can choose which folder to be their default profile.</li>
+  <li>User can choose which folder to show by default in their profile.</li>
+  <li>User can opt to make post public or private.</li>
+  <li>User can create groups, where members in group can work on a post collectively</li>
 </ul>
 
 <hr margin-bottom="2em"/>
