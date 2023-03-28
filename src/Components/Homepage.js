@@ -134,7 +134,8 @@ export default function Homepage() {
               posts.map((post, index) =>
                 profiles.map(
                   (profile) =>
-                    profile.uid === post.uid && (
+                    profile.uid === post.uid &&
+                    !profile.private && (
                       <div
                         key={index}
                         style={{
