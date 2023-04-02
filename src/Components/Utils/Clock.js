@@ -53,7 +53,7 @@ export default function Clock(props) {
   }
 
   return (
-    <div style={{ fontSize: ".85rem" }} className={`time`}>
+    <div className={`time`}>
       <p>{`${hour}:${minute}${timeOfDay}, ${day} ${month} ${year}`}</p>
     </div>
   );

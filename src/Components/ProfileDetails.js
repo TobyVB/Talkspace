@@ -143,13 +143,7 @@ export default function ProfileDetails() {
                         justifyContent: "right",
                       }}
                     >
-                      <p
-                        style={{
-                          fontSize: ".7rem",
-                        }}
-                      >
-                        user since:
-                      </p>
+                      <p>user since:</p>
                       <Clock createdAt={profile.createdAt} />
                     </div>
                   </div>
