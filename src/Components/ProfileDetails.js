@@ -135,7 +135,7 @@ export default function ProfileDetails() {
                 </div>
                 <div className="profile-jumbotron">
                   <div className="profile-info-section">
-                    <p style={{ fontSize: ".8rem" }}>{profile.aboutMe}</p>
+                    <p>"{profile.aboutMe}"</p>
                     <div
                       style={{
                         display: "flex",

@@ -551,6 +551,12 @@ input {
   }
 }
 @media screen and (min-width: 700px) {
+  .mini-defaultPic {
+    height: 50px;
+    width: 50px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+  }
   .homepage-post {
     max-height: 150px;
   }
@@ -572,7 +578,6 @@ input {
     padding: 1rem;
   }
   .content-header-username {
-    font-size: 0.85rem;
     padding: 0;
   }
   .post-title {
