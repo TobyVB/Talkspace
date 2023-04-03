@@ -536,7 +536,6 @@ input {
     width: 100%;
     background: rgba(255, 255, 255, 0.2);
     padding: 1rem;
-    font-size: 0.8rem;
   }
   .content-header-username {
     padding: 0;
@@ -572,7 +571,6 @@ input {
     width: 100%;
     background: rgba(255, 255, 255, 0.2);
     padding: 1rem;
-    font-size: 0.8rem;
   }
   .content-header-username {
     font-size: 0.85rem;
