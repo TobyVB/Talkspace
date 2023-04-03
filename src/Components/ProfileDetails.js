@@ -78,7 +78,7 @@ export default function ProfileDetails() {
         >
           <ContentHeader profile={poster[0]} createdAt={props.post.createdAt} />
           <div className="post-title">{props.post.title}</div>
-          <div className="post-text">
+          <div className="post-text" style={{ overflow: "scroll" }}>
             {props.post && parse(props.post.text)}
           </div>
         </div>

@@ -90,7 +90,8 @@ export default function Homepage() {
           <div
             onClick={() => viewPost(props.post.id)}
             style={{
-              overflow: "none",
+              overflowX: "scroll",
+              overflowY: "none",
               cursor: "pointer",
             }}
             className="post-text"

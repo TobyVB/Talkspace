@@ -151,7 +151,9 @@ export default function ViewPost(props) {
             >
               <ContentHeader profile={profile} createdAt={post.createdAt} />
               <div className="post-title">{post.title}</div>
-              <div className="post-text">{post && parse(post.text)}</div>
+              <div className="post-text" style={{ overflow: "scroll" }}>
+                {post && parse(post.text)}
+              </div>
               <div ref={myRef}></div>
             </div>
           </div>
