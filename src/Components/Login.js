@@ -39,6 +39,12 @@ export default function Login() {
               setNoError(false);
               setEmailUnverified(true);
               console.log("email isn't verified");
+              setLoading(false);
+              setTimeout(() => {
+                setLoading(false);
+                setNoError(true);
+                setEmailUnverified(false);
+              }, 5000);
             });
           } else {
             setNoError(true);
@@ -52,7 +58,8 @@ export default function Login() {
         }
       );
     } catch {
-      console.log("error with handleSignup function in Register.js");
+      console.log("Invalid credentials");
+      setLoading(false);
     }
   }
 
