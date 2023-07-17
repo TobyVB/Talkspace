@@ -170,7 +170,7 @@ export default function ProfileDetails() {
                     </button>
                   </div>
                   {usersSelected ? (
-                    <div>
+                    <div style={{ marginTop: "5em" }}>
                       <h4>{`${profile.username}'s`}</h4>
                       <div className="foundUser-posts">
                         {posts.filter((post) => post.uid === profile.uid)
@@ -188,7 +188,7 @@ export default function ProfileDetails() {
                       </div>
                     </div>
                   ) : (
-                    <div>
+                    <div style={{ marginTop: "5em" }}>
                       <h4>Following</h4>
                       <div className="foundUser-posts">
                         {posts.filter((post) =>
