@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   useNavigate,
   useLoaderData,
@@ -126,7 +126,11 @@ export default function ViewPost(props) {
         <div className="page-body" style={{ paddingTop: "5em" }}>
           {auth.currentUser && (
             <div style={{ display: "flex", justifyContent: "space-between" }}>
-              <button className="profile-options" onClick={followPost}>
+              <button
+                style={{ marginTop: "2em" }}
+                className="profile-options"
+                onClick={followPost}
+              >
                 {post.follows.includes(user.id) ? "- UNFOLLOW" : "+ FOLLOW"}
               </button>
               {post.uid === user.uid && (
