@@ -81,7 +81,9 @@ export default function Homepage() {
           />
           <div
             onClick={() => viewPost(props.post.id)}
-            style={{ cursor: "pointer" }}
+            style={{
+              cursor: "pointer",
+            }}
             className="post-title"
           >
             {props.post.title}
