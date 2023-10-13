@@ -1,3 +1,4 @@
+import { UilBell, UilPlusCircle, UilSetting } from "@iconscout/react-unicons";
 import { useEffect, useRef, useState } from "react";
 import {
   getFirestore,
@@ -128,7 +129,7 @@ export default function Navbar(props) {
                       className="bell"
                       onClick={props.toggleNotifyWindow}
                     >
-                      🛎
+                      <UilBell color="white" size="2.2rem" />
                       {auth.currentUser &&
                         user &&
                         notifications.filter(
@@ -158,7 +159,9 @@ export default function Navbar(props) {
                           isActive ? "link active" : "link"
                         }
                       >
-                        <span className="plus">+</span>
+                        <span className="plus">
+                          <UilPlusCircle size="2.2rem" />
+                        </span>
                       </NavLink>
                     </div>
                     <NavLink
@@ -184,9 +187,8 @@ export default function Navbar(props) {
                             ? {
                                 userSelect: "none",
                                 display: "inline-block",
-                                animation: "gearAnimation .35s 1",
+                                animation: "gearAnimation .42s 1",
                                 cursor: "pointer",
-                                color: "rgba(0,0,0,1)",
                               }
                             : {
                                 fontSize: "1.25rem",
@@ -195,7 +197,9 @@ export default function Navbar(props) {
                         }
                         onClick={toggleHidden}
                       >
-                        <span className="gear">⚙️</span>
+                        <span className="gear">
+                          <UilSetting size="2.2rem" />
+                        </span>
                       </a>
                       <div className={`settings-buttons ${hidden}`}>
                         <NavLink
