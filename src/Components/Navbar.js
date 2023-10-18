@@ -129,7 +129,7 @@ export default function Navbar(props) {
                       className="bell"
                       onClick={props.toggleNotifyWindow}
                     >
-                      <UilBell color="white" size="2.2rem" />
+                      <UilBell color="white" size="2rem" />
                       {auth.currentUser &&
                         user &&
                         notifications.filter(
@@ -160,7 +160,7 @@ export default function Navbar(props) {
                         }
                       >
                         <span className="plus">
-                          <UilPlusCircle size="2.2rem" />
+                          <UilPlusCircle size="2rem" />
                         </span>
                       </NavLink>
                     </div>
@@ -198,7 +198,7 @@ export default function Navbar(props) {
                         onClick={toggleHidden}
                       >
                         <span className="gear">
-                          <UilSetting size="2.2rem" />
+                          <UilSetting size="2rem" />
                         </span>
                       </a>
                       <div className={`settings-buttons ${hidden}`}>
